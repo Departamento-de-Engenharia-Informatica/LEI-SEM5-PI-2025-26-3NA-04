@@ -10,10 +10,13 @@ using DDDSample1.Infrastructure.Categories;
 using DDDSample1.Infrastructure.Products;
 using DDDSample1.Infrastructure.Families;
 using DDDSample1.Infrastructure.Shared;
+using DDDSample1.Infrastructure.Storage;
 using DDDSample1.Domain.Shared;
 using DDDSample1.Domain.Categories;
 using DDDSample1.Domain.Products;
 using DDDSample1.Domain.Families;
+using DDDSample1.Domain.Storage;
+using DDDSample1.Application.Services;
 
 namespace DDDSample1
 {
@@ -83,6 +86,10 @@ namespace DDDSample1
 
             services.AddTransient<IFamilyRepository,FamilyRepository>();
             services.AddTransient<FamilyService>();
+
+            services.AddTransient<IFacilityRepository, FacilityRepository>();
+            services.AddTransient<FacilityService>();
+
         }
     }
 }
