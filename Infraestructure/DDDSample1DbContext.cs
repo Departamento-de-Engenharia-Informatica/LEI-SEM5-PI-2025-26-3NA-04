@@ -6,6 +6,8 @@ using DDDSample1.Domain.Storage;
 using DDDSample1.Infrastructure.Categories;
 using DDDSample1.Infrastructure.Products;
 using DDDSample1.Infrastructure.Storage;
+using DDDSample1.Domain.VesselTypes;
+using DDDSample1.Infrastructure.VesselTypes;
 
 namespace DDDSample1.Infrastructure
 {
@@ -19,6 +21,8 @@ namespace DDDSample1.Infrastructure
 
         public DbSet<Facility> Facilities { get; set; }
 
+        public DbSet<VesselType> VesselTypes { get; set; }
+
         public DDDSample1DbContext(DbContextOptions options) : base(options)
         {
 
@@ -30,6 +34,7 @@ namespace DDDSample1.Infrastructure
             modelBuilder.ApplyConfiguration(new ProductEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new FamilyEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new FacilityEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new VesselTypeEntityTypeConfiguration());
         }
     }
 }
