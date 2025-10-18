@@ -11,6 +11,12 @@ namespace DDDSample1.Infrastructure.Storage
         {
             builder.ToTable("Facilities", SchemaNames.DDDSample1);
             builder.HasKey(f => f.Id);
+
+            
+            builder.HasDiscriminator<string>("FacilityType")
+                   .HasValue<Yard>("Yard")
+                   .HasValue<Warehouse>("Warehouse");
+
         }
     }
 }

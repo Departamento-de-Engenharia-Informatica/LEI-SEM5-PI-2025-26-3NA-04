@@ -4,9 +4,8 @@ using DDDSample1.Domain.Shared;
 
 namespace DDDSample1.Domain.Storage
 {
-    public class Facility : Entity<FacilityId>, IAggregateRoot
+    public abstract class Facility : Entity<FacilityId>, IAggregateRoot
     {
-        public string Type { get; private set; } // Yard, Warehouse
         public string Location { get; private set; }
         public int MaxCapacityTEU { get; private set; }
         public int CurrentOccupancyTEU { get; private set; }
@@ -16,7 +15,6 @@ namespace DDDSample1.Domain.Storage
         public Facility(string type, string location, int maxCapacityTEU)
         {
             Id = new FacilityId(Guid.NewGuid());
-            Type = type;
             Location = location;
             MaxCapacityTEU = maxCapacityTEU;
             CurrentOccupancyTEU = 0;

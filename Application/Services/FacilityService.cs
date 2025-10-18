@@ -11,35 +11,65 @@ namespace DDDSample1.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFacilityRepository _repo;
 
-        public FacilityService(IFacilityRepository repo, IUnitOfWork unitOfWork)
+        public FacilityService(IUnitOfWork unitOfWork, IFacilityRepository repo)
         {
-            this._repo = repo;
             this._unitOfWork = unitOfWork;
+            this._repo = repo;
         }
 
         public async Task<List<FacilityDto>> GetAllAsync()
         {
             var facilities = await _repo.GetAllAsync();
 
-            List<FacilityDto> listDto = facilities.ConvertAll<FacilityDto>(facility => 
-                new FacilityDto(facility.Id.AsGuid(), facility.Type, facility.Location, facility.MaxCapacityTEU, facility.CurrentOccupancyTEU));
+
+            if (facilities == null)
+                return new List<FacilityDto>();
+
+
+            List<FacilityDto> listDto = facilities.ConvertAll<FacilityDto>(facility =>
+            {
+                string type = facility is Yard ? "Yard" : "Warehouse";
+                return new FacilityDto(facility.Id.AsGuid(), type, facility.Location, facility.MaxCapacityTEU, facility.CurrentOccupancyTEU);
+            });
 
             return listDto;
+
         }
 
         public async Task<FacilityDto> GetByIdAsync(FacilityId id)
         {
             var facility = await _repo.GetByIdAsync(id);
             if (facility == null) return null;
-            return new FacilityDto(facility.Id.AsGuid(), facility.Type, facility.Location, facility.MaxCapacityTEU, facility.CurrentOccupancyTEU);
+
+            string type = facility is Yard ? "Yard" : "Warehouse";
+
+            return new FacilityDto(facility.Id.AsGuid(), type, facility.Location, facility.MaxCapacityTEU, facility.CurrentOccupancyTEU);
         }
 
         public async Task<FacilityDto> AddAsync(CreatingFacilityDto dto)
         {
-            var facility = new Facility(dto.Type, dto.Location, dto.MaxCapacityTEU);
+            
+            Facility facility;
+
+            if (dto.Type == "Yard")
+            {
+                facility = new Yard(dto.Location, dto.MaxCapacityTEU);
+            }
+            else if (dto.Type == "Warehouse")
+            {
+                facility = new Warehouse(dto.Location, dto.MaxCapacityTEU);
+            }
+            else
+            {
+                throw new BusinessRuleValidationException("Invalid facility type. Must be 'Yard' or 'Warehouse'.");
+            }
+
             await _repo.AddAsync(facility);
             await this._unitOfWork.CommitAsync();
-            return new FacilityDto(facility.Id.AsGuid(), facility.Type, facility.Location, facility.MaxCapacityTEU, facility.CurrentOccupancyTEU);
+
+            string type = facility is Yard ? "Yard" : "Warehouse";
+
+            return new FacilityDto(facility.Id.AsGuid(), type, facility.Location, facility.MaxCapacityTEU, facility.CurrentOccupancyTEU);
         }
 
         public async Task<FacilityDto> UpdateAsync(int currentOccupancyTEU, FacilityDto dto)
@@ -50,7 +80,10 @@ namespace DDDSample1.Application.Services
             facility.ChangeCurrentOccupancyTEU(currentOccupancyTEU);
 
             await this._unitOfWork.CommitAsync();
-            return new FacilityDto(facility.Id.AsGuid(), facility.Type, facility.Location, facility.MaxCapacityTEU, facility.CurrentOccupancyTEU);
+
+            string type = facility is Yard ? "Yard" : "Warehouse";
+
+            return new FacilityDto(facility.Id.AsGuid(), type, facility.Location, facility.MaxCapacityTEU, facility.CurrentOccupancyTEU);
         }
 
         public async Task<FacilityDto> DeleteAsync(FacilityId id)
@@ -59,7 +92,10 @@ namespace DDDSample1.Application.Services
             if (facility == null) return null;
             this._repo.Remove(facility);
             await this._unitOfWork.CommitAsync();
-            return new FacilityDto(facility.Id.AsGuid(), facility.Type, facility.Location, facility.MaxCapacityTEU, facility.CurrentOccupancyTEU);
+
+            string type = facility is Yard ? "Yard" : "Warehouse";
+
+            return new FacilityDto(facility.Id.AsGuid(), type, facility.Location, facility.MaxCapacityTEU, facility.CurrentOccupancyTEU);
         }
     }
 }
