@@ -17,6 +17,9 @@ using DDDSample1.Domain.Products;
 using DDDSample1.Domain.Families;
 using DDDSample1.Domain.Storage;
 using DDDSample1.Application.Services;
+using DDDSample1.Domain.VesselTypes;
+using DDDSample1.Infrastructure.VesselTypes;
+
 
 namespace DDDSample1
 {
@@ -89,6 +92,10 @@ namespace DDDSample1
 
             services.AddTransient<IFacilityRepository, FacilityRepository>();
             services.AddTransient<FacilityService>();
+
+            services.AddTransient<VesselTypeService>();
+            services.AddTransient<IVesselTypeRepository, VesselTypeRepository>();
+
 
         }
     }
