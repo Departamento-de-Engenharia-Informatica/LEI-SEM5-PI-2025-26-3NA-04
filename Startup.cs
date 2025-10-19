@@ -16,9 +16,11 @@ using DDDSample1.Domain.Categories;
 using DDDSample1.Domain.Products;
 using DDDSample1.Domain.Families;
 using DDDSample1.Domain.Storage;
+using DDDSample1.Domain.Vessels;
 using DDDSample1.Application.Services;
 using DDDSample1.Domain.VesselTypes;
 using DDDSample1.Infrastructure.VesselTypes;
+using DDDSample1.Infrastructure.Vessels;
 
 
 namespace DDDSample1
@@ -81,20 +83,23 @@ namespace DDDSample1
         {
             services.AddTransient<IUnitOfWork,UnitOfWork>();
 
-            services.AddTransient<ICategoryRepository,CategoryRepository>();
-            services.AddTransient<CategoryService>();
+            //services.AddTransient<ICategoryRepository,CategoryRepository>();
+            //services.AddTransient<CategoryService>();
 
-            services.AddTransient<IProductRepository,ProductRepository>();
-            services.AddTransient<ProductService>();
+            //services.AddTransient<IProductRepository,ProductRepository>();
+            //services.AddTransient<ProductService>();
 
-            services.AddTransient<IFamilyRepository,FamilyRepository>();
-            services.AddTransient<FamilyService>();
+            //services.AddTransient<IFamilyRepository,FamilyRepository>();
+            //services.AddTransient<FamilyService>();
 
             services.AddTransient<IFacilityRepository, FacilityRepository>();
             services.AddTransient<FacilityService>();
 
             services.AddTransient<VesselTypeService>();
             services.AddTransient<IVesselTypeRepository, VesselTypeRepository>();
+
+            services.AddTransient<VesselService>();
+            services.AddTransient<IVesselRepository, VesselRepository>();
 
 
         }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DDDSample1.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
     public class ValuesController : ControllerBase

@@ -9,6 +9,7 @@ using DDDSample1.Domain.Products;
 
 namespace DDDSample1.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
     public class ProductsController : ControllerBase
