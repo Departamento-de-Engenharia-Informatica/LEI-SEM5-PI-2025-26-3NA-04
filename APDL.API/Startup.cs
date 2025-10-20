@@ -5,17 +5,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using DDDSample1.Infrastructure;
-using DDDSample1.Infrastructure.Categories;
-using DDDSample1.Infrastructure.Products;
-using DDDSample1.Infrastructure.Families;
-using DDDSample1.Infrastructure.Shared;
-using DDDSample1.Domain.Shared;
-using DDDSample1.Domain.Categories;
-using DDDSample1.Domain.Products;
-using DDDSample1.Domain.Families;
+using APDL.API.Infrastructure.ShippingAgentInfrastructure;
+using APDL.API.Infrastructure.Shared;
+using APDL.API.Infrastructure;
+using APDL.API.Domain.Shared;
+using APDL.API.Domain.ShippingAgentAggregate.Repos;
+using APDL.API.Domain.ShippingAgentAggregate;
 
-namespace DDDSample1
+namespace APDL.API
 {
     public class Startup
     {
@@ -75,14 +72,11 @@ namespace DDDSample1
         {
             services.AddTransient<IUnitOfWork,UnitOfWork>();
 
-            services.AddTransient<ICategoryRepository,CategoryRepository>();
-            services.AddTransient<CategoryService>();
+            services.AddTransient<IShippingAgentRepository, ShippingAgentRepository>();
+            services.AddTransient<ShippingAgentService>();
 
-            services.AddTransient<IProductRepository,ProductRepository>();
-            services.AddTransient<ProductService>();
-
-            services.AddTransient<IFamilyRepository,FamilyRepository>();
-            services.AddTransient<FamilyService>();
+            services.AddTransient<IShippingAgentRepresentativeRepository, ShippingAgentRepresentativeRepository>();
+            services.AddTransient<ShippingAgentRepresentativeService>();
         }
     }
 }

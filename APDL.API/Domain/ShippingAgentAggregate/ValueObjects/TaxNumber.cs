@@ -1,3 +1,5 @@
+using APDL.API.Domain.Shared;
+using System.Text.RegularExpressions;
 
 namespace APDL.API.Domain.ShippingAgentAggregate.ValueObjects
 {

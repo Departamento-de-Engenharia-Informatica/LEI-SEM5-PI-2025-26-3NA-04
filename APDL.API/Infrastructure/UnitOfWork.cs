@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using DDDSample1.Domain.Shared;
+using APDL.API.Domain.Shared;
 
-namespace DDDSample1.Infrastructure
+namespace APDL.API.Infrastructure
 {
     public class UnitOfWork : IUnitOfWork
     {

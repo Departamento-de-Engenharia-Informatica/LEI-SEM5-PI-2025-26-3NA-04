@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using APDL.API.Domain.ShippingAgentAggregate;
+using APDL.API.Domain.ShippingAgentAggregate.DTO;
 
 namespace APDL.API.Controllers
 {
@@ -37,7 +39,7 @@ namespace APDL.API.Controllers
 
         // POST: api/ShippingAgent
         [HttpPost]
-        public async Task<ActionResult<ShippingAgentDto>> Create(ShippingAgentDto dto)
+        public async Task<ActionResult<ShippingAgentDto>> Create(CreateShippingAgentDto dto)
         {
             var created = await _service.AddAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);

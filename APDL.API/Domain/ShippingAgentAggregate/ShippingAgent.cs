@@ -1,4 +1,7 @@
+using System.Collections.Generic;
 using APDL.API.Domain.Shared;
+using APDL.API.Domain.ShippingAgentAggregate.ValueObjects;
+using System.Linq;
 
 namespace APDL.API.Domain.ShippingAgentAggregate
 {
@@ -22,7 +25,7 @@ namespace APDL.API.Domain.ShippingAgentAggregate
             List<ShippingAgentRepresentative> representatives)
         {
             if (representatives == null || !representatives.Any())
-                throw new BusinessRuleValidationException(nameof(representatives), "At least one representative is required.");
+                throw new BusinessRuleValidationException("At least one representative is required.");
 
             LegalName = new Name(legalName);
             AlternativeName = string.IsNullOrWhiteSpace(alternativeName) ? null : new Name(alternativeName);
@@ -34,35 +37,29 @@ namespace APDL.API.Domain.ShippingAgentAggregate
 
         public void UpdateLegalName(string legalName)
         {
-            if (string.IsNullOrWhiteSpace(legalName))
-                throw new ArgumentException("LegalName cannot be empty.", nameof(legalName));
-            LegalName = legalName;
+            LegalName = new Name(legalName);
         }
 
         public void UpdateAlternativeName(string alternativeName)
         {
-            AlternativeName = alternativeName ?? string.Empty;
+            AlternativeName = new Name(alternativeName);
         }
 
         public void UpdateAddress(string address)
         {
-            if (string.IsNullOrWhiteSpace(address))
-                throw new ArgumentException("Address cannot be empty.", nameof(address));
-            Address = address;
+            Address = new Address(address);
         }
 
         public void UpdateTaxNumber(string taxNumber)
         {
-            if (string.IsNullOrWhiteSpace(taxNumber))
-                throw new ArgumentException("TaxNumber cannot be empty.", nameof(taxNumber));
-            TaxNumber = taxNumber;
+            TaxNumber = new TaxNumber(taxNumber);
         }
 
         // Representative management
         public void AddRepresentative(ShippingAgentRepresentative rep)
         {
             if (rep == null)
-                throw new ArgumentNullException(nameof(rep));
+                throw new BusinessRuleValidationException(nameof(rep));
 
             if (!_representatives.Contains(rep))
                 _representatives.Add(rep);
@@ -71,10 +68,10 @@ namespace APDL.API.Domain.ShippingAgentAggregate
         public void RemoveRepresentative(ShippingAgentRepresentative rep)
         {
             if (rep == null)
-                throw new ArgumentNullException(nameof(rep));
+                throw new BusinessRuleValidationException("Provide a representative");
 
             if (_representatives.Count <= 1)
-                throw new InvalidOperationException("A shipping agent must have at least one representative.");
+                throw new BusinessRuleValidationException("A shipping agent must have at least one representative.");
 
             _representatives.Remove(rep);
         }

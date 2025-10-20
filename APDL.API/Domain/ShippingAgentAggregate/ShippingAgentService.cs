@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using APDL.API.Domain.Shared;
+using APDL.API.Domain.ShippingAgentAggregate.DTO;
+using APDL.API.Domain.ShippingAgentAggregate.Repos;
+using APDL.API.Domain.ShippingAgentAggregate.ValueObjects;
 
 namespace APDL.API.Domain.ShippingAgentAggregate
 {
@@ -29,14 +32,14 @@ namespace APDL.API.Domain.ShippingAgentAggregate
                 Address = agent.Address.Value,
                 TaxNumber = agent.TaxNumber.Value,
                 Representatives = agent.Representatives
-                    .Select(rep => new ShippingAgentRepresentativeDto
+                    .Select(rep => new RepresentativeDto
                     {
                         Id = rep.Id.AsGuid(),
-                        Name = rep.Name,
+                        Name = rep.Name.Value,
                         Email = rep.Email.Value,
-                        CitizenId = rep.CitizenId,
-                        Nationality = rep.Nationality,
-                        Phone = rep.Phone
+                        CitizenId = rep.CitizenId.Value,
+                        Nationality = rep.Nationality.Value,
+                        Phone = rep.Phone.Value
                     }).ToList()
             }).ToList();
         }
@@ -54,14 +57,14 @@ namespace APDL.API.Domain.ShippingAgentAggregate
                 Address = agent.Address.Value,
                 TaxNumber = agent.TaxNumber.Value,
                 Representatives = agent.Representatives
-                    .Select(rep => new ShippingAgentRepresentativeDto
+                    .Select(rep => new RepresentativeDto
                     {
                         Id = rep.Id.AsGuid(),
-                        Name = rep.Name,
+                        Name = rep.Name.Value,
                         Email = rep.Email.Value,
-                        CitizenId = rep.CitizenId,
-                        Nationality = rep.Nationality,
-                        Phone = rep.Phone
+                        CitizenId = rep.CitizenId.Value,
+                        Nationality = rep.Nationality.Value,
+                        Phone = rep.Phone.Value
                     }).ToList()
             };
         }
@@ -72,11 +75,11 @@ namespace APDL.API.Domain.ShippingAgentAggregate
                 throw new BusinessRuleValidationException(nameof(dto.Representatives), "At least one representative is required.");
 
             var reps = dto.Representatives.Select(r => new ShippingAgentRepresentative(
-                r.Name,
-                r.CitizenId,
-                r.Nationality,
-                r.Email,
-                r.Phone
+                new Name(r.Name),
+                new CitizenId(r.CitizenId),
+                new Nationality(r.Nationality),
+                new Email(r.Email),
+                new Phone(r.Phone)
             )).ToList();
 
             Name? altName = string.IsNullOrWhiteSpace(dto.AlternativeName) ? null : new Name(dto.AlternativeName);
@@ -100,14 +103,14 @@ namespace APDL.API.Domain.ShippingAgentAggregate
                 Address = agent.Address.Value,
                 TaxNumber = agent.TaxNumber.Value,
                 Representatives = agent.Representatives
-                    .Select(r => new ShippingAgentRepresentativeDto
+                    .Select(r => new RepresentativeDto
                     {
                         Id = r.Id.AsGuid(),
-                        Name = r.Name,
-                        CitizenId = r.CitizenId,
-                        Nationality = r.Nationality,
+                        Name = r.Name.Value,
+                        CitizenId = r.CitizenId.Value,
+                        Nationality = r.Nationality.Value,
                         Email = r.Email.Value,
-                        Phone = r.Phone
+                        Phone = r.Phone.Value
                     }).ToList()
             };
         }
@@ -133,14 +136,14 @@ namespace APDL.API.Domain.ShippingAgentAggregate
                 Address = agent.Address.Value,
                 TaxNumber = agent.TaxNumber.Value,
                 Representatives = agent.Representatives
-                    .Select(rep => new ShippingAgentRepresentativeDto
+                    .Select(rep => new RepresentativeDto
                     {
                         Id = rep.Id.AsGuid(),
-                        Name = rep.Name,
-                        CitizenId = rep.CitizenId,
-                        Nationality = rep.Nationality,
+                        Name = rep.Name.Value,
+                        CitizenId = rep.CitizenId.Value,
+                        Nationality = rep.Nationality.Value,
                         Email = rep.Email.Value,
-                        Phone = rep.Phone
+                        Phone = rep.Phone.Value
                     }).ToList()
             };
         }
@@ -162,14 +165,14 @@ namespace APDL.API.Domain.ShippingAgentAggregate
                 Address = agent.Address.Value,
                 TaxNumber = agent.TaxNumber.Value,
                 Representatives = agent.Representatives
-                    .Select(rep => new ShippingAgentRepresentativeDto
+                    .Select(rep => new RepresentativeDto
                     {
                         Id = rep.Id.AsGuid(),
-                        Name = rep.Name,
-                        CitizenId = rep.CitizenId,
-                        Nationality = rep.Nationality,
+                        Name = rep.Name.Value,
+                        CitizenId = rep.CitizenId.Value,
+                        Nationality = rep.Nationality.Value,
                         Email = rep.Email.Value,
-                        Phone = rep.Phone
+                        Phone = rep.Phone.Value
                     }).ToList()
             };
         }
