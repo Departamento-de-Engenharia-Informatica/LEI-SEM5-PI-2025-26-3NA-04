@@ -1,28 +1,28 @@
-using APDL.API.Domain.Shared;
-using System.Text.RegularExpressions;
+    using APDL.API.Domain.Shared;
+    using System.Text.RegularExpressions;
 
-namespace APDL.API.Domain.ShippingAgentAggregate.ValueObjects
-{
-    public class TaxNumber : IValueObject
+    namespace APDL.API.Domain.ShippingAgentAggregate.ValueObjects
     {
-        public string Value { get; }
-
-        public TaxNumber(string value)
+        public class TaxNumber : IValueObject
         {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new BusinessRuleValidationException("Tax number cannot be empty.", nameof(value));
+            public string Value { get; }
 
-            if (!Regex.IsMatch(value, @"^\d{9}$"))
-                throw new BusinessRuleValidationException("Tax number must be 9 digits.", nameof(value));
+            public TaxNumber(string value)
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    throw new BusinessRuleValidationException("Tax number cannot be empty.", nameof(value));
 
-            Value = value;
+                if (!Regex.IsMatch(value, @"^\d{9}$"))
+                    throw new BusinessRuleValidationException("Tax number must be 9 digits.", nameof(value));
+
+                Value = value;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is TaxNumber other && Value == other.Value;
+            }
+
+            public override int GetHashCode() => Value.GetHashCode();
         }
-
-        public override bool Equals(object obj)
-        {
-            return obj is TaxNumber other && Value == other.Value;
-        }
-
-        public override int GetHashCode() => Value.GetHashCode();
     }
-}

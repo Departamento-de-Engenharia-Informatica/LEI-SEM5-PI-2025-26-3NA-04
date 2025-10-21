@@ -46,8 +46,12 @@ namespace APDL.API.Domain.ShippingAgentAggregate
 
         public async Task<ShippingAgentDto> GetByIdAsync(ShippingAgentId id)
         {
+            Console.WriteLine($"SERVICE: Received ID = {id.Value}");
             var agent = await _repo.GetByIdAsync(id);
-            if (agent == null) return null;
+            if (agent == null){
+                Console.WriteLine("DEBUG: Agent is NULL inside GetByIdAsync!");
+                return null;
+            } 
 
             return new ShippingAgentDto
             {

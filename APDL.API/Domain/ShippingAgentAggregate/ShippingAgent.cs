@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using APDL.API.Domain.Shared;
 using APDL.API.Domain.ShippingAgentAggregate.ValueObjects;
@@ -27,6 +28,7 @@ namespace APDL.API.Domain.ShippingAgentAggregate
             if (representatives == null || !representatives.Any())
                 throw new BusinessRuleValidationException("At least one representative is required.");
 
+            Id = new ShippingAgentId(Guid.NewGuid());
             LegalName = new Name(legalName);
             AlternativeName = string.IsNullOrWhiteSpace(alternativeName) ? null : new Name(alternativeName);
             Address = new Address(address);

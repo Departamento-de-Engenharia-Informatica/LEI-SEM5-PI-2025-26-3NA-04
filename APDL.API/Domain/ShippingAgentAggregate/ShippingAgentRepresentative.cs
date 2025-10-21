@@ -22,6 +22,7 @@ namespace APDL.API.Domain.ShippingAgentAggregate
             Email email,
             Phone phone)
         {
+            Id = new ShippingAgentRepresentativeId(Guid.NewGuid());
             Name = name ?? throw new BusinessRuleValidationException(nameof(name), "Name must be provided.");
             CitizenId = citizenId ?? throw new BusinessRuleValidationException(nameof(citizenId), "Citizen id must be provided.");
             Nationality = nationality ?? throw new BusinessRuleValidationException(nameof(nationality), "Nationality must be provided.");
