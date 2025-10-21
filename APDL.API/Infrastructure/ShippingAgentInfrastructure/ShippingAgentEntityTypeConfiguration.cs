@@ -32,10 +32,8 @@ namespace APDL.API.Infrastructure.ShippingAgentInfrastructure
                 tn.Property(t => t.Value).HasColumnName("TaxNumber").IsRequired();
             });
 
-            builder.HasMany<ShippingAgentRepresentative>("_representatives")
-                   .WithOne()
-                   .HasForeignKey("ShippingAgentId")
-                   .OnDelete(DeleteBehavior.Cascade);
+            builder.Metadata.FindNavigation(nameof(ShippingAgent.Representatives))
+                .SetPropertyAccessMode(PropertyAccessMode.Field);
         }
     }
 }

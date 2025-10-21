@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using APDL.API.Infrastructure.ShippingAgentInfrastructure;
 using APDL.API.Infrastructure.Shared;
@@ -30,8 +31,12 @@ namespace APDL.API
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
+            // services.AddDbContext<DDDSample1DbContext>(opt =>
+            //     opt.UseInMemoryDatabase("DDDSample1DB")
+            //     .ReplaceService<IValueConverterSelector, StronglyEntityIdValueConverterSelector>());
+
             services.AddDbContext<DDDSample1DbContext>(opt =>
-                opt.UseInMemoryDatabase("DDDSample1DB")
+                opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
                 .ReplaceService<IValueConverterSelector, StronglyEntityIdValueConverterSelector>());
 
             ConfigureMyServices(services);
