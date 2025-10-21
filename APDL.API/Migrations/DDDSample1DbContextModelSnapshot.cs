@@ -49,6 +49,76 @@ namespace DDDNetCore.Migrations
                     b.ToTable("ShippingAgentRepresentatives", "port");
                 });
 
+            modelBuilder.Entity("APDL.API.Domain.Storage.Facility", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("CurrentOccupancyTEU")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FacilityType")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MaxCapacityTEU")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Facilities", "port");
+
+                    b.HasDiscriminator<string>("FacilityType").HasValue("Facility");
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("APDL.API.Domain.VesselTypes.VesselType", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Capacity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MaxBays")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaxRows")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaxTiers")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("VesselTypes", "port");
+                });
+
+            modelBuilder.Entity("APDL.API.Domain.Storage.Warehouse", b =>
+                {
+                    b.HasBaseType("APDL.API.Domain.Storage.Facility");
+
+                    b.HasDiscriminator().HasValue("Warehouse");
+                });
+
+            modelBuilder.Entity("APDL.API.Domain.Storage.Yard", b =>
+                {
+                    b.HasBaseType("APDL.API.Domain.Storage.Facility");
+
+                    b.HasDiscriminator().HasValue("Yard");
+                });
+
             modelBuilder.Entity("APDL.API.Domain.ShippingAgentAggregate.ShippingAgent", b =>
                 {
                     b.OwnsOne("APDL.API.Domain.ShippingAgentAggregate.ValueObjects.Name", "AlternativeName", b1 =>

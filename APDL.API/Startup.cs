@@ -7,11 +7,16 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using APDL.API.Infrastructure.ShippingAgentInfrastructure;
+using APDL.API.Infrastructure.Storage;
+using APDL.API.Infrastructure.VesselTypes;
 using APDL.API.Infrastructure.Shared;
 using APDL.API.Infrastructure;
 using APDL.API.Domain.Shared;
 using APDL.API.Domain.ShippingAgentAggregate.Repos;
 using APDL.API.Domain.ShippingAgentAggregate;
+using APDL.API.Domain.Storage;
+using APDL.API.Domain.VesselTypes;
+
 
 namespace APDL.API
 {
@@ -75,13 +80,26 @@ namespace APDL.API
 
         public void ConfigureMyServices(IServiceCollection services)
         {
-            services.AddTransient<IUnitOfWork,UnitOfWork>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-            services.AddTransient<IShippingAgentRepository, ShippingAgentRepository>();
-            services.AddTransient<ShippingAgentService>();
+            services.AddScoped<IShippingAgentRepository, ShippingAgentRepository>();
+            services.AddScoped<ShippingAgentService>();
 
-            services.AddTransient<IShippingAgentRepresentativeRepository, ShippingAgentRepresentativeRepository>();
-            services.AddTransient<ShippingAgentRepresentativeService>();
+            services.AddScoped<IShippingAgentRepresentativeRepository, ShippingAgentRepresentativeRepository>();
+            services.AddScoped<ShippingAgentRepresentativeService>();
+
+            services.AddScoped<IFacilityRepository, FacilityRepository>();
+            services.AddScoped<FacilityService>();
+
+            services.AddScoped<IVesselTypeRepository, VesselTypeRepository>();
+            services.AddScoped<VesselTypeService>();
+
+            services.AddTransient<IFacilityRepository, FacilityRepository>();
+            services.AddTransient<FacilityService>();
+
+            services.AddTransient<VesselTypeService>();
+            services.AddTransient<IVesselTypeRepository, VesselTypeRepository>();
+
         }
     }
 }

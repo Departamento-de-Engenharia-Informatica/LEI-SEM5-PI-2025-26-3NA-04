@@ -14,6 +14,22 @@ namespace DDDNetCore.Migrations
                 name: "port");
 
             migrationBuilder.CreateTable(
+                name: "Facilities",
+                schema: "port",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MaxCapacityTEU = table.Column<int>(type: "int", nullable: false),
+                    CurrentOccupancyTEU = table.Column<int>(type: "int", nullable: false),
+                    FacilityType = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Facilities", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ShippingAgents",
                 schema: "port",
                 columns: table => new
@@ -27,6 +43,24 @@ namespace DDDNetCore.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ShippingAgents", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VesselTypes",
+                schema: "port",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Capacity = table.Column<int>(type: "int", nullable: false),
+                    MaxRows = table.Column<int>(type: "int", nullable: false),
+                    MaxBays = table.Column<int>(type: "int", nullable: false),
+                    MaxTiers = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VesselTypes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -65,7 +99,15 @@ namespace DDDNetCore.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Facilities",
+                schema: "port");
+
+            migrationBuilder.DropTable(
                 name: "ShippingAgentRepresentatives",
+                schema: "port");
+
+            migrationBuilder.DropTable(
+                name: "VesselTypes",
                 schema: "port");
 
             migrationBuilder.DropTable(
