@@ -16,13 +16,15 @@ namespace APDL.API.Tests.Domain.ShippingAgentAggregate
     {
         private readonly Mock<IUnitOfWork> _mockUnitOfWork;
         private readonly Mock<IShippingAgentRepository> _mockRepo;
+        private readonly Mock<IShippingAgentRepresentativeRepository> _mockRepRepo;
         private readonly ShippingAgentService _service;
 
         public ShippingAgentServiceTests()
         {
             _mockUnitOfWork = new Mock<IUnitOfWork>();
             _mockRepo = new Mock<IShippingAgentRepository>();
-            _service = new ShippingAgentService(_mockUnitOfWork.Object, _mockRepo.Object);
+            _mockRepRepo = new Mock<IShippingAgentRepresentativeRepository>();
+            _service = new ShippingAgentService(_mockUnitOfWork.Object, _mockRepo.Object, _mockRepRepo.Object);
         }
 
         #region GetAllAsync Tests
@@ -286,6 +288,72 @@ namespace APDL.API.Tests.Domain.ShippingAgentAggregate
 
         #endregion
 
+        #region AddRepresentativeToAgentAsync Tests
+
+        [Fact]
+        public async Task AddRepresentativeToAgentAsync_ShouldAddRepresentative_WhenBothExist()
+        {
+            // Arrange
+            var agent = CreateTestShippingAgents()[0];
+            var representative = CreateTestRepresentative("New Rep");
+            var agentId = agent.Id.AsGuid();
+            var repEmail = representative.Email.Value;
+
+            _mockRepo.Setup(r => r.GetByIdAsync(It.IsAny<ShippingAgentId>())).ReturnsAsync(agent);
+            _mockRepRepo.Setup(r => r.GetByEmailAsync(repEmail)).ReturnsAsync(representative);
+            _mockUnitOfWork.Setup(u => u.CommitAsync()).ReturnsAsync(1);
+
+            // Act
+            var result = await _service.AddRepresentativeToAgentAsync(agentId, repEmail);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(representative.Id.AsGuid(), result.Id);
+            Assert.Equal(representative.Name.Value, result.Name);
+            Assert.Equal(representative.Email.Value, result.Email);
+            _mockUnitOfWork.Verify(u => u.CommitAsync(), Times.Once);
+        }
+
+        [Fact]
+        public async Task AddRepresentativeToAgentAsync_ShouldThrowException_WhenAgentNotFound()
+        {
+            // Arrange
+            var agentId = Guid.NewGuid();
+            var repEmail = "test@example.com";
+
+            _mockRepo.Setup(r => r.GetByIdAsync(It.IsAny<ShippingAgentId>())).ReturnsAsync((ShippingAgent)null);
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
+                () => _service.AddRepresentativeToAgentAsync(agentId, repEmail)
+            );
+            Assert.Contains("Shipping agent", exception.Message);
+            Assert.Contains("not found", exception.Message);
+            _mockUnitOfWork.Verify(u => u.CommitAsync(), Times.Never);
+        }
+
+        [Fact]
+        public async Task AddRepresentativeToAgentAsync_ShouldThrowException_WhenRepresentativeNotFound()
+        {
+            // Arrange
+            var agent = CreateTestShippingAgents()[0];
+            var agentId = agent.Id.AsGuid();
+            var repEmail = "nonexistent@example.com";
+
+            _mockRepo.Setup(r => r.GetByIdAsync(It.IsAny<ShippingAgentId>())).ReturnsAsync(agent);
+            _mockRepRepo.Setup(r => r.GetByEmailAsync(repEmail)).ReturnsAsync((ShippingAgentRepresentative)null);
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
+                () => _service.AddRepresentativeToAgentAsync(agentId, repEmail)
+            );
+            Assert.Contains("Representative", exception.Message);
+            Assert.Contains("not found", exception.Message);
+            _mockUnitOfWork.Verify(u => u.CommitAsync(), Times.Never);
+        }
+
+        #endregion
+
         #region Helper Methods
 
         private List<ShippingAgent> CreateTestShippingAgents()
@@ -318,7 +386,7 @@ namespace APDL.API.Tests.Domain.ShippingAgentAggregate
         }
 
         private ShippingAgentRepresentative CreateTestRepresentative(string name)
-        {
+        { 
             return new ShippingAgentRepresentative(
                 new Name(name),
                 new CitizenId("12345678"),
