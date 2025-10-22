@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "U/3cwnHUhKc=",
+  "dgSpecHash": "mNT519Tdji0=",
   "success": true,
-  "projectFilePath": "C:\\Users\\dannn\\OneDrive\\Ambiente de Trabalho\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.Tests\\APDL.Tests.csproj",
+  "projectFilePath": "C:\\Users\\dannn\\Desktop\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.Tests\\APDL.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\dannn\\.nuget\\packages\\castle.core\\5.1.1\\castle.core.5.1.1.nupkg.sha512",
     "C:\\Users\\dannn\\.nuget\\packages\\coverlet.collector\\6.0.2\\coverlet.collector.6.0.2.nupkg.sha512",

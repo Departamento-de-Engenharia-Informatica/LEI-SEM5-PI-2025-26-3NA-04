@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\dannn\\OneDrive\\Ambiente de Trabalho\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.Tests\\APDL.Tests.csproj": {}
+    "C:\\Users\\dannn\\Desktop\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.Tests\\APDL.Tests.csproj": {}
   },
   "projects": {
-    "C:\\Users\\dannn\\OneDrive\\Ambiente de Trabalho\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.API\\DDDNetCore.csproj": {
+    "C:\\Users\\dannn\\Desktop\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.API\\DDDNetCore.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dannn\\OneDrive\\Ambiente de Trabalho\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.API\\DDDNetCore.csproj",
+        "projectUniqueName": "C:\\Users\\dannn\\Desktop\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.API\\DDDNetCore.csproj",
         "projectName": "DDDNetCore",
-        "projectPath": "C:\\Users\\dannn\\OneDrive\\Ambiente de Trabalho\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.API\\DDDNetCore.csproj",
+        "projectPath": "C:\\Users\\dannn\\Desktop\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.API\\DDDNetCore.csproj",
         "packagesPath": "C:\\Users\\dannn\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dannn\\OneDrive\\Ambiente de Trabalho\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.API\\obj\\",
+        "outputPath": "C:\\Users\\dannn\\Desktop\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.API\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\dannn\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -83,19 +83,19 @@
           "downloadDependencies": [
             {
               "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.21, 8.0.21]"
+              "version": "[8.0.20, 8.0.20]"
             },
             {
               "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[8.0.21, 8.0.21]"
+              "version": "[8.0.20, 8.0.20]"
             },
             {
               "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.21, 8.0.21]"
+              "version": "[8.0.20, 8.0.20]"
             },
             {
               "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[8.0.21, 8.0.21]"
+              "version": "[8.0.20, 8.0.20]"
             }
           ],
           "frameworkReferences": {
@@ -106,18 +106,18 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\dannn\\OneDrive\\Ambiente de Trabalho\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.Tests\\APDL.Tests.csproj": {
+    "C:\\Users\\dannn\\Desktop\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.Tests\\APDL.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dannn\\OneDrive\\Ambiente de Trabalho\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.Tests\\APDL.Tests.csproj",
+        "projectUniqueName": "C:\\Users\\dannn\\Desktop\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.Tests\\APDL.Tests.csproj",
         "projectName": "APDL.Tests",
-        "projectPath": "C:\\Users\\dannn\\OneDrive\\Ambiente de Trabalho\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.Tests\\APDL.Tests.csproj",
+        "projectPath": "C:\\Users\\dannn\\Desktop\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.Tests\\APDL.Tests.csproj",
         "packagesPath": "C:\\Users\\dannn\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dannn\\OneDrive\\Ambiente de Trabalho\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.Tests\\obj\\",
+        "outputPath": "C:\\Users\\dannn\\Desktop\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\dannn\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -132,8 +132,8 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "C:\\Users\\dannn\\OneDrive\\Ambiente de Trabalho\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.API\\DDDNetCore.csproj": {
-                "projectPath": "C:\\Users\\dannn\\OneDrive\\Ambiente de Trabalho\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.API\\DDDNetCore.csproj"
+              "C:\\Users\\dannn\\Desktop\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.API\\DDDNetCore.csproj": {
+                "projectPath": "C:\\Users\\dannn\\Desktop\\LEI-SEM5-PI-2025-26-3NA-04\\APDL.API\\DDDNetCore.csproj"
               }
             }
           }
@@ -193,7 +193,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

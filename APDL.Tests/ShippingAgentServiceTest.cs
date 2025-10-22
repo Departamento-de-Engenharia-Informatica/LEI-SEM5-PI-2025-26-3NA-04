@@ -122,10 +122,8 @@ namespace APDL.API.Tests.Domain.ShippingAgentAggregate
             _mockRepo.Setup(r => r.AddAsync(It.IsAny<ShippingAgent>())).ReturnsAsync((ShippingAgent a) => a);
             _mockUnitOfWork.Setup(u => u.CommitAsync()).ReturnsAsync(1);
 
-            // Act
             var result = await _service.AddAsync(dto);
 
-            // Assert
             Assert.NotNull(result);
             Assert.Equal(dto.LegalName, result.LegalName);
             Assert.Equal(dto.AlternativeName, result.AlternativeName);
@@ -138,7 +136,6 @@ namespace APDL.API.Tests.Domain.ShippingAgentAggregate
         [Fact]
         public async Task AddAsync_ShouldThrowException_WhenNoRepresentatives()
         {
-            // Arrange
             var dto = new CreateShippingAgentDto
             {
                 LegalName = "New Agent",
@@ -147,14 +144,12 @@ namespace APDL.API.Tests.Domain.ShippingAgentAggregate
                 Representatives = new List<CreateRepresentativeDto>()
             };
 
-            // Act & Assert
             await Assert.ThrowsAsync<BusinessRuleValidationException>(() => _service.AddAsync(dto));
         }
 
         [Fact]
         public async Task AddAsync_ShouldThrowException_WhenRepresentativesIsNull()
         {
-            // Arrange
             var dto = new CreateShippingAgentDto
             {
                 LegalName = "New Agent",
@@ -163,14 +158,12 @@ namespace APDL.API.Tests.Domain.ShippingAgentAggregate
                 Representatives = null
             };
 
-            // Act & Assert
             await Assert.ThrowsAsync<BusinessRuleValidationException>(() => _service.AddAsync(dto));
         }
 
         [Fact]
         public async Task AddAsync_ShouldHandleNullAlternativeName()
         {
-            // Arrange
             var dto = new CreateShippingAgentDto
             {
                 LegalName = "New Agent",
@@ -193,10 +186,8 @@ namespace APDL.API.Tests.Domain.ShippingAgentAggregate
             _mockRepo.Setup(r => r.AddAsync(It.IsAny<ShippingAgent>())).ReturnsAsync((ShippingAgent a) => a);
             _mockUnitOfWork.Setup(u => u.CommitAsync()).ReturnsAsync(1);
 
-            // Act
             var result = await _service.AddAsync(dto);
 
-            // Assert
             Assert.NotNull(result);
             Assert.Null(result.AlternativeName);
         }
@@ -208,7 +199,6 @@ namespace APDL.API.Tests.Domain.ShippingAgentAggregate
         [Fact]
         public async Task UpdateAsync_ShouldUpdateAndReturnAgent_WhenAgentExists()
         {
-            // Arrange
             var representatives = new List<ShippingAgentRepresentative>
             {
                 CreateTestRepresentative("Rep 1")
@@ -234,10 +224,8 @@ namespace APDL.API.Tests.Domain.ShippingAgentAggregate
             _mockRepo.Setup(r => r.GetByIdAsync(It.IsAny<ShippingAgentId>())).ReturnsAsync(agent);
             _mockUnitOfWork.Setup(u => u.CommitAsync()).ReturnsAsync(1);
 
-            // Act
             var result = await _service.UpdateAsync(dto);
 
-            // Assert
             Assert.NotNull(result);
             _mockUnitOfWork.Verify(u => u.CommitAsync(), Times.Once);
         }
@@ -245,7 +233,6 @@ namespace APDL.API.Tests.Domain.ShippingAgentAggregate
         [Fact]
         public async Task UpdateAsync_ShouldReturnNull_WhenAgentDoesNotExist()
         {
-            // Arrange
             var dto = new ShippingAgentDto
             {
                 Id = Guid.NewGuid(),
@@ -256,10 +243,8 @@ namespace APDL.API.Tests.Domain.ShippingAgentAggregate
 
             _mockRepo.Setup(r => r.GetByIdAsync(It.IsAny<ShippingAgentId>())).ReturnsAsync((ShippingAgent)null);
 
-            // Act
             var result = await _service.UpdateAsync(dto);
 
-            // Assert
             Assert.Null(result);
             _mockUnitOfWork.Verify(u => u.CommitAsync(), Times.Never);
         }
@@ -271,7 +256,6 @@ namespace APDL.API.Tests.Domain.ShippingAgentAggregate
         [Fact]
         public async Task DeleteAsync_ShouldRemoveAndReturnAgent_WhenAgentExists()
         {
-            // Arrange
             var agent = CreateTestShippingAgents()[0];
             var agentId = agent.Id;
 
@@ -279,10 +263,8 @@ namespace APDL.API.Tests.Domain.ShippingAgentAggregate
             _mockRepo.Setup(r => r.Remove(agent)).Verifiable();
             _mockUnitOfWork.Setup(u => u.CommitAsync()).ReturnsAsync(1);
 
-            // Act
             var result = await _service.DeleteAsync(agentId);
 
-            // Assert
             Assert.NotNull(result);
             Assert.Equal(agent.Id.AsGuid(), result.Id);
             _mockRepo.Verify(r => r.Remove(agent), Times.Once);
@@ -292,14 +274,11 @@ namespace APDL.API.Tests.Domain.ShippingAgentAggregate
         [Fact]
         public async Task DeleteAsync_ShouldReturnNull_WhenAgentDoesNotExist()
         {
-            // Arrange
             var agentId = new ShippingAgentId(Guid.NewGuid());
             _mockRepo.Setup(r => r.GetByIdAsync(agentId)).ReturnsAsync((ShippingAgent)null);
 
-            // Act
             var result = await _service.DeleteAsync(agentId);
 
-            // Assert
             Assert.Null(result);
             _mockRepo.Verify(r => r.Remove(It.IsAny<ShippingAgent>()), Times.Never);
             _mockUnitOfWork.Verify(u => u.CommitAsync(), Times.Never);
