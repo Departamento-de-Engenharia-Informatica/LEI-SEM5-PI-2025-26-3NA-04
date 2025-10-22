@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -20,7 +21,7 @@ namespace DDDNetCore.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MaxCapacityTEU = table.Column<int>(type: "int", nullable: false),
+                    MaxCapacityTEU = table.Column<int>(type: "int", nullable: true),
                     CurrentOccupancyTEU = table.Column<int>(type: "int", nullable: false),
                     FacilityType = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false)
                 },
@@ -64,6 +65,30 @@ namespace DDDNetCore.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "FacilityDockAssignments",
+                schema: "port",
+                columns: table => new
+                {
+                    FacilityId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DebugColumn1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DockId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DistanceToDock = table.Column<double>(type: "float", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FacilityDockAssignments", x => new { x.FacilityId, x.Id });
+                    table.ForeignKey(
+                        name: "FK_FacilityDockAssignments_Facilities_FacilityId",
+                        column: x => x.FacilityId,
+                        principalSchema: "port",
+                        principalTable: "Facilities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ShippingAgentRepresentatives",
                 schema: "port",
                 columns: table => new
@@ -99,7 +124,7 @@ namespace DDDNetCore.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Facilities",
+                name: "FacilityDockAssignments",
                 schema: "port");
 
             migrationBuilder.DropTable(
@@ -108,6 +133,10 @@ namespace DDDNetCore.Migrations
 
             migrationBuilder.DropTable(
                 name: "VesselTypes",
+                schema: "port");
+
+            migrationBuilder.DropTable(
+                name: "Facilities",
                 schema: "port");
 
             migrationBuilder.DropTable(
