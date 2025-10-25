@@ -30,6 +30,20 @@ namespace APDL.API.Controllers
             return result;
         }
 
+        
+        [HttpGet("name")]
+        public async Task<ActionResult<IEnumerable<VesselTypeDto>>> GetByName([FromQuery] string name)
+        {
+            return await _service.SearchAsyncName(name);
+        }
+
+        [HttpGet("description")]
+        public async Task<ActionResult<IEnumerable<VesselTypeDto>>> GetByDescription([FromQuery] string description)
+        {
+            return await _service.SearchAsyncDescription(description);
+        }
+
+
         [HttpPost]
         public async Task<ActionResult<VesselTypeDto>> Create(CreatingVesselTypeDto dto)
         {
