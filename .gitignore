@@ -10,11 +10,13 @@
 
 # VS Code settings
 .vscode/
+.config/
 
 # NuGet packages
 *.nupkg
 *.snupkg
 .nuget/
+**/packages/
 
 # Logs
 *.log
@@ -22,6 +24,9 @@
 # Temporary files
 *.tmp
 *.temp
+
+# Runtime files
+**/runtimes/
 
 # Others
 *.DS_Store

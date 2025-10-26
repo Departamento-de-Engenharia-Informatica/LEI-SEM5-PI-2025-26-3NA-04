@@ -24,12 +24,12 @@ namespace APDL.API.Domain.VesselTypes
             return list.ConvertAll(v => new VesselTypeDto
             {
                 Id = v.Id.AsString(),
-                Name = v.Name,
-                Description = v.Description,
-                Capacity = v.Capacity,
-                MaxRows = v.MaxRows,
-                MaxBays = v.MaxBays,
-                MaxTiers = v.MaxTiers
+                Name = v.Name.Value,
+                Description = v.Description.Value,
+                Capacity = v.Capacity.Value,
+                MaxRows = v.MaxRows.Value,
+                MaxBays = v.MaxBays.Value,
+                MaxTiers = v.MaxTiers.Value
             });
         }
 
@@ -40,14 +40,50 @@ namespace APDL.API.Domain.VesselTypes
             return new VesselTypeDto
             {
                 Id = v.Id.AsString(),
-                Name = v.Name,
-                Description = v.Description,
-                Capacity = v.Capacity,
-                MaxRows = v.MaxRows,
-                MaxBays = v.MaxBays,
-                MaxTiers = v.MaxTiers
+                Name = v.Name.Value,
+                Description = v.Description.Value,
+                Capacity = v.Capacity.Value,
+                MaxRows = v.MaxRows.Value,
+                MaxBays = v.MaxBays.Value,
+                MaxTiers = v.MaxTiers.Value
             };
         }
+
+
+        public async Task<List<VesselTypeDto>> SearchAsyncName(string name)
+        {
+            var vesselTypes = await _repo.GetByNameAsync(name);
+
+            return vesselTypes.ConvertAll(v => new VesselTypeDto
+            {
+                Id = v.Id.AsString(),
+                Name = v.Name.Value,
+                Description = v.Description.Value,
+                Capacity = v.Capacity.Value,
+                MaxRows = v.MaxRows.Value,
+                MaxBays = v.MaxBays.Value,
+                MaxTiers = v.MaxTiers.Value
+            });
+        }
+        
+        
+        public async Task<List<VesselTypeDto>> SearchAsyncDescription(string description)
+        {
+            var vesselTypes = await _repo.GetByDescriptionAsync(description);
+
+            return vesselTypes.ConvertAll(v => new VesselTypeDto
+            {
+                Id = v.Id.AsString(),
+                Name = v.Name.Value,
+                Description = v.Description.Value,
+                Capacity = v.Capacity.Value,
+                MaxRows = v.MaxRows.Value,
+                MaxBays = v.MaxBays.Value,
+                MaxTiers = v.MaxTiers.Value
+            });
+        }
+
+
 
         public async Task<VesselTypeDto> AddAsync(CreatingVesselTypeDto dto)
         {
@@ -57,12 +93,12 @@ namespace APDL.API.Domain.VesselTypes
             return new VesselTypeDto
             {
                 Id = vesselType.Id.AsString(),
-                Name = vesselType.Name,
-                Description = vesselType.Description,
-                Capacity = vesselType.Capacity,
-                MaxRows = vesselType.MaxRows,
-                MaxBays = vesselType.MaxBays,
-                MaxTiers = vesselType.MaxTiers
+                Name = vesselType.Name.Value,
+                Description = vesselType.Description.Value,
+                Capacity = vesselType.Capacity.Value,
+                MaxRows = vesselType.MaxRows.Value,
+                MaxBays = vesselType.MaxBays.Value,
+                MaxTiers = vesselType.MaxTiers.Value
             };
         }
 
@@ -75,12 +111,12 @@ namespace APDL.API.Domain.VesselTypes
             return new VesselTypeDto
             {
                 Id = vesselType.Id.AsString(),
-                Name = vesselType.Name,
-                Description = vesselType.Description,
-                Capacity = vesselType.Capacity,
-                MaxRows = vesselType.MaxRows,
-                MaxBays = vesselType.MaxBays,
-                MaxTiers = vesselType.MaxTiers
+                Name = vesselType.Name.Value,
+                Description = vesselType.Description.Value,
+                Capacity = vesselType.Capacity.Value,
+                MaxRows = vesselType.MaxRows.Value,
+                MaxBays = vesselType.MaxBays.Value,
+                MaxTiers = vesselType.MaxTiers.Value
             };
         }
 
@@ -93,12 +129,12 @@ namespace APDL.API.Domain.VesselTypes
             return new VesselTypeDto
             {
                 Id = vesselType.Id.AsString(),
-                Name = vesselType.Name,
-                Description = vesselType.Description,
-                Capacity = vesselType.Capacity,
-                MaxRows = vesselType.MaxRows,
-                MaxBays = vesselType.MaxBays,
-                MaxTiers = vesselType.MaxTiers
+                Name = vesselType.Name.Value,
+                Description = vesselType.Description.Value,
+                Capacity = vesselType.Capacity.Value,
+                MaxRows = vesselType.MaxRows.Value,
+                MaxBays = vesselType.MaxBays.Value,
+                MaxTiers = vesselType.MaxTiers.Value
             };
         }
     }

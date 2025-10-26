@@ -1,36 +1,41 @@
 using System;
+using System.Collections.Generic;
 using APDL.API.Domain.Shared;
+using APDL.API.Domain.VesselTypes.ValueObjects;
 
 namespace APDL.API.Domain.VesselTypes
 {
+    
     public class VesselType : Entity<VesselTypeId>, IAggregateRoot
     {
-        public string Name { get; private set; }
-        public string Description { get; private set; }
-        public int Capacity { get; private set; }
-        public int MaxRows { get; private set; }
-        public int MaxBays { get; private set; }
-        public int MaxTiers { get; private set; }
+        public Name Name { get; private set; }
+        public Description Description { get; private set; }
+        public Capacity Capacity { get; private set; }
+        public Dimension MaxRows { get; private set; }
+        public Dimension MaxBays { get; private set; }
+        public Dimension MaxTiers { get; private set; }
 
+        public VesselType() { }
         public VesselType(string name, string description, int capacity, int maxRows, int maxBays, int maxTiers)
         {
             Id = new VesselTypeId(Guid.NewGuid());
-            Name = name;
-            Description = description;
-            Capacity = capacity;
-            MaxRows = maxRows;
-            MaxBays = maxBays;
-            MaxTiers = maxTiers;
+            Name = new Name(name);
+            Description = new Description(description);
+            Capacity = new Capacity(capacity);
+            MaxRows = new Dimension(maxRows);
+            MaxBays = new Dimension(maxBays);
+            MaxTiers = new Dimension(maxTiers);
         }
 
         public void Update(string name, string description, int capacity, int maxRows, int maxBays, int maxTiers)
         {
-            Name = name;
-            Description = description;
-            Capacity = capacity;
-            MaxRows = maxRows;
-            MaxBays = maxBays;
-            MaxTiers = maxTiers;
+            Name = new Name(name);
+            Description = new Description(description);
+            Capacity = new Capacity(capacity);
+            MaxRows = new Dimension(maxRows);
+            MaxBays = new Dimension(maxBays);
+            MaxTiers = new Dimension(maxTiers);
         }
     }
+
 }

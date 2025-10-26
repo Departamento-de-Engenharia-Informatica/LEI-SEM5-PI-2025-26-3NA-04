@@ -5,7 +5,7 @@ using DDDSample1.Domain.VesselTypes;
 
 namespace DDDSample1.Infrastructure.VesselTypes
 {
-    internal class VesselTypeEntityTypeConfiguration : IEntityTypeConfiguration<VesselType>
+    public class VesselTypeEntityTypeConfiguration : IEntityTypeConfiguration<VesselType>
     {
         public void Configure(EntityTypeBuilder<VesselType> builder)
         {
