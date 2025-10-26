@@ -1,5 +1,3 @@
-
-
 using System;
 using APDL.API.Domain.Shared;
 
