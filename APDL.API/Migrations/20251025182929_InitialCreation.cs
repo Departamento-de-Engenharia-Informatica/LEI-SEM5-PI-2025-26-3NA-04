@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DDDNetCore.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialCreation : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,7 +21,7 @@ namespace DDDNetCore.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MaxCapacityTEU = table.Column<int>(type: "int", nullable: true),
+                    MaxCapacityTEU = table.Column<int>(type: "int", nullable: false),
                     CurrentOccupancyTEU = table.Column<int>(type: "int", nullable: false),
                     FacilityType = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false)
                 },
@@ -65,30 +65,6 @@ namespace DDDNetCore.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FacilityDockAssignments",
-                schema: "port",
-                columns: table => new
-                {
-                    FacilityId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    DebugColumn1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DockId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DistanceToDock = table.Column<double>(type: "float", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FacilityDockAssignments", x => new { x.FacilityId, x.Id });
-                    table.ForeignKey(
-                        name: "FK_FacilityDockAssignments_Facilities_FacilityId",
-                        column: x => x.FacilityId,
-                        principalSchema: "port",
-                        principalTable: "Facilities",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ShippingAgentRepresentatives",
                 schema: "port",
                 columns: table => new
@@ -113,18 +89,47 @@ namespace DDDNetCore.Migrations
                         principalColumn: "Id");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Vessels",
+                schema: "port",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    ImoNumber = table.Column<string>(type: "nvarchar(7)", maxLength: 7, nullable: true),
+                    VesselTypeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Operator = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Vessels", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Vessels_VesselTypes_VesselTypeId",
+                        column: x => x.VesselTypeId,
+                        principalSchema: "port",
+                        principalTable: "VesselTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_ShippingAgentRepresentatives_ShippingAgentId",
                 schema: "port",
                 table: "ShippingAgentRepresentatives",
                 column: "ShippingAgentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Vessels_VesselTypeId",
+                schema: "port",
+                table: "Vessels",
+                column: "VesselTypeId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "FacilityDockAssignments",
+                name: "Facilities",
                 schema: "port");
 
             migrationBuilder.DropTable(
@@ -132,15 +137,15 @@ namespace DDDNetCore.Migrations
                 schema: "port");
 
             migrationBuilder.DropTable(
-                name: "VesselTypes",
-                schema: "port");
-
-            migrationBuilder.DropTable(
-                name: "Facilities",
+                name: "Vessels",
                 schema: "port");
 
             migrationBuilder.DropTable(
                 name: "ShippingAgents",
+                schema: "port");
+
+            migrationBuilder.DropTable(
+                name: "VesselTypes",
                 schema: "port");
         }
     }

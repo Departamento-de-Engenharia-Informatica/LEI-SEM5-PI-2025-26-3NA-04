@@ -1,0 +1,84 @@
+
+@startuml Vessel_UseCase_2_2_2_Full
+
+' Nível 1 - Contexto
+actor "Port Authority Officer" as Agent
+rectangle "APDL System" {
+  component "VesselController"
+  component "VesselService"
+  component "IVesselRepository"
+  component "Vessel"
+  component "VesselType"
+  component "IVesselTypeRepository"
+}
+Agent --> VesselController : Register Vessel
+VesselController --> VesselService : Add / Delete / Search
+VesselService --> IVesselRepository : Persist Vessel
+VesselService --> IVesselTypeRepository : Validate Type
+IVesselTypeRepository --> VesselType : Validate Type
+IVesselRepository --> Vessel : Create Instance
+
+@enduml
+
+@startuml Vessel_UseCase_2_2_2_Containers
+
+' Nível 2 - Containers
+node "APDL System" {
+  [SPA Web App]
+  [REST API]
+  database "Relational DB"
+'  [Authentication Service]
+}
+[SPA Web App] --> [REST API]
+[REST API] --> [Relational DB]
+'  [REST API] --> [Authentication Service]
+
+@enduml
+
+@startuml Vessel_UseCase_2_2_2_Components
+
+' Nível 3 - Componentes internos
+package "REST API" {
+  [VesselController]
+  [VesselService]
+  [IVesselRepository]
+  [IVesselTypeRepository]
+  [Vessel]
+  [VesselType]
+  [CreatingVesselDto]
+}
+VesselController --> VesselService
+VesselService --> IVesselRepository
+VesselService --> IVesselTypeRepository
+VesselService --> CreatingVesselDto
+VesselService --> Vessel
+Vessel --> VesselType
+
+@enduml
+
+@startuml Vessel_UseCase_2_2_2_Classes
+
+' Nível 4 - Classes e métodos
+class Vessel {
+  - Name
+  - ImoNumber
+  - VesselTypeId
+  - VesselType
+  - Operator
+  + Vessel(name, imo, typeId, type, operator)
+}
+class CreatingVesselDto {
+  + Name
+  + ImoNumber
+  + VesselTypeId
+  + Operator
+}
+class VesselService {
+  + AddAsync(CreatingVesselDto)
+  + DeleteAsync(VesselId)
+  + SearchByNameAsync(string)
+  + SearchByOperatorAsync(string)
+  + GetByImoAsync(string)
+}
+
+@enduml

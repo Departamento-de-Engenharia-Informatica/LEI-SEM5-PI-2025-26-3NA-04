@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DDDNetCore.Migrations
 {
     [DbContext(typeof(DDDSample1DbContext))]
-    [Migration("20251022205259_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251025182929_InitialCreation")]
+    partial class InitialCreation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -66,6 +66,12 @@ namespace DDDNetCore.Migrations
                         .HasMaxLength(13)
                         .HasColumnType("nvarchar(13)");
 
+                    b.Property<string>("Location")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MaxCapacityTEU")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("Facilities", "port");
@@ -101,6 +107,22 @@ namespace DDDNetCore.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("VesselTypes", "port");
+                });
+
+            modelBuilder.Entity("APDL.API.Domain.Vessels.Vessel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("VesselTypeId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VesselTypeId");
+
+                    b.ToTable("Vessels", "port");
                 });
 
             modelBuilder.Entity("APDL.API.Domain.Storage.Warehouse", b =>
@@ -306,96 +328,78 @@ namespace DDDNetCore.Migrations
                     b.Navigation("Phone");
                 });
 
-            modelBuilder.Entity("APDL.API.Domain.Storage.Facility", b =>
+            modelBuilder.Entity("APDL.API.Domain.Vessels.Vessel", b =>
                 {
-                    b.OwnsMany("APDL.API.Domain.Storage.FacilityDockAssignment", "DockAssignments", b1 =>
+                    b.HasOne("APDL.API.Domain.VesselTypes.VesselType", "VesselType")
+                        .WithMany()
+                        .HasForeignKey("VesselTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("APDL.API.Domain.Vessels.ValueObjects.ImoNumber", "ImoNumber", b1 =>
                         {
-                            b1.Property<string>("FacilityId")
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
-
-                            b1.Property<string>("DebugColumn1")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<Guid>("DockId")
-                                .HasColumnType("uniqueidentifier")
-                                .HasColumnName("DockId");
-
-                            b1.HasKey("FacilityId", "Id");
-
-                            b1.ToTable("FacilityDockAssignments", "port");
-
-                            b1.WithOwner()
-                                .HasForeignKey("FacilityId");
-
-                            b1.OwnsOne("APDL.API.Domain.Storage.ValueObjects.Distance", "DistanceToDock", b2 =>
-                                {
-                                    b2.Property<string>("FacilityDockAssignmentFacilityId")
-                                        .HasColumnType("nvarchar(450)");
-
-                                    b2.Property<int>("FacilityDockAssignmentId")
-                                        .HasColumnType("int");
-
-                                    b2.Property<double>("Meters")
-                                        .HasColumnType("float")
-                                        .HasColumnName("DistanceToDock");
-
-                                    b2.HasKey("FacilityDockAssignmentFacilityId", "FacilityDockAssignmentId");
-
-                                    b2.ToTable("FacilityDockAssignments", "port");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("FacilityDockAssignmentFacilityId", "FacilityDockAssignmentId");
-                                });
-
-                            b1.Navigation("DistanceToDock");
-                        });
-
-                    b.OwnsOne("APDL.API.Domain.Storage.ValueObjects.Location", "Location", b1 =>
-                        {
-                            b1.Property<string>("FacilityId")
-                                .HasColumnType("nvarchar(450)");
+                            b1.Property<Guid>("VesselId")
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)")
-                                .HasColumnName("Location");
+                                .HasMaxLength(7)
+                                .HasColumnType("nvarchar(7)")
+                                .HasColumnName("ImoNumber");
 
-                            b1.HasKey("FacilityId");
+                            b1.HasKey("VesselId");
 
-                            b1.ToTable("Facilities", "port");
+                            b1.ToTable("Vessels", "port");
 
                             b1.WithOwner()
-                                .HasForeignKey("FacilityId");
+                                .HasForeignKey("VesselId");
                         });
 
-                    b.OwnsOne("APDL.API.Domain.Storage.ValueObjects.TEUCapacity", "MaxCapacityTEU", b1 =>
+                    b.OwnsOne("APDL.API.Domain.Vessels.ValueObjects.Name", "Name", b1 =>
                         {
-                            b1.Property<string>("FacilityId")
-                                .HasColumnType("nvarchar(450)");
+                            b1.Property<Guid>("VesselId")
+                                .HasColumnType("uniqueidentifier");
 
-                            b1.Property<int>("Value")
-                                .HasColumnType("int")
-                                .HasColumnName("MaxCapacityTEU");
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("nvarchar(100)")
+                                .HasColumnName("Name");
 
-                            b1.HasKey("FacilityId");
+                            b1.HasKey("VesselId");
 
-                            b1.ToTable("Facilities", "port");
+                            b1.ToTable("Vessels", "port");
 
                             b1.WithOwner()
-                                .HasForeignKey("FacilityId");
+                                .HasForeignKey("VesselId");
                         });
 
-                    b.Navigation("DockAssignments");
+                    b.OwnsOne("APDL.API.Domain.Vessels.ValueObjects.Operator", "Operator", b1 =>
+                        {
+                            b1.Property<Guid>("VesselId")
+                                .HasColumnType("uniqueidentifier");
 
-                    b.Navigation("Location");
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("nvarchar(50)")
+                                .HasColumnName("Operator");
 
-                    b.Navigation("MaxCapacityTEU");
+                            b1.HasKey("VesselId");
+
+                            b1.ToTable("Vessels", "port");
+
+                            b1.WithOwner()
+                                .HasForeignKey("VesselId");
+                        });
+
+                    b.Navigation("ImoNumber");
+
+                    b.Navigation("Name");
+
+                    b.Navigation("Operator");
+
+                    b.Navigation("VesselType");
                 });
 
             modelBuilder.Entity("APDL.API.Domain.ShippingAgentAggregate.ShippingAgent", b =>
