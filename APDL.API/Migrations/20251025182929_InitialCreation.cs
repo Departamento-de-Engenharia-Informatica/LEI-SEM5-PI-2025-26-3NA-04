@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace DDDNetCore.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialCreation : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -88,11 +89,40 @@ namespace DDDNetCore.Migrations
                         principalColumn: "Id");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Vessels",
+                schema: "port",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    ImoNumber = table.Column<string>(type: "nvarchar(7)", maxLength: 7, nullable: true),
+                    VesselTypeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Operator = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Vessels", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Vessels_VesselTypes_VesselTypeId",
+                        column: x => x.VesselTypeId,
+                        principalSchema: "port",
+                        principalTable: "VesselTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_ShippingAgentRepresentatives_ShippingAgentId",
                 schema: "port",
                 table: "ShippingAgentRepresentatives",
                 column: "ShippingAgentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Vessels_VesselTypeId",
+                schema: "port",
+                table: "Vessels",
+                column: "VesselTypeId");
         }
 
         /// <inheritdoc />
@@ -107,11 +137,15 @@ namespace DDDNetCore.Migrations
                 schema: "port");
 
             migrationBuilder.DropTable(
-                name: "VesselTypes",
+                name: "Vessels",
                 schema: "port");
 
             migrationBuilder.DropTable(
                 name: "ShippingAgents",
+                schema: "port");
+
+            migrationBuilder.DropTable(
+                name: "VesselTypes",
                 schema: "port");
         }
     }

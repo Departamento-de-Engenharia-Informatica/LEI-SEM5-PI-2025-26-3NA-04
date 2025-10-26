@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using APDL.API.Infrastructure.ShippingAgentInfrastructure;
 using APDL.API.Infrastructure.Storage;
 using APDL.API.Infrastructure.VesselTypes;
+using APDL.API.Infrastructure.Vessels;
 using APDL.API.Infrastructure.Shared;
 using APDL.API.Infrastructure;
 using APDL.API.Domain.Shared;
@@ -16,6 +17,7 @@ using APDL.API.Domain.ShippingAgentAggregate.Repos;
 using APDL.API.Domain.ShippingAgentAggregate;
 using APDL.API.Domain.Storage;
 using APDL.API.Domain.VesselTypes;
+using APDL.API.Domain.Vessels;
 
 
 namespace APDL.API
@@ -99,6 +101,9 @@ namespace APDL.API
 
             services.AddTransient<VesselTypeService>();
             services.AddTransient<IVesselTypeRepository, VesselTypeRepository>();
+
+            services.AddTransient<VesselService>();
+            services.AddTransient<IVesselRepository, VesselRepository>();
 
         }
     }
