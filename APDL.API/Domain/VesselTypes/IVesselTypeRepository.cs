@@ -7,6 +7,8 @@ namespace APDL.API.Domain.VesselTypes
 {
     public interface IVesselTypeRepository : IRepository<VesselType, VesselTypeId>
     {
-        Task<List<VesselType>> GetByNameOrDescriptionAsync(string searchTerm);
+        Task<List<VesselType>> GetByDescriptionAsync(string searchTerm);
+
+        Task<List<VesselType>> GetByNameAsync(string searchTerm);
     }
 }
