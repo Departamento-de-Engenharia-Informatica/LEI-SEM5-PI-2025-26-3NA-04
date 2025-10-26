@@ -1,0 +1,57 @@
+
+@startuml VesselType_UseCase_2_2_1_Full
+
+' Nível 1 - Contexto
+actor "Port Authority Officer" as Officer
+rectangle "APDL System" {
+  component "VesselTypeController"
+  component "VesselTypeService"
+  component "IVesselTypeRepository"
+  component "VesselType"
+}
+Officer --> VesselTypeController : Manage Vessel Types
+VesselTypeController --> VesselTypeService : Add / Update / Delete
+VesselTypeService --> IVesselTypeRepository : Persist Changes
+VesselTypeService --> VesselType : ChangeName()
+
+@enduml
+
+@startuml VesselType_UseCase_2_2_1_Containers
+
+' Nível 2 - Containers
+node "APDL System" {
+  [SPA Web App]
+  [REST API]
+  database "Relational DB"
+'  [Authentication Service]
+}
+[SPA Web App] --> [REST API]
+[REST API] --> [Relational DB]
+' [REST API] --> [Authentication Service]
+
+@enduml
+
+@startuml VesselType_UseCase_2_2_1_Components
+
+' Nível 3 - Componentes internos
+package "REST API" {
+  [VesselTypeController]
+  [VesselTypeService]
+  [IVesselTypeRepository]
+  [VesselType]
+}
+VesselTypeController --> VesselTypeService
+VesselTypeService --> IVesselTypeRepository
+IVesselTypeRepository --> VesselType
+
+@enduml
+
+@startuml VesselType_UseCase_2_2_1_Classes
+
+' Nível 4 - Classes e métodos
+class VesselType {
+  - Name
+  + ChangeName(string)
+}
+
+@enduml

@@ -67,5 +67,13 @@ namespace APDL.API.Controllers
             return NoContent();
         }
 
+        // POST
+        [HttpPost("{agentId}/representatives")]
+        public async Task<IActionResult> AddRepresentativeToAgent(Guid agentId, [FromBody] string representativeEmail)
+        {
+            var repDto = await _service.AddRepresentativeToAgentAsync(agentId, representativeEmail);
+            return Ok(repDto);
+        }
+
     }
 }
