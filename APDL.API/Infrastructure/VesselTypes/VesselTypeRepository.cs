@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using APDL.API.Domain.VesselTypes;
 using APDL.API.Infrastructure.Shared;
 
@@ -18,14 +19,19 @@ namespace APDL.API.Infrastructure.VesselTypes
             _context = context;
         }
 
-        public async Task<List<VesselType>> GetByNameOrDescriptionAsync(string searchTerm)
+        public async Task<List<VesselType>> GetByNameAsync(string name)
         {
             return await _context.VesselTypes
-                .Where(v => v.Name.Contains(searchTerm) || v.Description.Contains(searchTerm))
+                .Where(v => v.Name.Value.Contains(name))
                 .ToListAsync();
         }
 
-
+        public async Task<List<VesselType>> GetByDescriptionAsync(string description)
+        {
+            return await _context.VesselTypes
+                .Where(v => v.Description.Value.Contains(description))
+                .ToListAsync();
+        }
         
     }
 }
