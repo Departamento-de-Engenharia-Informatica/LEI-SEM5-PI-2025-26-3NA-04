@@ -19,7 +19,7 @@ namespace APDL.Tests.Domain.Vessels
             Assert.Equal("Evergreen", vessel.Name.Value);
             Assert.Equal("1234567", vessel.ImoNumber.Value);
             Assert.Equal(vesselTypeId, vessel.VesselTypeId);
-            Assert.Equal("Feeder", vessel.VesselType.Name);
+            Assert.Equal("Feeder", (IAsyncEnumerable<char>?)vessel.VesselType.Name);
             Assert.Equal("Maersk", vessel.Operator.Value);
         }
 
