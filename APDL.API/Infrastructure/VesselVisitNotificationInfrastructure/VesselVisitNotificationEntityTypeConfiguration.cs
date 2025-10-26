@@ -14,6 +14,8 @@ namespace APDL.API.Infrastructure.VesselVisitInfrastructure
 
             builder.HasKey(v => v.Id);
 
+            builder.Ignore(v => v.SafetyCrewOfficers);
+
             builder.Property(v => v.Id)
                 .HasConversion(
                     id => id.Value,
@@ -60,10 +62,6 @@ namespace APDL.API.Infrastructure.VesselVisitInfrastructure
                     .IsRequired();
             });
 
-            builder.Metadata.FindNavigation(nameof(VesselVisitNotification.SafetyCrewOfficers))
-                .SetPropertyAccessMode(PropertyAccessMode.Field);
-
-            builder.HasIndex("Status");
         }
     }
 }

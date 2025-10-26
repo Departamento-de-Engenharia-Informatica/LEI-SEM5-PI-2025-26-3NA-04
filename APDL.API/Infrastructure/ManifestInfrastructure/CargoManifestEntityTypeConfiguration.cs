@@ -55,9 +55,6 @@ namespace APDL.API.Infrastructure.ManifestInfrastructure
                     .HasColumnName("ContainerId")
                     .IsRequired();
             });
-
-            builder.Metadata.FindNavigation(nameof(CargoManifest.ContainerIds))
-                .SetPropertyAccessMode(PropertyAccessMode.Field);
         }
     }
 }

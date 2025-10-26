@@ -96,14 +96,14 @@ namespace APDL.API
             services.AddScoped<IVesselTypeRepository, VesselTypeRepository>();
             services.AddScoped<VesselTypeService>();
 
-            services.AddTransient<IFacilityRepository, FacilityRepository>();
-            services.AddTransient<FacilityService>();
+            services.AddScoped<IFacilityRepository, FacilityRepository>();
+            services.AddScoped<FacilityService>();
 
-            services.AddTransient<VesselTypeService>();
-            services.AddTransient<IVesselTypeRepository, VesselTypeRepository>();
+            services.AddScoped<VesselTypeService>();
+            services.AddScoped<IVesselTypeRepository, VesselTypeRepository>();
 
-            services.AddTransient<VesselService>();
-            services.AddTransient<IVesselRepository, VesselRepository>();
+            services.AddScoped<VesselService>();
+            services.AddScoped<IVesselRepository, VesselRepository>();
 
         }
     }
