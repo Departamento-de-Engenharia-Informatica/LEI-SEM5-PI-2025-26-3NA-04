@@ -44,24 +44,21 @@ namespace APDL.Tests
         }
 
         [Fact]
-        public void AddingDuplicateRepresentative_ShouldNotDuplicate()
+        public void AddingDuplicateRepresentative_ShouldThrowException()
         {
             var rep = CreateRep();
             var agent = new ShippingAgent("LegalName", null, "Address", "123456789", new List<ShippingAgentRepresentative> { rep });
 
-            agent.AddRepresentative(rep);
-
-            Assert.Single(agent.Representatives);
-        }
+            var ex = Assert.Throws<BusinessRuleValidationException>(() => agent.AddRepresentative(rep));
+            Assert.Contains("Representative already part of this organization", ex.Message);
+        } 
 
         [Fact]
         public void RemovingLastRepresentative_ShouldThrow()
         {
-            // Arrange
             var rep = CreateRep();
             var agent = new ShippingAgent("LegalName", null, "Address", "123456789", new List<ShippingAgentRepresentative> { rep });
 
-            // Act & Assert
             var ex = Assert.Throws<BusinessRuleValidationException>(() => agent.RemoveRepresentative(rep));
             Assert.Contains("must have at least one representative", ex.Message);
         }

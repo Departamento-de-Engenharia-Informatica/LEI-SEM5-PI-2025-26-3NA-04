@@ -1,0 +1,84 @@
+
+@startuml Facility_UseCase_2_2_4_Full
+
+' Nível 1 - Contexto
+actor "Port Authority Officer" as Agent
+rectangle "APDL System" {
+  component "FacilityController"
+  component "FacilityService"
+  component "IFacilityRepository"
+  component "Facility"
+  component "Warehouse"
+  component "Yard"
+}
+Agent --> FacilityController : Create Facility
+FacilityController --> FacilityService : AddAsync(dto)
+FacilityService --> IFacilityRepository : AddAsync(Facility)
+FacilityService --> Facility : AssignDock(), ChangeOccupancy()
+Facility <|-- Warehouse
+Facility <|-- Yard
+
+@enduml
+
+@startuml Facility_UseCase_2_2_4_Containers
+
+' Nível 2 - Containers
+node "APDL System" {
+  [SPA Web App]
+  [REST API]
+  database "Relational DB"
+'  [Authentication Service]
+}
+[SPA Web App] --> [REST API]
+[REST API] --> [Relational DB]
+' [REST API] --> [Authentication Service]
+
+@enduml
+
+@startuml Facility_UseCase_2_2_4_Components
+
+' Nível 3 - Componentes internos
+package "REST API" {
+  [FacilityController]
+  [FacilityService]
+  [IFacilityRepository]
+  [Facility]
+  [Warehouse]
+  [Yard]
+  [FacilityDto]
+  [CreatingFacilityDto]
+  [DockAssignmentDto]
+}
+FacilityController --> FacilityService
+FacilityService --> IFacilityRepository
+FacilityService --> FacilityDto
+FacilityService --> CreatingFacilityDto
+IFacilityRepository --> Facility
+Facility <|-- Warehouse
+Facility <|-- Yard
+FacilityDto --> DockAssignmentDto
+
+@enduml
+
+@startuml Facility_UseCase_2_2_4_Classes
+
+' Nível 4 - Classes e métodos
+class Facility {
+  - Location
+  - MaxCapacityTEU
+  - CurrentOccupancyTEU
+  - DockAssignments
+  + ChangeCurrentOccupancyTEU()
+  + AssignDock()
+}
+class Warehouse {
+  + Warehouse(Location, TEUCapacity)
+}
+class Yard {
+  + Yard(Location, TEUCapacity)
+}
+Facility <|-- Warehouse
+Facility <|-- Yard
+
+@enduml
+
