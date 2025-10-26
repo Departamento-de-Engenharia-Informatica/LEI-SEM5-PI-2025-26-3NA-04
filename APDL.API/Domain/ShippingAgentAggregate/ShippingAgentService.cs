@@ -11,18 +11,23 @@ namespace APDL.API.Domain.ShippingAgentAggregate
 {
     public class ShippingAgentService
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IShippingAgentRepository _repo;
 
-        public ShippingAgentService(IUnitOfWork unitOfWork, IShippingAgentRepository repo)
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IShippingAgentRepository _agentRepo;
+        private readonly IShippingAgentRepresentativeRepository _repRepo;
+        public ShippingAgentService(
+            IUnitOfWork unitOfWork, 
+            IShippingAgentRepository agentRepo,
+            IShippingAgentRepresentativeRepository repRepo) 
         {
             _unitOfWork = unitOfWork;
-            _repo = repo;
+            _agentRepo = agentRepo;
+            _repRepo = repRepo;
         }
 
         public async Task<List<ShippingAgentDto>> GetAllAsync()
         {
-            var agents = await _repo.GetAllAsync();
+            var agents = await _agentRepo.GetAllAsync();
 
             return agents.Select(agent => new ShippingAgentDto
             {
@@ -47,7 +52,7 @@ namespace APDL.API.Domain.ShippingAgentAggregate
         public async Task<ShippingAgentDto> GetByIdAsync(ShippingAgentId id)
         {
             Console.WriteLine($"SERVICE: Received ID = {id.Value}");
-            var agent = await _repo.GetByIdAsync(id);
+            var agent = await _agentRepo.GetByIdAsync(id);
             if (agent == null){
                 Console.WriteLine("DEBUG: Agent is NULL inside GetByIdAsync!");
                 return null;
@@ -96,7 +101,7 @@ namespace APDL.API.Domain.ShippingAgentAggregate
                 reps
             );
 
-            await _repo.AddAsync(agent);
+            await _agentRepo.AddAsync(agent);
             await _unitOfWork.CommitAsync();
 
             return new ShippingAgentDto
@@ -122,7 +127,7 @@ namespace APDL.API.Domain.ShippingAgentAggregate
 
         public async Task<ShippingAgentDto> UpdateAsync(ShippingAgentDto dto)
         {
-            var agent = await _repo.GetByIdAsync(new ShippingAgentId(dto.Id));
+            var agent = await _agentRepo.GetByIdAsync(new ShippingAgentId(dto.Id));
             if (agent == null) return null;
 
             agent.UpdateLegalName(dto.LegalName);
@@ -155,10 +160,10 @@ namespace APDL.API.Domain.ShippingAgentAggregate
 
         public async Task<ShippingAgentDto> DeleteAsync(ShippingAgentId id)
         {
-            var agent = await _repo.GetByIdAsync(id);
+            var agent = await _agentRepo.GetByIdAsync(id);
             if (agent == null) return null;
 
-            _repo.Remove(agent);
+            _agentRepo.Remove(agent);
             await _unitOfWork.CommitAsync();
 
             return new ShippingAgentDto
@@ -178,6 +183,33 @@ namespace APDL.API.Domain.ShippingAgentAggregate
                         Email = rep.Email.Value,
                         Phone = rep.Phone.Value
                     }).ToList()
+            };
+        }
+
+        public async Task<RepresentativeDto> AddRepresentativeToAgentAsync(Guid agentId, string representativeEmail)
+        {
+            var shippingAgentId = new ShippingAgentId(agentId);
+            var agent = await _agentRepo.GetByIdAsync(shippingAgentId);
+            if (agent == null)
+                throw new KeyNotFoundException($"Shipping agent {agentId} not found.");
+
+            var rep = await _repRepo.GetByEmailAsync(representativeEmail);
+            if (rep == null)
+                throw new KeyNotFoundException($"Representative {representativeEmail} not found");
+            
+            agent.AddRepresentative(rep);
+
+            await _unitOfWork.CommitAsync();
+
+            return new RepresentativeDto
+            {
+                Id = rep.Id.AsGuid(),
+                Name = rep.Name.Value,
+                CitizenId = rep.CitizenId.Value,
+                Nationality = rep.Nationality.Value,
+                Email = rep.Email.Value,
+                Phone = rep.Phone.Value,
+                IsActive = rep.IsActive
             };
         }
     }

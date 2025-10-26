@@ -56,15 +56,15 @@ namespace APDL.API.Domain.ShippingAgentAggregate
         {
             TaxNumber = new TaxNumber(taxNumber);
         }
-
-        // Representative management
         public void AddRepresentative(ShippingAgentRepresentative rep)
         {
             if (rep == null)
-                throw new BusinessRuleValidationException(nameof(rep));
+                throw new BusinessRuleValidationException("Representative is empty.");
 
-            if (!_representatives.Contains(rep))
-                _representatives.Add(rep);
+            if (_representatives.Contains(rep))
+                throw new BusinessRuleValidationException("Representative already part of this organization.");
+
+            _representatives.Add(rep);
         }
 
         public void RemoveRepresentative(ShippingAgentRepresentative rep)
