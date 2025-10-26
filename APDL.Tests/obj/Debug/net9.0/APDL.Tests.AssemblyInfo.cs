@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("APDL.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+22d0905a6598bf391e5452226753fe361272a8e2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+656a70822e982a6ae6c4fd00626c51ef9e3936f2")]
 [assembly: System.Reflection.AssemblyProductAttribute("APDL.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("APDL.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
