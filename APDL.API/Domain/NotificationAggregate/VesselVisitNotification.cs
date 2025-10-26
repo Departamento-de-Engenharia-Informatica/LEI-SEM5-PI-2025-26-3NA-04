@@ -43,8 +43,7 @@ namespace APDL.API.Domain.VesselVisitAggregate
         {
             if (expectedDeparture <= expectedArrival)
             {
-                throw new BusinessRuleValidationException(
-                    nameof(expectedDeparture), "Expected departure must be after expected arrival.");
+                throw new BusinessRuleValidationException("Expected departure must be after expected arrival.");
             }
 
             var safetyOfficers = new List<SafetyOfficer>();
@@ -89,8 +88,7 @@ namespace APDL.API.Domain.VesselVisitAggregate
 
             if (expectedDeparture <= ExpectedArrival.Value)
             {
-                throw new BusinessRuleValidationException(
-                    nameof(expectedDeparture), "Expected departure must be after expected arrival.");
+                throw new BusinessRuleValidationException("Expected departure must be after expected arrival.");
             }
 
             ExpectedDeparture = new ExpectedDeparture(expectedDeparture);
@@ -126,8 +124,7 @@ namespace APDL.API.Domain.VesselVisitAggregate
             
             if (_safetyCrewOfficers.Any(o => o.Name.Equals(officer.Name, StringComparison.OrdinalIgnoreCase)))
             {
-                throw new BusinessRuleValidationException(
-                    nameof(officerName), $"Safety officer '{officerName}' is already in the crew list.");
+                throw new BusinessRuleValidationException( "Safety officer is already in the crew list.");
             }
 
             _safetyCrewOfficers.Add(officer);
@@ -145,8 +142,7 @@ namespace APDL.API.Domain.VesselVisitAggregate
 
             if (officer == null)
             {
-                throw new BusinessRuleValidationException(
-                    nameof(officerName), $"Safety officer '{officerName}' not found in crew list.");
+                throw new BusinessRuleValidationException("Safety officer not found in crew list.");
             }
 
             _safetyCrewOfficers.Remove(officer);
