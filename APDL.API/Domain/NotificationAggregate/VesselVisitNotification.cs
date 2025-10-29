@@ -150,7 +150,7 @@ namespace APDL.API.Domain.VesselVisitAggregate
 
         public void Submit()
         {
-            if (Status != NotificationStatus.InProgress)
+             if (!Status.Equals(NotificationStatus.InProgress))
             {
                 throw new BusinessRuleValidationException("Only notifications in progress can be submitted.");
             }
@@ -160,7 +160,7 @@ namespace APDL.API.Domain.VesselVisitAggregate
 
         public void Approve()
         {
-            if (Status != NotificationStatus.Submitted)
+             if (!Status.Equals(NotificationStatus.Submitted))
             {
                 throw new BusinessRuleValidationException("Only submitted notifications can be approved.");
             }
@@ -170,7 +170,7 @@ namespace APDL.API.Domain.VesselVisitAggregate
 
         public void Reject()
         {
-            if (Status != NotificationStatus.Submitted)
+             if (!Status.Equals(NotificationStatus.Submitted))
             {
                 throw new BusinessRuleValidationException("Only submitted notifications can be rejected.");
             }

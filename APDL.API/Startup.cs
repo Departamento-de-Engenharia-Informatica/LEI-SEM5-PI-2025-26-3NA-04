@@ -18,6 +18,15 @@ using APDL.API.Domain.ShippingAgentAggregate;
 using APDL.API.Domain.Storage;
 using APDL.API.Domain.VesselTypes;
 using APDL.API.Domain.Vessels;
+using APDL.API.Domain.NotificationAggregate.Repos;
+using APDL.API.Infrastructure.VesselVisitInfrastructure;
+using APDL.API.Domain.VesselVisitAggregate;
+using APDL.API.Domain.ContainerAggregate.Repos;
+using APDL.API.Infrastructure.ContainerInfrastructure;
+using APDL.API.Domain.ContainerAggregate;
+using APDL.API.Domain.ManifestAggregate.Repos;
+using APDL.API.Infrastructure.ManifestInfrastructure;
+using APDL.API.Domain.ManifestAggregate;
 
 
 namespace APDL.API
@@ -93,9 +102,6 @@ namespace APDL.API
             services.AddScoped<IFacilityRepository, FacilityRepository>();
             services.AddScoped<FacilityService>();
 
-            services.AddScoped<IVesselTypeRepository, VesselTypeRepository>();
-            services.AddScoped<VesselTypeService>();
-
             services.AddScoped<IFacilityRepository, FacilityRepository>();
             services.AddScoped<FacilityService>();
 
@@ -105,6 +111,14 @@ namespace APDL.API
             services.AddScoped<VesselService>();
             services.AddScoped<IVesselRepository, VesselRepository>();
 
+            services.AddScoped<IVesselVisitNotificationRepository, VesselVisitNotificationRepository>();
+            services.AddScoped<VesselVisitNotificationService>();
+
+            services.AddScoped<IContainerRepository, ContainerRepository>();
+            services.AddScoped<ContainerService>();
+
+            services.AddScoped<ICargoManifestRepository, CargoManifestRepository>();
+            services.AddScoped<CargoManifestService>();
         }
     }
 }

@@ -86,6 +86,7 @@ namespace APDL.API.Domain.VesselVisitAggregate
                 dto.SafetyCrewOfficers
             );
 
+            Console.WriteLine($"Officers in notification: {string.Join(", ", notification.SafetyCrewOfficers.Select(o => o.Name))}");
             await _repo.AddAsync(notification);
             await _unitOfWork.CommitAsync();
 

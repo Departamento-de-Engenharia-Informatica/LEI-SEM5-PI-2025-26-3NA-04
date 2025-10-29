@@ -7,6 +7,7 @@ using APDL.API.Domain.ManifestAggregate;
 using APDL.API.Domain.ManifestAggregate.Repos;
 using APDL.API.Domain.CargoManifestAggregate.ValueObjects;
 using APDL.API.Infrastructure.Shared;
+using APDL.API.Domain.NotificationAggregate;
 
 namespace APDL.API.Infrastructure.ManifestInfrastructure
 {
@@ -23,9 +24,10 @@ namespace APDL.API.Infrastructure.ManifestInfrastructure
             Guid vesselVisitNotificationId, 
             bool isLoadingManifest)
         {
+            VesselVisitNotificationId id = new VesselVisitNotificationId(vesselVisitNotificationId);
             return await _context.CargoManifests
                 .AnyAsync(m => 
-                    m.VesselVisitNotificationId.AsGuid() == vesselVisitNotificationId && 
+                    m.VesselVisitNotificationId == id && 
                     m.IsLoadingManifest == isLoadingManifest);
         }
 
