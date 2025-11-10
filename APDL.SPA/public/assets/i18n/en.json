@@ -1,0 +1,30 @@
+{
+  "APP": {
+    "TITLE": "APDL Operations System",
+    "WELCOME": "Welcome"
+  },
+  "MENU": {
+    "HOME": "Home",
+    "VESSEL_TYPES": "Vessel Types",
+    "VESSELS": "Vessels",
+    "DOCKS": "Docks",
+    "STORAGE_AREAS": "Storage Areas",
+    "SHIPPING_AGENTS": "Shipping Agents",
+    "VISIT_APPROVALS": "Visit Approvals",
+    "VISIT_NOTIFICATIONS": "Visit Notifications",
+    "STAFF": "Staff",
+    "RESOURCES": "Resources",
+    "QUALIFICATIONS": "Qualifications",
+    "3D_VISUALIZATION": "3D Visualization"
+  },
+  "USER": {
+    "WELCOME": "Welcome",
+    "GUEST": "Guest",
+    "LOGOUT": "Logout"
+  },
+  "LANGUAGE": {
+    "SELECT": "Language",
+    "EN": "English",
+    "PT": "Portuguese"
+  }
+}

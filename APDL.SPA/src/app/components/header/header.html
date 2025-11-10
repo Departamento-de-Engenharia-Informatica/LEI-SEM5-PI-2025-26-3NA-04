@@ -1,0 +1,18 @@
+<header class="app-header">
+    <div class="header-content">
+        <div class="logo-section">
+            <h1 class="system-name">{{ 'APP.TITLE' | translate }}</h1>
+        </div>
+
+        <div class="header-actions">
+            <div class="user-info" *ngIf="currentUser">
+                <span class="user-name">{{ getUserDisplayName() }}</span>
+                <span class="user-role">{{ getUserRole() }}</span>
+            </div>
+
+            <div class="user-info" *ngIf="!currentUser">
+                <span class="user-name">Guest</span>
+            </div>
+        </div>
+    </div>
+</header>
