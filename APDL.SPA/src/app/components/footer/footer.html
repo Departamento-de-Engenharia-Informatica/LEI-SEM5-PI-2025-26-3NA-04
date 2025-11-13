@@ -1,0 +1,34 @@
+<footer class="app-footer">
+  <div class="footer-content">
+    <div class="footer-left">
+      <p class="copyright">
+        © {{ currentYear }} APDL - Administração dos Portos do Douro, Leixões e Viana do Castelo
+      </p>
+      <p class="footer-subtitle">
+        {{ 'FOOTER.TAGLINE' | translate }}
+      </p>
+    </div>
+
+    <div class="footer-right">
+      <div class="language-selector">
+        <span class="language-label">{{ 'LANGUAGE.SELECT' | translate }}:</span>
+        <button 
+          class="lang-btn" 
+          [class.active]="isCurrentLang('en')"
+          (click)="switchLanguage('en')"
+          [title]="'LANGUAGE.EN' | translate"
+        >
+          EN
+        </button>
+        <button 
+          class="lang-btn" 
+          [class.active]="isCurrentLang('pt')"
+          (click)="switchLanguage('pt')"
+          [title]="'LANGUAGE.PT' | translate"
+        >
+          PT
+        </button>
+      </div>
+    </div>
+  </div>
+</footer>

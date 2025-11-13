@@ -4,11 +4,14 @@ using System;
 using System.Threading.Tasks;
 using APDL.API.Domain.Storage;
 using APDL.API.Domain.Shared;
+using APDL.API.Infrastructure.Authorization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace APDL.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class FacilitiesController : ControllerBase
     {
         private readonly FacilityService _service;
@@ -19,6 +22,7 @@ namespace APDL.API.Controllers
         }
 
         // GET: api/Products
+        [RequireRole("Admin", "Logistics Operator")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<FacilityDto>>> GetAll()
         {
@@ -26,13 +30,14 @@ namespace APDL.API.Controllers
             {
                 return await _service.GetAllAsync();
             }
-            catch(BusinessRuleValidationException ex)
+            catch (BusinessRuleValidationException ex)
             {
-                return BadRequest(new {Message = ex.Message});
+                return BadRequest(new { Message = ex.Message });
             }
         }
 
         // GET: api/Products/id
+        [RequireRole("Admin", "Logistics Operator")]
         [HttpGet("{id}")]
         public async Task<ActionResult<FacilityDto>> GetById(Guid id)
         {
@@ -41,15 +46,16 @@ namespace APDL.API.Controllers
                 var facility = await _service.GetByIdAsync(new FacilityId(id));
                 if (facility == null)
                     return NotFound();
-                return facility;    
+                return facility;
             }
-            catch(BusinessRuleValidationException ex)
+            catch (BusinessRuleValidationException ex)
             {
-                return BadRequest(new {Message = ex.Message});
+                return BadRequest(new { Message = ex.Message });
             }
         }
 
         // POST: api/Products
+        [RequireRole("Admin", "Logistics Operator")]
         [HttpPost]
         public async Task<ActionResult<FacilityDto>> Create(CreatingFacilityDto dto)
         {
@@ -65,6 +71,7 @@ namespace APDL.API.Controllers
         }
 
         // PUT: api/Products/id
+        [RequireRole("Admin", "Logistics Operator")]
         [HttpPut("{id}")]
         public async Task<ActionResult<FacilityDto>> Update(Guid id, FacilityDto dto)
         {
@@ -85,6 +92,7 @@ namespace APDL.API.Controllers
         }
 
         // DELETE: api/Products/id
+        [RequireRole("Admin", "Logistics Operator")]
         [HttpDelete("{id}")]
         public async Task<ActionResult<FacilityDto>> SoftDelete(Guid id)
         {

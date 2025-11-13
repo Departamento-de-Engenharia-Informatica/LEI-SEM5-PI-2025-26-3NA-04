@@ -1,8 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Header } from '../header/header';
+import { Footer } from '../footer/footer';
 import { Auth } from '../../services/auth';
 import { MenuItem, MENU_ITEMS } from '../../models/menu';
 import { TranslatePipe, TranslateDirective } from "@ngx-translate/core";
@@ -16,7 +17,8 @@ import { TranslatePipe, TranslateDirective } from "@ngx-translate/core";
     RouterLink,
     RouterLinkActive,
     Header,
-    TranslatePipe, 
+    Footer,
+    TranslatePipe,
     TranslateDirective
   ],
   templateUrl: './layout.html',
@@ -27,7 +29,10 @@ export class Layout implements OnInit, OnDestroy {
   visibleMenuItems: MenuItem[] = [];
   private userSubscription?: Subscription;
 
-  constructor(private authService: Auth) { }
+  constructor(
+    private authService: Auth,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
     this.userSubscription = this.authService.currentUser$.subscribe(user => {

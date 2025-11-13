@@ -12,7 +12,9 @@ using APDL.API.Domain.ContainerAggregate;
 using APDL.API.Infrastructure.ContainerInfrastructure;
 using APDL.API.Domain.VesselVisitAggregate;
 using APDL.API.Infrastructure.VesselVisitInfrastructure;
+using APDL.API.Infrastructure.UserInfrastructure;
 using APDL.API.Infrastructure.Vessels;
+using APDL.API.Domain.UserAggregate;
 
 
 namespace APDL.API.Infrastructure
@@ -29,7 +31,7 @@ namespace APDL.API.Infrastructure
         public DbSet<VesselType> VesselTypes { get; set; }
 
         public DbSet<Vessel> Vessels { get; set; }
-
+        public DbSet<User> Users { get; set; }
         public DDDSample1DbContext(DbContextOptions<DDDSample1DbContext> options)
             : base(options)
         {
@@ -45,6 +47,7 @@ namespace APDL.API.Infrastructure
             modelBuilder.ApplyConfiguration(new FacilityEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new VesselTypeEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new VesselEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new UserEntityTypeConfiguration());
         }
     }
 }

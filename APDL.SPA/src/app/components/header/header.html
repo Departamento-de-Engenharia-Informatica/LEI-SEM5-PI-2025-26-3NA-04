@@ -11,8 +11,17 @@
             </div>
 
             <div class="user-info" *ngIf="!currentUser">
-                <span class="user-name">Guest</span>
+                <span class="user-name">{{ 'USER.GUEST' | translate }}</span>
             </div>
+
+            <button 
+                *ngIf="currentUser" 
+                class="logout-btn" 
+                (click)="logout()"
+                [title]="'USER.LOGOUT' | translate"
+            >
+                {{ 'USER.LOGOUT' | translate }}
+            </button>
         </div>
     </div>
 </header>

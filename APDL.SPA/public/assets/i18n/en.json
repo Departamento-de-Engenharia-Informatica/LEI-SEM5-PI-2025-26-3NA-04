@@ -3,6 +3,11 @@
     "TITLE": "APDL Operations System",
     "WELCOME": "Welcome"
   },
+  "LOGIN": {
+    "WELCOME": "Welcome!",
+    "MESSAGE": "Please login with your APDL credentials to access the operations system.",
+    "BUTTON": "Login with Auth0"
+  },
   "MENU": {
     "HOME": "Home",
     "VESSEL_TYPES": "Vessel Types",
@@ -26,5 +31,16 @@
     "SELECT": "Language",
     "EN": "English",
     "PT": "Portuguese"
+  },
+    "ACCESS_DENIED": {
+    "TITLE": "Access Denied",
+    "MESSAGE": "You don't have permission to access this page.",
+    "LOGGED_IN_AS": "Logged in as",
+    "YOUR_ROLE": "Your role",
+    "GO_HOME": "Go to Home",
+    "HELP": "If you believe you should have access to this page, please contact your administrator."
+  },
+  "FOOTER": {
+    "TAGLINE": "Port Operations Management System"
   }
 }

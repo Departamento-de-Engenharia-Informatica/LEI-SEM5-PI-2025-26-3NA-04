@@ -6,11 +6,14 @@ using APDL.API.Domain.Shared;
 using APDL.API.Domain.ContainerAggregate;
 using APDL.API.Domain.ContainerAggregate.DTO;
 using APDL.API.Domain.ContainerAggregate.ValueObjects;
+using Microsoft.AspNetCore.Authorization;
+using APDL.API.Infrastructure.Authorization;
 
 namespace APDL.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ContainersController : ControllerBase
     {
         private readonly ContainerService _service;
@@ -21,6 +24,7 @@ namespace APDL.API.Controllers
         }
 
         // GET: api/Containers
+        [RequireRole("Admin", "Shipping Agent Representative", "Logistics Operator", "Port Authority Officer")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ContainerDto>>> GetAll()
         {
@@ -29,6 +33,7 @@ namespace APDL.API.Controllers
         }
 
         // GET: api/Containers/{id}
+        [RequireRole("Admin", "Shipping Agent Representative", "Logistics Operator", "Port Authority Officer")]
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<ContainerDto>> GetById(Guid id)
         {
@@ -40,7 +45,7 @@ namespace APDL.API.Controllers
         }
 
         // GET: api/Containers/number/{containerNumber}
-        // Get container by its unique container number (e.g., MSCU1234567)
+        [RequireRole("Admin", "Shipping Agent Representative", "Logistics Operator", "Port Authority Officer")]
         [HttpGet("number/{containerNumber}")]
         public async Task<ActionResult<ContainerDto>> GetByContainerNumber(string containerNumber)
         {
@@ -52,6 +57,7 @@ namespace APDL.API.Controllers
         }
 
         // POST: api/Containers
+        [RequireRole("Admin", "Shipping Agent Representative")]
         [HttpPost]
         public async Task<ActionResult<ContainerDto>> Create(CreateContainerDto dto)
         {
@@ -67,6 +73,7 @@ namespace APDL.API.Controllers
         }
 
         // PUT: api/Containers/{id}
+        [RequireRole("Admin", "Shipping Agent Representative")]
         [HttpPut("{id:guid}")]
         public async Task<ActionResult<ContainerDto>> Update(Guid id, UpdateContainerDto dto)
         {
@@ -88,6 +95,7 @@ namespace APDL.API.Controllers
         }
 
         // DELETE: api/Containers/{id}
+        [RequireRole("Admin", "Shipping Agent Representative")]
         [HttpDelete("{id:guid}")]
         public async Task<ActionResult> Delete(Guid id)
         {
