@@ -4,11 +4,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using APDL.API.Domain.ShippingAgentAggregate;
 using APDL.API.Domain.ShippingAgentAggregate.DTO;
+using Microsoft.AspNetCore.Authorization;
+using APDL.API.Infrastructure.Authorization;
 
 namespace APDL.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ShippingAgentRepresentativesController : ControllerBase
     {
         private readonly ShippingAgentRepresentativeService _service;
@@ -19,6 +22,7 @@ namespace APDL.API.Controllers
         }
 
         // GET: api/ShippingAgentRepresentatives
+        [RequireRole("Admin", "Port Authority Officer")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<RepresentativeDto>>> GetAll()
         {
@@ -27,6 +31,7 @@ namespace APDL.API.Controllers
         }
 
         // GET: api/ShippingAgentRepresentatives/{id}
+        [RequireRole("Admin", "Port Authority Officer")]
         [HttpGet("{id}")]
         public async Task<ActionResult<RepresentativeDto>> GetById(Guid id)
         {
@@ -36,6 +41,7 @@ namespace APDL.API.Controllers
         }
 
         // POST: api/ShippingAgentRepresentatives
+        [RequireRole("Admin", "Port Authority Officer")]
         [HttpPost]
         public async Task<ActionResult<RepresentativeDto>> Create(CreateRepresentativeDto dto)
         {
@@ -44,6 +50,7 @@ namespace APDL.API.Controllers
         }
 
         // PUT: api/ShippingAgentRepresentatives/{id}
+        [RequireRole("Admin", "Port Authority Officer")]
         [HttpPut("{id}")]
         public async Task<ActionResult<RepresentativeDto>> Update(Guid id, RepresentativeDto dto)
         {
@@ -56,6 +63,7 @@ namespace APDL.API.Controllers
         }
 
         // DELETE: api/ShippingAgentRepresentatives/{id}
+        [RequireRole("Admin", "Port Authority Officer")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(Guid id)
         {
@@ -66,6 +74,7 @@ namespace APDL.API.Controllers
         }
 
         // PATCH: api/ShippingAgentRepresentatives/{id}/deactivate
+        [RequireRole("Admin", "Port Authority Officer")]
         [HttpPatch("{id}/deactivate")]
         public async Task<ActionResult> Deactivate(Guid id)
         {
@@ -78,6 +87,7 @@ namespace APDL.API.Controllers
         }
 
         // PATCH: api/ShippingAgentRepresentatives/{id}/reactivate
+        [RequireRole("Admin", "Port Authority Officer")]
         [HttpPatch("{id}/reactivate")]
         public async Task<ActionResult> Reactivate(Guid id)
         {

@@ -6,11 +6,14 @@ using APDL.API.Domain.Shared;
 using APDL.API.Domain.VesselVisitAggregate;
 using APDL.API.Domain.NotificationAggregate;
 using APDL.API.Domain.NotificationAggregate.DTO;
+using Microsoft.AspNetCore.Authorization;
+using APDL.API.Infrastructure.Authorization;
 
 namespace APDL.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class VesselVisitNotificationsController : ControllerBase
     {
         private readonly VesselVisitNotificationService _service;
@@ -20,6 +23,7 @@ namespace APDL.API.Controllers
             _service = service;
         }
 
+        [RequireRole("Admin", "Shipping Agent Representative", "Logistics Operator", "Port Authority Officer")]
         // GET: api/VesselVisitNotifications
         [HttpGet]
         public async Task<ActionResult<IEnumerable<VesselVisitNotificationDto>>> GetAll()
@@ -29,6 +33,7 @@ namespace APDL.API.Controllers
         }
 
         // GET: api/VesselVisitNotifications/{id}
+        [RequireRole("Admin", "Shipping Agent Representative", "Logistics Operator", "Port Authority Officer")]
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<VesselVisitNotificationDto>> GetById(Guid id)
         {
@@ -40,6 +45,7 @@ namespace APDL.API.Controllers
         }
 
         // GET: api/VesselVisitNotifications/status/{status}
+        [RequireRole("Admin", "Shipping Agent Representative", "Logistics Operator", "Port Authority Officer")]
         [HttpGet("status/{status}")]
         public async Task<ActionResult<IEnumerable<VesselVisitNotificationDto>>> GetByStatus(string status)
         {
@@ -55,6 +61,7 @@ namespace APDL.API.Controllers
         }
 
         // GET: api/VesselVisitNotifications/pending
+        [RequireRole("Admin", "Shipping Agent Representative", "Logistics Operator", "Port Authority Officer")]
         [HttpGet("pending")]
         public async Task<ActionResult<IEnumerable<VesselVisitNotificationDto>>> GetPending()
         {
@@ -63,6 +70,7 @@ namespace APDL.API.Controllers
         }
 
         // POST: api/VesselVisitNotifications
+        [RequireRole("Admin", "Shipping Agent Representative")]
         [HttpPost]
         public async Task<ActionResult<VesselVisitNotificationDto>> Create(CreateVesselVisitNotificationDto dto)
         {
@@ -78,6 +86,7 @@ namespace APDL.API.Controllers
         }
 
         // PUT: api/VesselVisitNotifications/{id}
+        [RequireRole("Admin", "Shipping Agent Representative", "Port Authority Officer")]
         [HttpPut("{id:guid}")]
         public async Task<ActionResult<VesselVisitNotificationDto>> Update(Guid id, UpdateVesselVisitNotificationDto dto)
         {
@@ -99,6 +108,7 @@ namespace APDL.API.Controllers
         }
 
         // POST: api/VesselVisitNotifications/{id}/submit
+        [RequireRole("Admin", "Shipping Agent Representative")]
         [HttpPost("{id:guid}/submit")]
         public async Task<ActionResult> Submit(Guid id)
         {
@@ -114,6 +124,7 @@ namespace APDL.API.Controllers
         }
 
         // POST: api/VesselVisitNotifications/{id}/approve
+        [RequireRole("Admin", "Port Authority Officer")]
         [HttpPost("{id:guid}/approve")]
         public async Task<ActionResult> Approve(Guid id)
         {
@@ -129,6 +140,7 @@ namespace APDL.API.Controllers
         }
 
         // POST: api/VesselVisitNotifications/{id}/reject
+        [RequireRole("Admin", "Port Authority Officer")]
         [HttpPost("{id:guid}/reject")]
         public async Task<ActionResult> Reject(Guid id)
         {
@@ -144,6 +156,7 @@ namespace APDL.API.Controllers
         }
 
         // DELETE: api/VesselVisitNotifications/{id}
+        [RequireRole("Admin", "Shipping Agent Representative")]
         [HttpDelete("{id:guid}")]
         public async Task<ActionResult> Delete(Guid id)
         {

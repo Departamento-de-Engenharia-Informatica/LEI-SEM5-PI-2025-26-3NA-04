@@ -1,0 +1,26 @@
+<div class="access-denied-container">
+  <div class="access-denied-card">
+    <div class="icon">🚫</div>
+    <h1>{{ 'ACCESS_DENIED.TITLE' | translate }}</h1>
+    <p class="message">{{ 'ACCESS_DENIED.MESSAGE' | translate }}</p>
+    
+    <div class="details" *ngIf="authService.getCurrentUser() as user">
+      <p class="user-info">
+        <strong>{{ 'ACCESS_DENIED.LOGGED_IN_AS' | translate }}:</strong> {{ user.name }}
+      </p>
+      <p class="role-info">
+        <strong>{{ 'ACCESS_DENIED.YOUR_ROLE' | translate }}:</strong> {{ user.role }}
+      </p>
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary" routerLink="/home">
+        🏠 {{ 'ACCESS_DENIED.GO_HOME' | translate }}
+      </button>
+    </div>
+
+    <p class="help-text">
+      {{ 'ACCESS_DENIED.HELP' | translate }}
+    </p>
+  </div>
+</div>

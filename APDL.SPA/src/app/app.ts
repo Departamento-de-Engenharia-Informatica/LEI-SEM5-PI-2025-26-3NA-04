@@ -1,4 +1,4 @@
-import { Component, inject, NgZone } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet, RouterLink } from '@angular/router';
 import { Auth } from './services/auth';
 import {
@@ -17,26 +17,13 @@ export class AppComponent {
   private translate = inject(TranslateService);
 
   constructor(
-    private authService: Auth,
-    private ngZone: NgZone,
+    private authService: Auth
   ) {
     this.translate.addLangs(['pt', 'en']);
     this.translate.setFallbackLang('en');
+
+    const browserLang = this.translate.getBrowserLang();
+    const langToUse = browserLang?.match(/en|pt/) ? browserLang : 'en';
     this.translate.use('pt');
-
-    const originalMockLogin = authService.mockLogin.bind(authService);
-    const originalLogout = authService.logout.bind(authService);
-
-    authService.mockLogin = (userId: string) => {
-      this.ngZone.run(() => originalMockLogin(userId));
-    };
-
-    authService.logout = () => {
-      this.ngZone.run(() => originalLogout());
-    };
-
-    (window as any).authService = authService;
-
-    console.log('Current user:', authService.getCurrentUser());
   }
 }

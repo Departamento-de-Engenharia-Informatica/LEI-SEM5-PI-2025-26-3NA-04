@@ -3,7 +3,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background-color: #1e2a38; /* dark/nav color */
+  background-color: #2c3e50;
   color: white;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
@@ -21,7 +21,7 @@
 }
 
 .logo-img {
-  height: 40px; /* adjust size as needed */
+  height: 40px;
   width: auto;
 }
 
@@ -49,4 +49,31 @@
 .user-role {
   font-size: 0.85rem;
   opacity: 0.8;
+}
+
+/* Logout button styles */
+.logout-btn {
+  padding: 0.5rem 1rem;
+  background-color: rgba(231, 76, 60, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.logout-btn:hover {
+  background-color: rgba(192, 57, 43, 1);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.4);
+}
+
+.logout-btn:active {
+  transform: translateY(0);
 }

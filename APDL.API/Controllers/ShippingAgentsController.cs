@@ -4,11 +4,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using APDL.API.Domain.ShippingAgentAggregate;
 using APDL.API.Domain.ShippingAgentAggregate.DTO;
+using Microsoft.AspNetCore.Authorization;
+using APDL.API.Infrastructure.Authorization;
 
 namespace APDL.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ShippingAgentsController : ControllerBase
     {
         private readonly ShippingAgentService _service;
@@ -19,6 +22,7 @@ namespace APDL.API.Controllers
         }
 
         // GET: api/ShippingAgent
+        [RequireRole("Admin", "Port Authority Officer")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ShippingAgentDto>>> GetAll()
         {
@@ -27,6 +31,7 @@ namespace APDL.API.Controllers
         }
 
         // GET: api/ShippingAgent/{id}
+        [RequireRole("Admin", "Port Authority Officer")]
         [HttpGet("{id}")]
         public async Task<ActionResult<ShippingAgentDto>> GetById(string id)
         {
@@ -38,6 +43,7 @@ namespace APDL.API.Controllers
         }
 
         // POST: api/ShippingAgent
+        [RequireRole("Admin", "Port Authority Officer")]
         [HttpPost]
         public async Task<ActionResult<ShippingAgentDto>> Create(CreateShippingAgentDto dto)
         {
@@ -46,6 +52,7 @@ namespace APDL.API.Controllers
         }
 
         // PUT: api/ShippingAgent/{id}
+        [RequireRole("Admin", "Port Authority Officer")]
         [HttpPut("{id:guid}")]
         public async Task<ActionResult<ShippingAgentDto>> Update(Guid id, ShippingAgentDto dto)
         {
@@ -58,6 +65,7 @@ namespace APDL.API.Controllers
         }
 
         // DELETE: api/ShippingAgent/{id}
+        [RequireRole("Admin", "Port Authority Officer")]
         [HttpDelete("{id:guid}")]
         public async Task<ActionResult> Delete(Guid id)
         {
@@ -68,6 +76,7 @@ namespace APDL.API.Controllers
         }
 
         // POST
+        [RequireRole("Admin", "Port Authority Officer")]
         [HttpPost("{agentId}/representatives")]
         public async Task<IActionResult> AddRepresentativeToAgent(Guid agentId, [FromBody] string representativeEmail)
         {

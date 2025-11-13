@@ -38,4 +38,8 @@ export class Header implements OnInit, OnDestroy {
     if (!this.currentUser) return '';
     return this.currentUser.role;
   }
+
+  logout(): void {
+    this.authService.logout();
+  }
 }

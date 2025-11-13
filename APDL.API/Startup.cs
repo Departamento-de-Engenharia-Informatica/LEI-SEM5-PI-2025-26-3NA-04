@@ -27,6 +27,10 @@ using APDL.API.Domain.ContainerAggregate;
 using APDL.API.Domain.ManifestAggregate.Repos;
 using APDL.API.Infrastructure.ManifestInfrastructure;
 using APDL.API.Domain.ManifestAggregate;
+using APDL.API.Domain.UserAggregate;
+using APDL.API.Infrastructure.UserInfrastructure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 
 namespace APDL.API
@@ -50,6 +54,35 @@ namespace APDL.API
             // services.AddDbContext<DDDSample1DbContext>(opt =>
             //     opt.UseInMemoryDatabase("DDDSample1DB")
             //     .ReplaceService<IValueConverterSelector, StronglyEntityIdValueConverterSelector>());
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAngularApp", policy =>
+                {
+                    policy.WithOrigins("http://localhost:4200")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                });
+            });
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.Authority = "https://apdl-operations.eu.auth0.com";
+                options.Audience = "https://localhost:5001/api";
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true
+                };
+            });
 
             services.AddDbContext<DDDSample1DbContext>(opt =>
                 opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
@@ -78,9 +111,12 @@ namespace APDL.API
 
             app.UseRouting();
 
+            app.UseCors("AllowAngularApp");
+
             app.UseSwagger();
             app.UseSwaggerUI();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -119,6 +155,9 @@ namespace APDL.API
 
             services.AddScoped<ICargoManifestRepository, CargoManifestRepository>();
             services.AddScoped<CargoManifestService>();
+
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<UserService>();
         }
     }
 }
