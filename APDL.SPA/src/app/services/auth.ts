@@ -118,10 +118,6 @@ export class Auth {
       this.currentUserSubject.next(user);
       this.isLoadingSubject.next(false);
 
-            // ✅ ADD THIS TEST BLOCK
-      console.log('=== TESTING ROLE-BASED ACCESS ===');
-      console.log('Current user role:', user.role);
-
       const currentUrl = this.router.url;
       if (currentUrl === '/login') {
         console.log("Current url:", currentUrl);
