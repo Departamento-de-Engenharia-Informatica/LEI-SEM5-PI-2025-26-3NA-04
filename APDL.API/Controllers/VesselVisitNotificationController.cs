@@ -23,8 +23,8 @@ namespace APDL.API.Controllers
             _service = service;
         }
 
-        [RequireRole("Admin", "Shipping Agent Representative", "Logistics Operator", "Port Authority Officer")]
         // GET: api/VesselVisitNotifications
+        [RequireRole("Admin", "Shipping Agent Representative", "Logistics Operator", "Port Authority Officer")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<VesselVisitNotificationDto>>> GetAll()
         {
@@ -61,7 +61,7 @@ namespace APDL.API.Controllers
         }
 
         // GET: api/VesselVisitNotifications/pending
-        [RequireRole("Admin", "Shipping Agent Representative", "Logistics Operator", "Port Authority Officer")]
+        [RequireRole("Admin", "Port Authority Officer")]
         [HttpGet("pending")]
         public async Task<ActionResult<IEnumerable<VesselVisitNotificationDto>>> GetPending()
         {
@@ -86,7 +86,7 @@ namespace APDL.API.Controllers
         }
 
         // PUT: api/VesselVisitNotifications/{id}
-        [RequireRole("Admin", "Shipping Agent Representative", "Port Authority Officer")]
+        [RequireRole("Admin", "Shipping Agent Representative")]
         [HttpPut("{id:guid}")]
         public async Task<ActionResult<VesselVisitNotificationDto>> Update(Guid id, UpdateVesselVisitNotificationDto dto)
         {
@@ -126,11 +126,11 @@ namespace APDL.API.Controllers
         // POST: api/VesselVisitNotifications/{id}/approve
         [RequireRole("Admin", "Port Authority Officer")]
         [HttpPost("{id:guid}/approve")]
-        public async Task<ActionResult> Approve(Guid id)
+        public async Task<ActionResult> Approve(Guid id, [FromBody] ApproveNotificationDto dto)
         {
             try
             {
-                await _service.ApproveAsync(id);
+                await _service.ApproveAsync(id, dto.AssignedDockId);
                 return NoContent();
             }
             catch (BusinessRuleValidationException ex)
@@ -142,11 +142,43 @@ namespace APDL.API.Controllers
         // POST: api/VesselVisitNotifications/{id}/reject
         [RequireRole("Admin", "Port Authority Officer")]
         [HttpPost("{id:guid}/reject")]
-        public async Task<ActionResult> Reject(Guid id)
+        public async Task<ActionResult> Reject(Guid id, [FromBody] RejectNotificationDto dto)
         {
             try
             {
-                await _service.RejectAsync(id);
+                await _service.RejectAsync(id, dto.Reason);
+                return NoContent();
+            }
+            catch (BusinessRuleValidationException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        // POST: api/VesselVisitNotifications/{id}/safety-officers
+        [RequireRole("Admin", "Shipping Agent Representative")]
+        [HttpPost("{id:guid}/safety-officers")]
+        public async Task<ActionResult> AddSafetyOfficer(Guid id, [FromBody] AddSafetyOfficerDto dto)
+        {
+            try
+            {
+                await _service.AddSafetyOfficerAsync(id, dto.OfficerName);
+                return NoContent();
+            }
+            catch (BusinessRuleValidationException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        // DELETE: api/VesselVisitNotifications/{id}/safety-officers/{officerName}
+        [RequireRole("Admin", "Shipping Agent Representative")]
+        [HttpDelete("{id:guid}/safety-officers/{officerName}")]
+        public async Task<ActionResult> RemoveSafetyOfficer(Guid id, string officerName)
+        {
+            try
+            {
+                await _service.RemoveSafetyOfficerAsync(id, officerName);
                 return NoContent();
             }
             catch (BusinessRuleValidationException ex)

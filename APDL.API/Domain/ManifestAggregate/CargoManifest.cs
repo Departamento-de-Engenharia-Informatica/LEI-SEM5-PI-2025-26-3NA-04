@@ -12,7 +12,7 @@ namespace APDL.API.Domain.ManifestAggregate
         public bool IsLoadingManifest { get; private set; }
         public CargoVolume CargoVolume { get; private set; }
         public VesselVisitNotificationId VesselVisitNotificationId { get; private set; }
-        
+
         private readonly List<ContainerId> _containerIds = new();
         public IReadOnlyCollection<ContainerId> ContainerIds => _containerIds.AsReadOnly();
 
@@ -20,9 +20,10 @@ namespace APDL.API.Domain.ManifestAggregate
 
         private CargoManifest(
             CargoManifestId id,
-            bool isLoadingManifest, 
-            CargoVolume cargoVolume, 
-            VesselVisitNotificationId vesselVisitNotificationId)
+            bool isLoadingManifest,
+            CargoVolume cargoVolume,
+            VesselVisitNotificationId vesselVisitNotificationId
+        )
         {
             Id = id;
             IsLoadingManifest = isLoadingManifest;
@@ -35,21 +36,26 @@ namespace APDL.API.Domain.ManifestAggregate
             int cargoVolume,
             VesselVisitNotificationId vesselVisitNotificationId,
             bool vesselVisitExists,
-            bool manifestAlreadyExists)
+            bool manifestAlreadyExists
+        )
         {
             if (!vesselVisitExists)
             {
-                throw new BusinessRuleValidationException($"Cannot create manifest. Vessel visit notification with ID {vesselVisitNotificationId.Value} does not exist.");
+                throw new BusinessRuleValidationException(
+                    $"Cannot create manifest. Vessel visit notification with ID {vesselVisitNotificationId.Value} does not exist."
+                );
             }
 
             if (manifestAlreadyExists)
             {
                 var manifestType = isLoadingManifest ? "loading" : "unloading";
-                throw new BusinessRuleValidationException($"Cannot create manifest. A {manifestType} manifest already exists for vessel visit {vesselVisitNotificationId.Value}.");
+                throw new BusinessRuleValidationException(
+                    $"Cannot create manifest. A {manifestType} manifest already exists for vessel visit {vesselVisitNotificationId.Value}."
+                );
             }
 
             var cargoVolumeVO = new CargoVolume(cargoVolume);
-            
+
             return new CargoManifest(
                 new CargoManifestId(Guid.NewGuid()),
                 isLoadingManifest,
@@ -65,7 +71,8 @@ namespace APDL.API.Domain.ManifestAggregate
 
             if (_containerIds.Contains(containerId))
                 throw new BusinessRuleValidationException(
-                    $"Container {containerId.Value} is already in this manifest.");
+                    $"Container {containerId.Value} is already in this manifest."
+                );
 
             _containerIds.Add(containerId);
         }
@@ -74,11 +81,12 @@ namespace APDL.API.Domain.ManifestAggregate
         {
             if (containerId == null)
                 throw new ArgumentNullException(nameof(containerId));
-                
+
             if (!_containerIds.Contains(containerId))
                 throw new BusinessRuleValidationException(
-                    $"Container {containerId.Value} is not in this manifest.");
-                
+                    $"Container {containerId.Value} is not in this manifest."
+                );
+
             _containerIds.Remove(containerId);
         }
 
