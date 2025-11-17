@@ -17,17 +17,18 @@ import { VisitNotifications } from './pages/visit-notifications/visit-notificati
 import { Staff } from './pages/staff/staff';
 import { Resources } from './pages/resources/resources';
 import { Qualifications } from './pages/qualifications/qualifications';
+import { PortSceneComponent } from './3d/port-scene/port-scene';
 
 export const routes: Routes = [
-  { 
-    path: '', 
-    redirectTo: '/login', 
-    pathMatch: 'full' 
+  {
+    path: '',
+    redirectTo: '/login',
+    pathMatch: 'full'
   },
 
-  { 
-    path: 'login', 
-    component: Login 
+  {
+    path: 'login',
+    component: Login
   },
 
   {
@@ -41,73 +42,78 @@ export const routes: Routes = [
     component: Layout,
     canActivate: [authGuard],
     children: [
-      { 
-        path: 'home', 
-        component: Home 
+      {
+        path: 'home',
+        component: Home
       },
-      
-      { 
-        path: 'vessel-types', 
+
+      {
+        path: 'port-layout', 
+        component: PortSceneComponent
+      },
+
+      {
+        path: 'vessel-types',
         component: VesselTypes,
         canActivate: [roleGuard([UserRole.PORT_AUTHORITY, UserRole.ADMIN])]
       },
-      { 
-        path: 'vessels', 
+      {
+        path: 'vessels',
         component: Vessels,
         canActivate: [roleGuard([UserRole.PORT_AUTHORITY, UserRole.ADMIN])]
       },
-      { 
-        path: 'docks', 
+      {
+        path: 'docks',
         component: Docks,
         canActivate: [roleGuard([UserRole.PORT_AUTHORITY, UserRole.ADMIN])]
       },
-      { 
-        path: 'storage-areas', 
+      {
+        path: 'storage-areas',
         component: StorageAreas,
         canActivate: [roleGuard([UserRole.PORT_AUTHORITY, UserRole.ADMIN])]
       },
-      { 
-        path: 'shipping-agents', 
+      {
+        path: 'shipping-agents',
         component: ShippingAgents,
         canActivate: [roleGuard([UserRole.PORT_AUTHORITY, UserRole.ADMIN])]
       },
-      { 
-        path: 'visit-approvals', 
+      {
+        path: 'visit-approvals',
         component: VisitApprovals,
         canActivate: [roleGuard([UserRole.PORT_AUTHORITY, UserRole.ADMIN])]
       },
-      
-      { 
-        path: 'visit-notifications', 
+
+      {
+        path: 'visit-notifications',
         component: VisitNotifications,
         canActivate: [roleGuard([UserRole.SHIPPING_AGENT, UserRole.ADMIN])]
       },
-      
-      { 
-        path: 'staff', 
+
+      {
+        path: 'staff',
         component: Staff,
         canActivate: [roleGuard([UserRole.LOGISTICS_OPERATOR, UserRole.ADMIN])]
       },
-      { 
-        path: 'resources', 
+      {
+        path: 'resources',
         component: Resources,
         canActivate: [roleGuard([UserRole.LOGISTICS_OPERATOR, UserRole.ADMIN])]
       },
-      { 
-        path: 'qualifications', 
+      {
+        path: 'qualifications',
         component: Qualifications,
         canActivate: [roleGuard([UserRole.LOGISTICS_OPERATOR, UserRole.ADMIN])]
       },
-      
-      { 
-        path: 'cube', 
-        component: Cube 
+
+      {
+        path: 'cube',
+        component: Cube
       }
     ]
   },
 
-  { 
-    path: '**', 
-    redirectTo: '/home' 
+  {
+    path: '**',
+    redirectTo: '/home'
   }
 ];

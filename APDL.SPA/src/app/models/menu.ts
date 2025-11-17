@@ -102,7 +102,7 @@ export const MENU_ITEMS: MenuItem[] = [
   // 3D
   {
     label: 'MENU.3D_VISUALIZATION',
-    route: '/cube',
+    route: '/port-layout',
     icon: '🎲',
     allowedRoles: [
       UserRole.SHIPPING_AGENT,
