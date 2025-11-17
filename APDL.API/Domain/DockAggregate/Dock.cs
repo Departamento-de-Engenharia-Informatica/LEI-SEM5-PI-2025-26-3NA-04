@@ -1,82 +1,87 @@
-using System.Collections.Generic;
-using System.Linq;
-using APDL.API.Domain.DockAggregate.ValueObjects;
-using APDL.API.Domain.Shared;
-
-namespace APDL.API.Domain.DockAggregate
+public class Dock : Entity<DockId>, IAggregateRoot
 {
-    public class Dock : Entity<DockId>, IAggregateRoot
+    private List<StsCrane> _stsCranes;
+    public IReadOnlyList<StsCrane> STSCranes => _stsCranes?.AsReadOnly();
+
+    public int NumberOfSTSCranes => _stsCranes?.Count ?? 0;
+
+    public string DockName { get; private set; }
+    public int DockLength { get; private set; }
+    public int DockDraft { get; private set; }
+
+    public UpcomingMaintenances UpcomingMaintenances { get; private set; }
+
+    protected Dock()
     {
-        public string DockName { get; private set; }
-        public int DockLength { get; private set; }
-        public int DockDraft { get; private set; }
-        public UpcomingMaintenances UpcomingMaintenances { get; private set; }
+        _stsCranes = new List<StsCrane>();
+        UpcomingMaintenances = new UpcomingMaintenances();
+    }
 
-        private List<StsCrane> _stsCranes;
-        public IReadOnlyList<StsCrane> STSCranes => _stsCranes?.AsReadOnly();
+    public Dock(string name, int length, int draft)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new BusinessRuleValidationException(
+                "Dock name cannot be empty.",
+                nameof(name)
+            );
 
-        public int NumberOfSTSCranes => _stsCranes?.Count ?? 0;
+        if (length <= 0)
+            throw new BusinessRuleValidationException(
+                "Dock length must be greater than zero.",
+                nameof(length)
+            );
 
-        protected Dock()
-        {
-            _stsCranes = new List<StsCrane>();
-            UpcomingMaintenances = new UpcomingMaintenances();
-        }
+        if (draft <= 0)
+            throw new BusinessRuleValidationException(
+                "Dock draft must be greater than zero.",
+                nameof(draft)
+            );
 
-        public Dock(string name, int length, int draft)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new BusinessRuleValidationException(
-                    "Dock name cannot be empty.",
-                    nameof(name)
-                );
+        this.DockName = name;
+        this.DockLength = length;
+        this.DockDraft = draft;
 
-            if (length <= 0)
-                throw new BusinessRuleValidationException(
-                    "Dock length must be greater than zero.",
-                    nameof(length)
-                );
+        this._stsCranes = new List<StsCrane>();
+        this.UpcomingMaintenances = new UpcomingMaintenances();
+    }
 
-            if (draft <= 0)
-                throw new BusinessRuleValidationException(
-                    "Dock draft must be greater than zero.",
-                    nameof(draft)
-                );
+    public void AddSTSCrane(StsCrane crane)
+    {
+        if (crane == null)
+            throw new BusinessRuleValidationException("Crane cannot be null.", nameof(crane));
 
-            this.DockName = name;
-            this.DockLength = length;
-            this.DockDraft = draft;
-            this._stsCranes = new List<StsCrane>();
-            this.UpcomingMaintenances = new UpcomingMaintenances();
-        }
+        if (crane.DockId != this.Id)
+            throw new BusinessRuleValidationException(
+                "Crane must belong to this dock.",
+                nameof(crane)
+            );
 
-        public void AddSTSCrane(StsCrane crane)
-        {
-            if (crane == null)
-                throw new BusinessRuleValidationException("Crane cannot be null.", nameof(crane));
+        _stsCranes.Add(crane);
+    }
 
-            if (crane.DockId != this.Id)
-                throw new BusinessRuleValidationException(
-                    "Crane must belong to this dock.",
-                    nameof(crane)
-                );
+    public void RemoveSTSCrane(StsCraneId craneId)
+    {
+        var crane = _stsCranes.FirstOrDefault(c => c.Id == craneId);
 
-            _stsCranes.Add(crane);
-        }
+        if (crane == null)
+            throw new BusinessRuleValidationException("Crane not found.", nameof(craneId));
 
-        public void RemoveSTSCrane(StsCraneId craneId)
-        {
-            var crane = _stsCranes.FirstOrDefault(c => c.Id == craneId);
+        _stsCranes.Remove(crane);
+    }
 
-            if (crane == null)
-                throw new BusinessRuleValidationException("Crane not found.", nameof(craneId));
+    public bool CanAccommodateVessel(int vesselLength, int vesselDraft)
+    {
+        return vesselLength <= this.DockLength && vesselDraft <= this.DockDraft;
+    }
 
-            _stsCranes.Remove(crane);
-        }
+    public void ScheduleMaintenance(MaintenanceSchedule maintenance)
+    {
+        if (maintenance == null)
+            throw new BusinessRuleValidationException(
+                "Maintenance schedule cannot be null.",
+                nameof(maintenance)
+            );
 
-        public bool CanAccommodateVessel(int vesselLength, int vesselDraft)
-        {
-            return vesselLength <= this.DockLength && vesselDraft <= this.DockDraft;
-        }
+        UpcomingMaintenances = UpcomingMaintenances.AddMaintenance(maintenance);
     }
 }
