@@ -65,5 +65,26 @@ namespace APDL.API.Controllers
                 isAuthenticated = true
             });
         }
+
+        
+       [HttpPost("activate")]
+        public async Task<IActionResult> ActivateUser([FromBody] ActivationRequest request)
+        {
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            if (string.IsNullOrEmpty(email))
+                return Unauthorized(new { error = "No email claim found" });
+
+            var user = await _userService.GetUserByActivationTokenAsync(request.Token);
+            if (user == null)
+                return BadRequest(new { error = "Invalid or expired activation link" });
+
+            if (user.Email != email)
+                return Forbid("Authenticated user does not match activation link");
+
+            await _userService.ActivateUserAsync(user.Id);
+
+            return Ok(new { message = "Activation successful", role = user.Role });
+        }
+
     }
 }

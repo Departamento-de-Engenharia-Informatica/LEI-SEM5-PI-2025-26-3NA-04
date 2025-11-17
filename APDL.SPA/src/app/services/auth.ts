@@ -132,6 +132,11 @@ export class Auth {
       this.isLoadingSubject.next(false);
     }
   }
+    activateUser(token: string): Observable<any> {
+      const url = 'https://localhost:5001/api/auth/activate';
+      return this.http.post(url, { token });
+    }
+
 
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
