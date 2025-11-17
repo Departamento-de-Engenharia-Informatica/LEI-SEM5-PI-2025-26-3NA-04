@@ -7,13 +7,11 @@ namespace APDL.API.Domain.NotificationAggregate
     public class VesselVisitNotificationId : EntityId
     {
         [JsonConstructor]
-        public VesselVisitNotificationId(Guid value) : base(value)
-        {
-        }
+        public VesselVisitNotificationId(Guid value)
+            : base(value) { }
 
-        public VesselVisitNotificationId(string value) : base(value)
-        {
-        }
+        public VesselVisitNotificationId(string value)
+            : base(value) { }
 
         protected override object createFromString(string text)
         {
@@ -31,6 +29,4 @@ namespace APDL.API.Domain.NotificationAggregate
             return (Guid)base.ObjValue;
         }
     }
-
-
 }
