@@ -1,0 +1,32 @@
+<app-header></app-header>
+
+<nav class="main-navigation">
+  <div class="nav-header">
+    <button class="menu-toggle" (click)="isMenuOpen = !isMenuOpen">
+      ☰
+    </button>
+  </div>
+
+  <div class="nav-content" [class.open]="isMenuOpen">
+    <a 
+      *ngFor="let item of visibleMenuItems"
+      [routerLink]="item.route"
+      routerLinkActive="active"
+      class="nav-link"
+      (click)="isMenuOpen = false"
+    >
+      <span class="nav-icon">{{ item.icon }}</span>
+      <span class="nav-label">{{ item.label | translate }}</span>
+    </a>
+    
+    <div *ngIf="visibleMenuItems.length === 0" class="no-menu">
+      No menu items available
+    </div>
+  </div>
+</nav>
+
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>
+
+<app-footer></app-footer>

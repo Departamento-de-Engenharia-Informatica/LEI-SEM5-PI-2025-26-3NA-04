@@ -7,6 +7,8 @@ namespace APDL.API.Domain.NotificationAggregate.ValueObjects
     {
         public string Name { get; private set; }
 
+        protected SafetyOfficer() { }
+
         public SafetyOfficer(string name)
         {
             if (string.IsNullOrWhiteSpace(name))

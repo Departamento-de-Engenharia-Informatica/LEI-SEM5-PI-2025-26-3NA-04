@@ -6,11 +6,14 @@ using APDL.API.Domain.Shared;
 using APDL.API.Domain.ManifestAggregate;
 using APDL.API.Domain.ManifestAggregate.DTO;
 using APDL.API.Domain.CargoManifestAggregate.ValueObjects;
+using Microsoft.AspNetCore.Authorization;
+using APDL.API.Infrastructure.Authorization;
 
 namespace APDL.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CargoManifestsController : ControllerBase
     {
         private readonly CargoManifestService _service;
@@ -21,6 +24,7 @@ namespace APDL.API.Controllers
         }
 
         // GET: api/CargoManifests
+        [RequireRole("Admin", "Shipping Agent Representative", "Logistics Operator", "Port Authority Officer")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CargoManifestDto>>> GetAll()
         {
@@ -29,6 +33,7 @@ namespace APDL.API.Controllers
         }
 
         // GET: api/CargoManifests/{id}
+        [RequireRole("Admin", "Shipping Agent Representative", "Logistics Operator", "Port Authority Officer")]
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<CargoManifestDto>> GetById(Guid id)
         {
@@ -40,6 +45,7 @@ namespace APDL.API.Controllers
         }
 
         // GET: api/CargoManifests/vessel/{vesselVisitNotificationId}
+        [RequireRole("Admin", "Shipping Agent Representative", "Logistics Operator", "Port Authority Officer")]
         [HttpGet("vessel/{vesselVisitNotificationId:guid}")]
         public async Task<ActionResult<IEnumerable<CargoManifestDto>>> GetByVesselVisit(Guid vesselVisitNotificationId)
         {
@@ -48,6 +54,7 @@ namespace APDL.API.Controllers
         }
 
         // POST: api/CargoManifests
+        [RequireRole("Admin", "Shipping Agent Representative")]
         [HttpPost]
         public async Task<ActionResult<CargoManifestDto>> Create(CreateCargoManifestDto dto)
         {
@@ -63,16 +70,17 @@ namespace APDL.API.Controllers
         }
 
         // PUT: api/CargoManifests/{id}
+        [RequireRole("Admin", "Shipping Agent Representative", "Port Authority Officer")]
         [HttpPut("{id:guid}")]
         public async Task<ActionResult<CargoManifestDto>> Update(Guid id, UpdateCargoManifestDto dto)
         {
-            if (id != dto.Id) 
+            if (id != dto.Id)
                 return BadRequest("ID mismatch");
 
             try
             {
                 var updated = await _service.UpdateAsync(dto);
-                if (updated == null) 
+                if (updated == null)
                     return NotFound();
 
                 return Ok(updated);
@@ -84,6 +92,7 @@ namespace APDL.API.Controllers
         }
 
         // POST: api/CargoManifests/{manifestId}/containers/{containerId}
+        [RequireRole("Admin", "Shipping Agent Representative")]
         [HttpPost("{manifestId:guid}/containers/{containerId:guid}")]
         public async Task<ActionResult> AddContainer(Guid manifestId, Guid containerId)
         {
@@ -99,6 +108,7 @@ namespace APDL.API.Controllers
         }
 
         // DELETE: api/CargoManifests/{manifestId}/containers/{containerId}
+        [RequireRole("Admin", "Shipping Agent Representative")]
         [HttpDelete("{manifestId:guid}/containers/{containerId:guid}")]
         public async Task<ActionResult> RemoveContainer(Guid manifestId, Guid containerId)
         {
@@ -114,6 +124,7 @@ namespace APDL.API.Controllers
         }
 
         // DELETE: api/CargoManifests/{id}
+        [RequireRole("Admin", "Shipping Agent Representative")]
         [HttpDelete("{id:guid}")]
         public async Task<ActionResult> Delete(Guid id)
         {

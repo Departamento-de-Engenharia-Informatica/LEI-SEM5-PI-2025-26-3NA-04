@@ -1,0 +1,46 @@
+{
+  "APP": {
+    "TITLE": "Sistema de Operações APDL",
+    "WELCOME": "Bem-vindo"
+  },
+  "LOGIN": {
+    "WELCOME": "Bem-vindo!",
+    "MESSAGE": "Por favor, inicie sessão com as suas credenciais APDL para aceder ao sistema de operações.",
+    "BUTTON": "Login com Auth0"
+  },
+  "MENU": {
+    "HOME": "Início",
+    "VESSEL_TYPES": "Tipos de Embarcação",
+    "VESSELS": "Embarcações",
+    "DOCKS": "Docas",
+    "STORAGE_AREAS": "Áreas de Armazenamento",
+    "SHIPPING_AGENTS": "Agentes de Navegação",
+    "VISIT_APPROVALS": "Aprovações de Visita",
+    "VISIT_NOTIFICATIONS": "Notificações de Visita",
+    "STAFF": "Staff",
+    "RESOURCES": "Recursos",
+    "QUALIFICATIONS": "Qualificações",
+    "3D_VISUALIZATION": "Visualização 3D"
+  },
+  "USER": {
+    "WELCOME": "Bem-vindo",
+    "GUEST": "Convidado",
+    "LOGOUT": "Terminar sessão"
+  },
+  "LANGUAGE": {
+    "SELECT": "Idioma",
+    "EN": "Inglês",
+    "PT": "Português"
+  },
+    "ACCESS_DENIED": {
+    "TITLE": "Acesso Não Permitido",
+    "MESSAGE": "Não tem permissão para aceder a esta página.",
+    "LOGGED_IN_AS": "Conectado como",
+    "YOUR_ROLE": "Função",
+    "GO_HOME": "Ir para Início",
+    "HELP": "Se deveria ter acesso a esta página, entre em contato com o administrador."
+  },
+  "FOOTER": {
+    "TAGLINE": "Sistema de Gestão de Operações Portuárias"
+  }
+}

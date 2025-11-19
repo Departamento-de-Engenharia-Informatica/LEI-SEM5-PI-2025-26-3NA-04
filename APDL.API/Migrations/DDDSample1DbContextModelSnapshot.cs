@@ -3,7 +3,6 @@ using System;
 using APDL.API.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -16,34 +15,90 @@ namespace DDDNetCore.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.10")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
-
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.11");
 
             modelBuilder.Entity("APDL.API.Domain.ContainerAggregate.Container", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
                     b.ToTable("Containers", "port");
                 });
 
+            modelBuilder.Entity("APDL.API.Domain.DockAggregate.StsCrane", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CapacityContainersPerHour")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("CapacityContainersPerHour");
+
+                    b.Property<string>("CraneName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("CraneName");
+
+                    b.Property<string>("DockId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("RequiredOperators")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("RequiredOperators");
+
+                    b.Property<TimeSpan>("SetupTime")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("SetupTime");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DockId");
+
+                    b.ToTable("StsCranes", "port");
+                });
+
+            modelBuilder.Entity("APDL.API.Domain.EquipmentAggregate.MobileEquipment", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EquipmentName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("EquipmentName");
+
+                    b.Property<int>("RequiredOperators")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("RequiredOperators");
+
+                    b.Property<TimeSpan>("SetupTime")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("SetupTime");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EquipmentName");
+
+                    b.ToTable("MobileEquipment", "port");
+                });
+
             modelBuilder.Entity("APDL.API.Domain.ManifestAggregate.CargoManifest", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("IsLoadingManifest")
-                        .HasColumnType("bit")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("IsLoadingManifest");
 
                     b.Property<string>("VesselVisitNotificationId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("VesselVisitNotificationId");
 
                     b.HasKey("Id");
@@ -51,10 +106,64 @@ namespace DDDNetCore.Migrations
                     b.ToTable("CargoManifests", "port");
                 });
 
+            modelBuilder.Entity("APDL.API.Domain.OperatingStaffAggregate.OperatingStaff", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("Email");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("Phone");
+
+                    b.Property<string>("ShortName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("ShortName");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OperatingStaff", "port");
+                });
+
+            modelBuilder.Entity("APDL.API.Domain.QualificationsAggregate.StaffQualification", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("Description");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("IsActive");
+
+                    b.Property<string>("QualificationName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("QualificationName");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("StaffQualifications", "port");
+                });
+
             modelBuilder.Entity("APDL.API.Domain.ShippingAgentAggregate.ShippingAgent", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -64,13 +173,13 @@ namespace DDDNetCore.Migrations
             modelBuilder.Entity("APDL.API.Domain.ShippingAgentAggregate.ShippingAgentRepresentative", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("ShippingAgentId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -79,32 +188,39 @@ namespace DDDNetCore.Migrations
                     b.ToTable("ShippingAgentRepresentatives", "port");
                 });
 
-            modelBuilder.Entity("APDL.API.Domain.Storage.Facility", b =>
+            modelBuilder.Entity("APDL.API.Domain.UserAggregate.User", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
 
-                    b.Property<int>("CurrentOccupancyTEU")
-                        .HasColumnType("int");
-
-                    b.Property<string>("FacilityType")
+                    b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Facilities", "port");
+                    b.HasIndex("Email")
+                        .IsUnique();
 
-                    b.HasDiscriminator<string>("FacilityType").HasValue("Facility");
-
-                    b.UseTphMappingStrategy();
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("APDL.API.Domain.VesselTypes.VesselType", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -114,9 +230,68 @@ namespace DDDNetCore.Migrations
             modelBuilder.Entity("APDL.API.Domain.VesselVisitAggregate.VesselVisitNotification", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AssignedDockId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CaptainName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("CaptainName");
+
+                    b.Property<string>("CargoType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("CargoType");
+
+                    b.Property<int>("CargoVolume")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("CargoVolume");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("CreatedAt");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("RejectionReason");
+
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("ReviewedAt");
+
+                    b.Property<string>("ShippingAgentId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SpecialHandlingRequirements")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("SpecialHandlingRequirements");
+
+                    b.Property<DateTime?>("SubmittedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("SubmittedAt");
+
+                    b.Property<int>("TotalCrewCount")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("TotalCrewCount");
+
+                    b.Property<string>("VesselId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AssignedDockId");
+
+                    b.HasIndex("ShippingAgentId");
+
+                    b.HasIndex("VesselId");
 
                     b.ToTable("VesselVisitNotifications", "port");
                 });
@@ -124,11 +299,11 @@ namespace DDDNetCore.Migrations
             modelBuilder.Entity("APDL.API.Domain.Vessels.Vessel", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("VesselTypeId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -137,18 +312,31 @@ namespace DDDNetCore.Migrations
                     b.ToTable("Vessels", "port");
                 });
 
-            modelBuilder.Entity("APDL.API.Domain.Storage.Warehouse", b =>
+            modelBuilder.Entity("Dock", b =>
                 {
-                    b.HasBaseType("APDL.API.Domain.Storage.Facility");
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
 
-                    b.HasDiscriminator().HasValue("Warehouse");
-                });
+                    b.Property<int>("DockDraft")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("DockDraft");
 
-            modelBuilder.Entity("APDL.API.Domain.Storage.Yard", b =>
-                {
-                    b.HasBaseType("APDL.API.Domain.Storage.Facility");
+                    b.Property<int>("DockLength")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("DockLength");
 
-                    b.HasDiscriminator().HasValue("Yard");
+                    b.Property<string>("DockName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("DockName");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DockName")
+                        .IsUnique();
+
+                    b.ToTable("Docks", "port");
                 });
 
             modelBuilder.Entity("APDL.API.Domain.ContainerAggregate.Container", b =>
@@ -156,12 +344,12 @@ namespace DDDNetCore.Migrations
                     b.OwnsOne("APDL.API.Domain.ContainerAggregate.ValueObjects.CargoType", "CargoType", b1 =>
                         {
                             b1.Property<string>("ContainerId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
                                 .HasMaxLength(50)
-                                .HasColumnType("nvarchar(50)")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("CargoType");
 
                             b1.HasKey("ContainerId");
@@ -175,12 +363,12 @@ namespace DDDNetCore.Migrations
                     b.OwnsOne("APDL.API.Domain.ContainerAggregate.ValueObjects.ContainerDescription", "Description", b1 =>
                         {
                             b1.Property<string>("ContainerId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
                                 .HasMaxLength(500)
-                                .HasColumnType("nvarchar(500)")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("Description");
 
                             b1.HasKey("ContainerId");
@@ -194,19 +382,18 @@ namespace DDDNetCore.Migrations
                     b.OwnsOne("APDL.API.Domain.ContainerAggregate.ValueObjects.ContainerNumber", "ContainerNumber", b1 =>
                         {
                             b1.Property<string>("ContainerId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
                                 .HasMaxLength(20)
-                                .HasColumnType("nvarchar(20)")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("ContainerNumber");
 
                             b1.HasKey("ContainerId");
 
                             b1.HasIndex("Value")
-                                .IsUnique()
-                                .HasFilter("[ContainerNumber] IS NOT NULL");
+                                .IsUnique();
 
                             b1.ToTable("Containers", "port");
 
@@ -217,11 +404,11 @@ namespace DDDNetCore.Migrations
                     b.OwnsOne("APDL.API.Domain.ContainerAggregate.ValueObjects.SpecialRequirements", "SpecialRequirements", b1 =>
                         {
                             b1.Property<string>("ContainerId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
                                 .HasMaxLength(500)
-                                .HasColumnType("nvarchar(500)")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("SpecialRequirements");
 
                             b1.HasKey("ContainerId");
@@ -235,18 +422,18 @@ namespace DDDNetCore.Migrations
                     b.OwnsOne("APDL.API.Domain.ContainerAggregate.ValueObjects.VesselPosition", "Position", b1 =>
                         {
                             b1.Property<string>("ContainerId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<int>("Bay")
-                                .HasColumnType("int")
+                                .HasColumnType("INTEGER")
                                 .HasColumnName("Bay");
 
                             b1.Property<int>("Row")
-                                .HasColumnType("int")
+                                .HasColumnType("INTEGER")
                                 .HasColumnName("Row");
 
                             b1.Property<int>("Tier")
-                                .HasColumnType("int")
+                                .HasColumnType("INTEGER")
                                 .HasColumnName("Tier");
 
                             b1.HasKey("ContainerId");
@@ -268,15 +455,224 @@ namespace DDDNetCore.Migrations
                     b.Navigation("SpecialRequirements");
                 });
 
+            modelBuilder.Entity("APDL.API.Domain.DockAggregate.StsCrane", b =>
+                {
+                    b.HasOne("Dock", null)
+                        .WithMany("STSCranes")
+                        .HasForeignKey("DockId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("APDL.API.Domain.Shared.ValueObjects.OperationalWindow", "OperationalWindow", b1 =>
+                        {
+                            b1.Property<string>("StsCraneId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<int>("EndDay")
+                                .HasColumnType("INTEGER")
+                                .HasColumnName("OperationalEndDay");
+
+                            b1.Property<TimeSpan>("EndTime")
+                                .HasColumnType("TEXT")
+                                .HasColumnName("OperationalEndTime");
+
+                            b1.Property<bool>("Is24x7")
+                                .HasColumnType("INTEGER")
+                                .HasColumnName("Is24x7");
+
+                            b1.Property<int>("StartDay")
+                                .HasColumnType("INTEGER")
+                                .HasColumnName("OperationalStartDay");
+
+                            b1.Property<TimeSpan>("StartTime")
+                                .HasColumnType("TEXT")
+                                .HasColumnName("OperationalStartTime");
+
+                            b1.HasKey("StsCraneId");
+
+                            b1.ToTable("StsCranes", "port");
+
+                            b1.WithOwner()
+                                .HasForeignKey("StsCraneId");
+                        });
+
+                    b.OwnsOne("APDL.API.Domain.Shared.ValueObjects.QualificationType", "RequiredQualification", b1 =>
+                        {
+                            b1.Property<string>("StsCraneId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("TEXT")
+                                .HasColumnName("RequiredQualification");
+
+                            b1.HasKey("StsCraneId");
+
+                            b1.ToTable("StsCranes", "port");
+
+                            b1.WithOwner()
+                                .HasForeignKey("StsCraneId");
+                        });
+
+                    b.OwnsOne("APDL.API.Domain.Shared.ValueObjects.ResourceStatus", "Status", b1 =>
+                        {
+                            b1.Property<string>("StsCraneId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("TEXT")
+                                .HasColumnName("Status");
+
+                            b1.HasKey("StsCraneId");
+
+                            b1.ToTable("StsCranes", "port");
+
+                            b1.WithOwner()
+                                .HasForeignKey("StsCraneId");
+                        });
+
+                    b.Navigation("OperationalWindow");
+
+                    b.Navigation("RequiredQualification");
+
+                    b.Navigation("Status");
+                });
+
+            modelBuilder.Entity("APDL.API.Domain.EquipmentAggregate.MobileEquipment", b =>
+                {
+                    b.OwnsOne("APDL.API.Domain.Shared.ValueObjects.OperationalWindow", "OperationalWindow", b1 =>
+                        {
+                            b1.Property<string>("MobileEquipmentId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<int>("EndDay")
+                                .HasColumnType("INTEGER")
+                                .HasColumnName("OperationalEndDay");
+
+                            b1.Property<TimeSpan>("EndTime")
+                                .HasColumnType("TEXT")
+                                .HasColumnName("OperationalEndTime");
+
+                            b1.Property<bool>("Is24x7")
+                                .HasColumnType("INTEGER")
+                                .HasColumnName("Is24x7");
+
+                            b1.Property<int>("StartDay")
+                                .HasColumnType("INTEGER")
+                                .HasColumnName("OperationalStartDay");
+
+                            b1.Property<TimeSpan>("StartTime")
+                                .HasColumnType("TEXT")
+                                .HasColumnName("OperationalStartTime");
+
+                            b1.HasKey("MobileEquipmentId");
+
+                            b1.ToTable("MobileEquipment", "port");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MobileEquipmentId");
+                        });
+
+                    b.OwnsOne("APDL.API.Domain.Shared.ValueObjects.QualificationType", "RequiredQualification", b1 =>
+                        {
+                            b1.Property<string>("MobileEquipmentId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("TEXT")
+                                .HasColumnName("RequiredQualification");
+
+                            b1.HasKey("MobileEquipmentId");
+
+                            b1.ToTable("MobileEquipment", "port");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MobileEquipmentId");
+                        });
+
+                    b.OwnsOne("APDL.API.Domain.Shared.ValueObjects.ResourceStatus", "Status", b1 =>
+                        {
+                            b1.Property<string>("MobileEquipmentId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("TEXT")
+                                .HasColumnName("Status");
+
+                            b1.HasKey("MobileEquipmentId");
+
+                            b1.ToTable("MobileEquipment", "port");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MobileEquipmentId");
+                        });
+
+                    b.OwnsOne("APDL.API.Domain.MobileEquipmentAggregate.ValueObjects.EquipmentCapacity", "Capacity", b1 =>
+                        {
+                            b1.Property<string>("MobileEquipmentId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<double?>("AverageSpeedPerHour")
+                                .HasColumnType("REAL")
+                                .HasColumnName("AverageSpeedPerHour");
+
+                            b1.Property<int?>("ContainersPerHour")
+                                .HasColumnType("INTEGER")
+                                .HasColumnName("ContainersPerHour");
+
+                            b1.Property<int?>("ContainersPerTrip")
+                                .HasColumnType("INTEGER")
+                                .HasColumnName("ContainersPerTrip");
+
+                            b1.HasKey("MobileEquipmentId");
+
+                            b1.ToTable("MobileEquipment", "port");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MobileEquipmentId");
+                        });
+
+                    b.OwnsOne("APDL.API.Domain.MobileEquipmentAggregate.ValueObjects.EquipmentType", "EquipmentType", b1 =>
+                        {
+                            b1.Property<string>("MobileEquipmentId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("TEXT")
+                                .HasColumnName("EquipmentType");
+
+                            b1.HasKey("MobileEquipmentId");
+
+                            b1.ToTable("MobileEquipment", "port");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MobileEquipmentId");
+                        });
+
+                    b.Navigation("Capacity");
+
+                    b.Navigation("EquipmentType");
+
+                    b.Navigation("OperationalWindow");
+
+                    b.Navigation("RequiredQualification");
+
+                    b.Navigation("Status");
+                });
+
             modelBuilder.Entity("APDL.API.Domain.ManifestAggregate.CargoManifest", b =>
                 {
                     b.OwnsOne("APDL.API.Domain.CargoManifestAggregate.ValueObjects.CargoVolume", "CargoVolume", b1 =>
                         {
                             b1.Property<string>("CargoManifestId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<int>("Value")
-                                .HasColumnType("int")
+                                .HasColumnType("INTEGER")
                                 .HasColumnName("CargoVolume");
 
                             b1.HasKey("CargoManifestId");
@@ -291,17 +687,15 @@ namespace DDDNetCore.Migrations
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+                                .HasColumnType("INTEGER");
 
                             b1.Property<string>("CargoManifestId")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("ContainerId");
 
                             b1.HasKey("Id");
@@ -319,15 +713,150 @@ namespace DDDNetCore.Migrations
                     b.Navigation("_containerIds");
                 });
 
+            modelBuilder.Entity("APDL.API.Domain.OperatingStaffAggregate.OperatingStaff", b =>
+                {
+                    b.OwnsOne("APDL.API.Domain.Shared.ValueObjects.OperationalWindow", "OperationalWindow", b1 =>
+                        {
+                            b1.Property<string>("OperatingStaffId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<int>("EndDay")
+                                .HasColumnType("INTEGER")
+                                .HasColumnName("OperationalEndDay");
+
+                            b1.Property<TimeSpan>("EndTime")
+                                .HasColumnType("TEXT")
+                                .HasColumnName("OperationalEndTime");
+
+                            b1.Property<bool>("Is24x7")
+                                .HasColumnType("INTEGER")
+                                .HasColumnName("Is24x7");
+
+                            b1.Property<int>("StartDay")
+                                .HasColumnType("INTEGER")
+                                .HasColumnName("OperationalStartDay");
+
+                            b1.Property<TimeSpan>("StartTime")
+                                .HasColumnType("TEXT")
+                                .HasColumnName("OperationalStartTime");
+
+                            b1.HasKey("OperatingStaffId");
+
+                            b1.ToTable("OperatingStaff", "port");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OperatingStaffId");
+                        });
+
+                    b.OwnsMany("APDL.API.Domain.Shared.ValueObjects.QualificationType", "Qualifications", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<string>("OperatingStaffId")
+                                .IsRequired()
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("TEXT")
+                                .HasColumnName("QualificationType");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("OperatingStaffId");
+
+                            b1.ToTable("OperatingStaffQualifications", "port");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OperatingStaffId");
+                        });
+
+                    b.OwnsOne("APDL.API.Domain.OperatingStaffAggregate.ValueObjects.MecanographicNumber", "MecanographicNumber", b1 =>
+                        {
+                            b1.Property<string>("OperatingStaffId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("TEXT")
+                                .HasColumnName("MecanographicNumber");
+
+                            b1.HasKey("OperatingStaffId");
+
+                            b1.HasIndex("Value")
+                                .IsUnique();
+
+                            b1.ToTable("OperatingStaff", "port");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OperatingStaffId");
+                        });
+
+                    b.OwnsOne("APDL.API.Domain.OperatingStaffAggregate.ValueObjects.StaffStatus", "Status", b1 =>
+                        {
+                            b1.Property<string>("OperatingStaffId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("TEXT")
+                                .HasColumnName("Status");
+
+                            b1.HasKey("OperatingStaffId");
+
+                            b1.ToTable("OperatingStaff", "port");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OperatingStaffId");
+                        });
+
+                    b.Navigation("MecanographicNumber");
+
+                    b.Navigation("OperationalWindow");
+
+                    b.Navigation("Qualifications");
+
+                    b.Navigation("Status");
+                });
+
+            modelBuilder.Entity("APDL.API.Domain.QualificationsAggregate.StaffQualification", b =>
+                {
+                    b.OwnsOne("APDL.API.Domain.Shared.ValueObjects.QualificationType", "QualificationType", b1 =>
+                        {
+                            b1.Property<string>("StaffQualificationId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("TEXT")
+                                .HasColumnName("QualificationType");
+
+                            b1.HasKey("StaffQualificationId");
+
+                            b1.HasIndex("Value")
+                                .IsUnique();
+
+                            b1.ToTable("StaffQualifications", "port");
+
+                            b1.WithOwner()
+                                .HasForeignKey("StaffQualificationId");
+                        });
+
+                    b.Navigation("QualificationType");
+                });
+
             modelBuilder.Entity("APDL.API.Domain.ShippingAgentAggregate.ShippingAgent", b =>
                 {
                     b.OwnsOne("APDL.API.Domain.ShippingAgentAggregate.ValueObjects.Name", "AlternativeName", b1 =>
                         {
                             b1.Property<string>("ShippingAgentId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
-                                .HasColumnType("nvarchar(max)")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("AlternativeName");
 
                             b1.HasKey("ShippingAgentId");
@@ -341,11 +870,11 @@ namespace DDDNetCore.Migrations
                     b.OwnsOne("APDL.API.Domain.ShippingAgentAggregate.ValueObjects.Name", "LegalName", b1 =>
                         {
                             b1.Property<string>("ShippingAgentId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("LegalName");
 
                             b1.HasKey("ShippingAgentId");
@@ -359,11 +888,11 @@ namespace DDDNetCore.Migrations
                     b.OwnsOne("APDL.API.Domain.ShippingAgentAggregate.ValueObjects.Address", "Address", b1 =>
                         {
                             b1.Property<string>("ShippingAgentId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("Address");
 
                             b1.HasKey("ShippingAgentId");
@@ -377,11 +906,11 @@ namespace DDDNetCore.Migrations
                     b.OwnsOne("APDL.API.Domain.ShippingAgentAggregate.ValueObjects.TaxNumber", "TaxNumber", b1 =>
                         {
                             b1.Property<string>("ShippingAgentId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("TaxNumber");
 
                             b1.HasKey("ShippingAgentId");
@@ -410,11 +939,11 @@ namespace DDDNetCore.Migrations
                     b.OwnsOne("APDL.API.Domain.ShippingAgentAggregate.Email", "Email", b1 =>
                         {
                             b1.Property<string>("ShippingAgentRepresentativeId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("Email");
 
                             b1.HasKey("ShippingAgentRepresentativeId");
@@ -428,11 +957,11 @@ namespace DDDNetCore.Migrations
                     b.OwnsOne("APDL.API.Domain.ShippingAgentAggregate.ValueObjects.Name", "Name", b1 =>
                         {
                             b1.Property<string>("ShippingAgentRepresentativeId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("Name");
 
                             b1.HasKey("ShippingAgentRepresentativeId");
@@ -446,11 +975,11 @@ namespace DDDNetCore.Migrations
                     b.OwnsOne("APDL.API.Domain.ShippingAgentAggregate.ValueObjects.CitizenId", "CitizenId", b1 =>
                         {
                             b1.Property<string>("ShippingAgentRepresentativeId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("CitizenId");
 
                             b1.HasKey("ShippingAgentRepresentativeId");
@@ -464,11 +993,11 @@ namespace DDDNetCore.Migrations
                     b.OwnsOne("APDL.API.Domain.ShippingAgentAggregate.ValueObjects.Nationality", "Nationality", b1 =>
                         {
                             b1.Property<string>("ShippingAgentRepresentativeId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("Nationality");
 
                             b1.HasKey("ShippingAgentRepresentativeId");
@@ -482,11 +1011,11 @@ namespace DDDNetCore.Migrations
                     b.OwnsOne("APDL.API.Domain.ShippingAgentAggregate.ValueObjects.Phone", "Phone", b1 =>
                         {
                             b1.Property<string>("ShippingAgentRepresentativeId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("Phone");
 
                             b1.HasKey("ShippingAgentRepresentativeId");
@@ -508,107 +1037,15 @@ namespace DDDNetCore.Migrations
                     b.Navigation("Phone");
                 });
 
-            modelBuilder.Entity("APDL.API.Domain.Storage.Facility", b =>
-                {
-                    b.OwnsMany("APDL.API.Domain.Storage.FacilityDockAssignment", "DockAssignments", b1 =>
-                        {
-                            b1.Property<string>("FacilityId")
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
-
-                            b1.Property<string>("DebugColumn1")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<Guid>("DockId")
-                                .HasColumnType("uniqueidentifier")
-                                .HasColumnName("DockId");
-
-                            b1.HasKey("FacilityId", "Id");
-
-                            b1.ToTable("FacilityDockAssignments", "port");
-
-                            b1.WithOwner()
-                                .HasForeignKey("FacilityId");
-
-                            b1.OwnsOne("APDL.API.Domain.Storage.ValueObjects.Distance", "DistanceToDock", b2 =>
-                                {
-                                    b2.Property<string>("FacilityDockAssignmentFacilityId")
-                                        .HasColumnType("nvarchar(450)");
-
-                                    b2.Property<int>("FacilityDockAssignmentId")
-                                        .HasColumnType("int");
-
-                                    b2.Property<double>("Meters")
-                                        .HasColumnType("float")
-                                        .HasColumnName("DistanceToDock");
-
-                                    b2.HasKey("FacilityDockAssignmentFacilityId", "FacilityDockAssignmentId");
-
-                                    b2.ToTable("FacilityDockAssignments", "port");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("FacilityDockAssignmentFacilityId", "FacilityDockAssignmentId");
-                                });
-
-                            b1.Navigation("DistanceToDock");
-                        });
-
-                    b.OwnsOne("APDL.API.Domain.Storage.ValueObjects.Location", "Location", b1 =>
-                        {
-                            b1.Property<string>("FacilityId")
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)")
-                                .HasColumnName("Location");
-
-                            b1.HasKey("FacilityId");
-
-                            b1.ToTable("Facilities", "port");
-
-                            b1.WithOwner()
-                                .HasForeignKey("FacilityId");
-                        });
-
-                    b.OwnsOne("APDL.API.Domain.Storage.ValueObjects.TEUCapacity", "MaxCapacityTEU", b1 =>
-                        {
-                            b1.Property<string>("FacilityId")
-                                .HasColumnType("nvarchar(450)");
-
-                            b1.Property<int>("Value")
-                                .HasColumnType("int")
-                                .HasColumnName("MaxCapacityTEU");
-
-                            b1.HasKey("FacilityId");
-
-                            b1.ToTable("Facilities", "port");
-
-                            b1.WithOwner()
-                                .HasForeignKey("FacilityId");
-                        });
-
-                    b.Navigation("DockAssignments");
-
-                    b.Navigation("Location");
-
-                    b.Navigation("MaxCapacityTEU");
-                });
-
             modelBuilder.Entity("APDL.API.Domain.VesselTypes.VesselType", b =>
                 {
                     b.OwnsOne("APDL.API.Domain.VesselTypes.ValueObjects.Capacity", "Capacity", b1 =>
                         {
                             b1.Property<string>("VesselTypeId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<int>("Value")
-                                .HasColumnType("int")
+                                .HasColumnType("INTEGER")
                                 .HasColumnName("Capacity");
 
                             b1.HasKey("VesselTypeId");
@@ -622,11 +1059,11 @@ namespace DDDNetCore.Migrations
                     b.OwnsOne("APDL.API.Domain.VesselTypes.ValueObjects.Description", "Description", b1 =>
                         {
                             b1.Property<string>("VesselTypeId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("Description");
 
                             b1.HasKey("VesselTypeId");
@@ -640,11 +1077,11 @@ namespace DDDNetCore.Migrations
                     b.OwnsOne("APDL.API.Domain.VesselTypes.ValueObjects.Name", "Name", b1 =>
                         {
                             b1.Property<string>("VesselTypeId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("Name");
 
                             b1.HasKey("VesselTypeId");
@@ -658,10 +1095,10 @@ namespace DDDNetCore.Migrations
                     b.OwnsOne("APDL.API.Domain.VesselTypes.ValueObjects.Dimension", "MaxBays", b1 =>
                         {
                             b1.Property<string>("VesselTypeId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<int>("Value")
-                                .HasColumnType("int")
+                                .HasColumnType("INTEGER")
                                 .HasColumnName("MaxBays");
 
                             b1.HasKey("VesselTypeId");
@@ -675,10 +1112,10 @@ namespace DDDNetCore.Migrations
                     b.OwnsOne("APDL.API.Domain.VesselTypes.ValueObjects.Dimension", "MaxRows", b1 =>
                         {
                             b1.Property<string>("VesselTypeId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<int>("Value")
-                                .HasColumnType("int")
+                                .HasColumnType("INTEGER")
                                 .HasColumnName("MaxRows");
 
                             b1.HasKey("VesselTypeId");
@@ -692,10 +1129,10 @@ namespace DDDNetCore.Migrations
                     b.OwnsOne("APDL.API.Domain.VesselTypes.ValueObjects.Dimension", "MaxTiers", b1 =>
                         {
                             b1.Property<string>("VesselTypeId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<int>("Value")
-                                .HasColumnType("int")
+                                .HasColumnType("INTEGER")
                                 .HasColumnName("MaxTiers");
 
                             b1.HasKey("VesselTypeId");
@@ -721,13 +1158,38 @@ namespace DDDNetCore.Migrations
 
             modelBuilder.Entity("APDL.API.Domain.VesselVisitAggregate.VesselVisitNotification", b =>
                 {
+                    b.OwnsMany("APDL.API.Domain.ManifestAggregate.CargoManifestId", "_cargoManifestIds", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("TEXT")
+                                .HasColumnName("CargoManifestId");
+
+                            b1.Property<string>("VesselVisitNotificationId")
+                                .IsRequired()
+                                .HasColumnType("TEXT");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("VesselVisitNotificationId");
+
+                            b1.ToTable("VesselVisitCargoManifests", "port");
+
+                            b1.WithOwner()
+                                .HasForeignKey("VesselVisitNotificationId");
+                        });
+
                     b.OwnsOne("APDL.API.Domain.NotificationAggregate.ValueObjects.ExpectedArrival", "ExpectedArrival", b1 =>
                         {
                             b1.Property<string>("VesselVisitNotificationId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<DateTime>("Value")
-                                .HasColumnType("datetime2")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("ExpectedArrival");
 
                             b1.HasKey("VesselVisitNotificationId");
@@ -741,10 +1203,10 @@ namespace DDDNetCore.Migrations
                     b.OwnsOne("APDL.API.Domain.NotificationAggregate.ValueObjects.ExpectedDeparture", "ExpectedDeparture", b1 =>
                         {
                             b1.Property<string>("VesselVisitNotificationId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<DateTime>("Value")
-                                .HasColumnType("datetime2")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("ExpectedDeparture");
 
                             b1.HasKey("VesselVisitNotificationId");
@@ -758,15 +1220,17 @@ namespace DDDNetCore.Migrations
                     b.OwnsOne("APDL.API.Domain.NotificationAggregate.ValueObjects.NotificationStatus", "Status", b1 =>
                         {
                             b1.Property<string>("VesselVisitNotificationId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
                                 .HasMaxLength(20)
-                                .HasColumnType("nvarchar(20)")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("Status");
 
                             b1.HasKey("VesselVisitNotificationId");
+
+                            b1.HasIndex("Value");
 
                             b1.ToTable("VesselVisitNotifications", "port");
 
@@ -778,19 +1242,17 @@ namespace DDDNetCore.Migrations
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+                                .HasColumnType("INTEGER");
 
                             b1.Property<string>("Name")
                                 .IsRequired()
                                 .HasMaxLength(100)
-                                .HasColumnType("nvarchar(100)")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("OfficerName");
 
                             b1.Property<string>("VesselVisitNotificationId")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.HasKey("Id");
 
@@ -808,6 +1270,8 @@ namespace DDDNetCore.Migrations
 
                     b.Navigation("Status");
 
+                    b.Navigation("_cargoManifestIds");
+
                     b.Navigation("_safetyCrewOfficers");
                 });
 
@@ -822,12 +1286,12 @@ namespace DDDNetCore.Migrations
                     b.OwnsOne("APDL.API.Domain.Vessels.ValueObjects.ImoNumber", "ImoNumber", b1 =>
                         {
                             b1.Property<Guid>("VesselId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
                                 .HasMaxLength(7)
-                                .HasColumnType("nvarchar(7)")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("ImoNumber");
 
                             b1.HasKey("VesselId");
@@ -841,12 +1305,12 @@ namespace DDDNetCore.Migrations
                     b.OwnsOne("APDL.API.Domain.Vessels.ValueObjects.Name", "Name", b1 =>
                         {
                             b1.Property<Guid>("VesselId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
                                 .HasMaxLength(100)
-                                .HasColumnType("nvarchar(100)")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("Name");
 
                             b1.HasKey("VesselId");
@@ -860,12 +1324,12 @@ namespace DDDNetCore.Migrations
                     b.OwnsOne("APDL.API.Domain.Vessels.ValueObjects.Operator", "Operator", b1 =>
                         {
                             b1.Property<Guid>("VesselId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
                                 .IsRequired()
                                 .HasMaxLength(50)
-                                .HasColumnType("nvarchar(50)")
+                                .HasColumnType("TEXT")
                                 .HasColumnName("Operator");
 
                             b1.HasKey("VesselId");
@@ -885,9 +1349,70 @@ namespace DDDNetCore.Migrations
                     b.Navigation("VesselType");
                 });
 
+            modelBuilder.Entity("Dock", b =>
+                {
+                    b.OwnsOne("APDL.API.Domain.DockAggregate.ValueObjects.UpcomingMaintenances", "UpcomingMaintenances", b1 =>
+                        {
+                            b1.Property<string>("DockId")
+                                .HasColumnType("TEXT");
+
+                            b1.HasKey("DockId");
+
+                            b1.ToTable("Docks", "port");
+
+                            b1.WithOwner()
+                                .HasForeignKey("DockId");
+
+                            b1.OwnsMany("APDL.API.Domain.DockAggregate.ValueObjects.MaintenanceSchedule", "Schedules", b2 =>
+                                {
+                                    b2.Property<string>("UpcomingMaintenancesDockId")
+                                        .HasColumnType("TEXT");
+
+                                    b2.Property<int>("Id")
+                                        .ValueGeneratedOnAdd()
+                                        .HasColumnType("INTEGER");
+
+                                    b2.Property<string>("Description")
+                                        .IsRequired()
+                                        .HasMaxLength(500)
+                                        .HasColumnType("TEXT")
+                                        .HasColumnName("Description");
+
+                                    b2.Property<DateTime>("EstimatedEndDate")
+                                        .HasColumnType("TEXT")
+                                        .HasColumnName("EstimatedEndDate");
+
+                                    b2.Property<DateTime>("ScheduledDate")
+                                        .HasColumnType("TEXT")
+                                        .HasColumnName("ScheduledDate");
+
+                                    b2.Property<string>("Type")
+                                        .IsRequired()
+                                        .HasColumnType("TEXT")
+                                        .HasColumnName("Type");
+
+                                    b2.HasKey("UpcomingMaintenancesDockId", "Id");
+
+                                    b2.ToTable("DockMaintenanceSchedules", "port");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("UpcomingMaintenancesDockId");
+                                });
+
+                            b1.Navigation("Schedules");
+                        });
+
+                    b.Navigation("UpcomingMaintenances");
+                });
+
             modelBuilder.Entity("APDL.API.Domain.ShippingAgentAggregate.ShippingAgent", b =>
                 {
                     b.Navigation("Representatives");
+                });
+
+            modelBuilder.Entity("Dock", b =>
+                {
+                    b.Navigation("STSCranes");
                 });
 #pragma warning restore 612, 618
         }

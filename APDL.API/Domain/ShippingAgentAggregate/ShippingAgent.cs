@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using APDL.API.Domain.Shared;
 using APDL.API.Domain.ShippingAgentAggregate.ValueObjects;
-using System.Linq;
 
 namespace APDL.API.Domain.ShippingAgentAggregate
 {
@@ -14,7 +14,8 @@ namespace APDL.API.Domain.ShippingAgentAggregate
         public TaxNumber TaxNumber { get; private set; }
 
         private readonly List<ShippingAgentRepresentative> _representatives = new();
-        public IReadOnlyCollection<ShippingAgentRepresentative> Representatives => _representatives.AsReadOnly();
+        public IReadOnlyCollection<ShippingAgentRepresentative> Representatives =>
+            _representatives.AsReadOnly();
 
         private ShippingAgent() { }
 
@@ -23,14 +24,19 @@ namespace APDL.API.Domain.ShippingAgentAggregate
             string? alternativeName,
             string address,
             string taxNumber,
-            List<ShippingAgentRepresentative> representatives)
+            List<ShippingAgentRepresentative> representatives
+        )
         {
             if (representatives == null || !representatives.Any())
-                throw new BusinessRuleValidationException("At least one representative is required.");
+                throw new BusinessRuleValidationException(
+                    "At least one representative is required."
+                );
 
             Id = new ShippingAgentId(Guid.NewGuid());
             LegalName = new Name(legalName);
-            AlternativeName = string.IsNullOrWhiteSpace(alternativeName) ? null : new Name(alternativeName);
+            AlternativeName = string.IsNullOrWhiteSpace(alternativeName)
+                ? null
+                : new Name(alternativeName);
             Address = new Address(address);
             TaxNumber = new TaxNumber(taxNumber);
 
@@ -56,13 +62,16 @@ namespace APDL.API.Domain.ShippingAgentAggregate
         {
             TaxNumber = new TaxNumber(taxNumber);
         }
+
         public void AddRepresentative(ShippingAgentRepresentative rep)
         {
             if (rep == null)
                 throw new BusinessRuleValidationException("Representative is empty.");
 
             if (_representatives.Contains(rep))
-                throw new BusinessRuleValidationException("Representative already part of this organization.");
+                throw new BusinessRuleValidationException(
+                    "Representative already part of this organization."
+                );
 
             _representatives.Add(rep);
         }
@@ -73,7 +82,9 @@ namespace APDL.API.Domain.ShippingAgentAggregate
                 throw new BusinessRuleValidationException("Provide a representative");
 
             if (_representatives.Count <= 1)
-                throw new BusinessRuleValidationException("A shipping agent must have at least one representative.");
+                throw new BusinessRuleValidationException(
+                    "A shipping agent must have at least one representative."
+                );
 
             _representatives.Remove(rep);
         }
