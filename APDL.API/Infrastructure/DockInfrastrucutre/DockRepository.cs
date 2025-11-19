@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using APDL.API.Domain.DockAggregate;
+using APDL.API.Domain.DockAggregate.Repos;
 using APDL.API.Domain.DockAggregate.ValueObjects;
 using APDL.API.Infrastructure.Shared;
 using Microsoft.EntityFrameworkCore;

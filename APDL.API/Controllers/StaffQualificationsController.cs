@@ -13,7 +13,7 @@ namespace APDL.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class StaffQualificationsController : ControllerBase
     {
         private readonly StaffQualificationService _service;
@@ -54,7 +54,7 @@ namespace APDL.API.Controllers
         }
 
         // POST: api/StaffQualifications
-        [RequireRole("Admin", "Port Authority Officer")]
+        //[RequireRole("Admin", "Port Authority Officer")]
         [HttpPost]
         public async Task<ActionResult<StaffQualificationDto>> Create(
             CreateStaffQualificationDto dto

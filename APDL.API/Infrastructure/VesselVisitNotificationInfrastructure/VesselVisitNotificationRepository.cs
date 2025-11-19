@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using APDL.API.Domain.Dock;
+using APDL.API.Domain.DockAggregate;
 using APDL.API.Domain.NotificationAggregate;
 using APDL.API.Domain.NotificationAggregate.Repos;
 using APDL.API.Domain.ShippingAgentAggregate;
@@ -77,5 +77,6 @@ namespace APDL.API.Infrastructure.VesselVisitInfrastructure
                 .OrderBy(v => v.ExpectedArrival.Value)
                 .ToListAsync();
         }
+
     }
 }

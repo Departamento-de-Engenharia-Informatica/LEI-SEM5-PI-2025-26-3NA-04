@@ -1,4 +1,4 @@
-using APDL.API.Domain.Dock;
+using APDL.API.Domain.DockAggregate;
 using APDL.API.Domain.ManifestAggregate;
 using APDL.API.Domain.NotificationAggregate;
 using APDL.API.Domain.NotificationAggregate.ValueObjects;
@@ -62,6 +62,8 @@ namespace APDL.API.Infrastructure.VesselVisitInfrastructure
                         .HasColumnName("Status")
                         .HasMaxLength(20)
                         .IsRequired();
+
+                    s.HasIndex(st => st.Value);
                 }
             );
 
@@ -140,7 +142,6 @@ namespace APDL.API.Infrastructure.VesselVisitInfrastructure
             builder.HasIndex(v => v.VesselId);
             builder.HasIndex(v => v.ShippingAgentId);
             builder.HasIndex(v => v.AssignedDockId);
-            builder.HasIndex(v => v.Status);
         }
     }
 }

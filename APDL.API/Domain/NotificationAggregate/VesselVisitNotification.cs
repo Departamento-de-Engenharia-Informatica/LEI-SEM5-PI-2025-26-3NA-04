@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using APDL.API.Domain.CargoManifestAggregate.ValueObjects;
-using APDL.API.Domain.Dock;
-using APDL.API.Domain.DockAggregate.ValueObjects;
+using APDL.API.Domain.DockAggregate;
 using APDL.API.Domain.ManifestAggregate;
 using APDL.API.Domain.NotificationAggregate;
 using APDL.API.Domain.NotificationAggregate.ValueObjects;
 using APDL.API.Domain.Shared;
 using APDL.API.Domain.ShippingAgentAggregate;
-using APDL.API.Domain.ShippingAgentAggregate.ValueObjects;
 using APDL.API.Domain.Vessels;
 
 namespace APDL.API.Domain.VesselVisitAggregate

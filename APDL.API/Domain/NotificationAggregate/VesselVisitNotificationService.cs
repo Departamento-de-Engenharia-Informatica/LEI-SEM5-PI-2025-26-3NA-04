@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using APDL.API.Domain.Dock;
+using APDL.API.Domain.DockAggregate;
 using APDL.API.Domain.NotificationAggregate;
 using APDL.API.Domain.NotificationAggregate.DTO;
 using APDL.API.Domain.NotificationAggregate.Repos;
