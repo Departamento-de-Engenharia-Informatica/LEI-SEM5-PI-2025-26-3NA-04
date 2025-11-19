@@ -1,3 +1,9 @@
+using System.Collections.Generic;
+using System.Linq;
+using APDL.API.Domain.DockAggregate;
+using APDL.API.Domain.DockAggregate.ValueObjects;
+using APDL.API.Domain.Shared;
+
 public class Dock : Entity<DockId>, IAggregateRoot
 {
     private List<StsCrane> _stsCranes;
@@ -20,10 +26,7 @@ public class Dock : Entity<DockId>, IAggregateRoot
     public Dock(string name, int length, int draft)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new BusinessRuleValidationException(
-                "Dock name cannot be empty.",
-                nameof(name)
-            );
+            throw new BusinessRuleValidationException("Dock name cannot be empty.", nameof(name));
 
         if (length <= 0)
             throw new BusinessRuleValidationException(

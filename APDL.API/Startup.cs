@@ -1,37 +1,42 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using APDL.API.Domain.ContainerAggregate;
+using APDL.API.Domain.ContainerAggregate.Repos;
+using APDL.API.Domain.DockAggregate;
+using APDL.API.Domain.DockAggregate.Repos;
+using APDL.API.Domain.ManifestAggregate;
+using APDL.API.Domain.ManifestAggregate.Repos;
+using APDL.API.Domain.MobileEquipmentAggregate;
+using APDL.API.Domain.NotificationAggregate.Repos;
+using APDL.API.Domain.Shared;
+using APDL.API.Domain.ShippingAgentAggregate;
+using APDL.API.Domain.ShippingAgentAggregate.Repos;
+using APDL.API.Domain.StaffQualificationAggregate;
+using APDL.API.Domain.UserAggregate;
+using APDL.API.Domain.Vessels;
+using APDL.API.Domain.VesselTypes;
+using APDL.API.Domain.VesselVisitAggregate;
+using APDL.API.Infrastructure;
+using APDL.API.Infrastructure.ContainerInfrastructure;
+using APDL.API.Infrastructure.DockInfrastructure;
+using APDL.API.Infrastructure.ManifestInfrastructure;
+using APDL.API.Infrastructure.MobileEquipmentInfrastructure;
+using APDL.API.Infrastructure.Shared;
+using APDL.API.Infrastructure.ShippingAgentInfrastructure;
+using APDL.API.Infrastructure.StaffQualificationInfrastructure;
+using APDL.API.Infrastructure.UserInfrastructure;
+using APDL.API.Infrastructure.Vessels;
+using APDL.API.Infrastructure.VesselTypes;
+using APDL.API.Infrastructure.VesselVisitInfrastructure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using APDL.API.Infrastructure.ShippingAgentInfrastructure;
-using APDL.API.Infrastructure.Storage;
-using APDL.API.Infrastructure.VesselTypes;
-using APDL.API.Infrastructure.Vessels;
-using APDL.API.Infrastructure.Shared;
-using APDL.API.Infrastructure;
-using APDL.API.Domain.Shared;
-using APDL.API.Domain.ShippingAgentAggregate.Repos;
-using APDL.API.Domain.ShippingAgentAggregate;
-using APDL.API.Domain.Storage;
-using APDL.API.Domain.VesselTypes;
-using APDL.API.Domain.Vessels;
-using APDL.API.Domain.NotificationAggregate.Repos;
-using APDL.API.Infrastructure.VesselVisitInfrastructure;
-using APDL.API.Domain.VesselVisitAggregate;
-using APDL.API.Domain.ContainerAggregate.Repos;
-using APDL.API.Infrastructure.ContainerInfrastructure;
-using APDL.API.Domain.ContainerAggregate;
-using APDL.API.Domain.ManifestAggregate.Repos;
-using APDL.API.Infrastructure.ManifestInfrastructure;
-using APDL.API.Domain.ManifestAggregate;
-using APDL.API.Domain.UserAggregate;
-using APDL.API.Infrastructure.UserInfrastructure;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-
 
 namespace APDL.API
 {
@@ -47,7 +52,6 @@ namespace APDL.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
@@ -57,39 +61,47 @@ namespace APDL.API
 
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowAngularApp", policy =>
-                {
-                    policy.WithOrigins("http://localhost:4200")
-                          .AllowAnyHeader()
-                          .AllowAnyMethod()
-                          .AllowCredentials();
-                });
+                options.AddPolicy(
+                    "AllowAngularApp",
+                    policy =>
+                    {
+                        policy
+                            .WithOrigins("http://localhost:4200")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials();
+                    }
+                );
             });
 
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.Authority = "https://apdl-operations.eu.auth0.com";
-                options.Audience = "https://localhost:5001/api";
-                options.TokenValidationParameters = new TokenValidationParameters
+            services
+                .AddAuthentication(options =>
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true
-                };
-            });
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.Authority = "https://apdl-operations.eu.auth0.com";
+                    options.Audience = "https://localhost:5001/api";
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                    };
+                });
 
             services.AddDbContext<DDDSample1DbContext>(opt =>
-                opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
-                .ReplaceService<IValueConverterSelector, StronglyEntityIdValueConverterSelector>());
+                opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection"))
+                    .ReplaceService<
+                        IValueConverterSelector,
+                        StronglyEntityIdValueConverterSelector
+                    >()
+            );
 
             ConfigureMyServices(services);
-            
 
             services.AddControllers().AddNewtonsoftJson();
         }
@@ -122,6 +134,22 @@ namespace APDL.API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+
+                endpoints.MapGet(
+                    "/health",
+                    async context =>
+                    {
+                        await context.Response.WriteAsJsonAsync(
+                            new
+                            {
+                                status = "healthy",
+                                timestamp = DateTime.UtcNow,
+                                version = "1.0.0",
+                                environment = env.EnvironmentName,
+                            }
+                        );
+                    }
+                );
             });
         }
 
@@ -132,14 +160,17 @@ namespace APDL.API
             services.AddScoped<IShippingAgentRepository, ShippingAgentRepository>();
             services.AddScoped<ShippingAgentService>();
 
-            services.AddScoped<IShippingAgentRepresentativeRepository, ShippingAgentRepresentativeRepository>();
+            services.AddScoped<
+                IShippingAgentRepresentativeRepository,
+                ShippingAgentRepresentativeRepository
+            >();
             services.AddScoped<ShippingAgentRepresentativeService>();
 
-            services.AddScoped<IFacilityRepository, FacilityRepository>();
-            services.AddScoped<FacilityService>();
+            // services.AddScoped<IFacilityRepository, FacilityRepository>();
+            // services.AddScoped<FacilityService>();
 
-            services.AddScoped<IFacilityRepository, FacilityRepository>();
-            services.AddScoped<FacilityService>();
+            // services.AddScoped<IFacilityRepository, FacilityRepository>();
+            // services.AddScoped<FacilityService>();
 
             services.AddScoped<VesselTypeService>();
             services.AddScoped<IVesselTypeRepository, VesselTypeRepository>();
@@ -147,7 +178,10 @@ namespace APDL.API
             services.AddScoped<VesselService>();
             services.AddScoped<IVesselRepository, VesselRepository>();
 
-            services.AddScoped<IVesselVisitNotificationRepository, VesselVisitNotificationRepository>();
+            services.AddScoped<
+                IVesselVisitNotificationRepository,
+                VesselVisitNotificationRepository
+            >();
             services.AddScoped<VesselVisitNotificationService>();
 
             services.AddScoped<IContainerRepository, ContainerRepository>();
@@ -155,6 +189,15 @@ namespace APDL.API
 
             services.AddScoped<ICargoManifestRepository, CargoManifestRepository>();
             services.AddScoped<CargoManifestService>();
+
+            services.AddScoped<IStaffQualificationRepository, StaffQualificationRepository>();
+            services.AddScoped<StaffQualificationService>();
+
+            services.AddScoped<IDockRepository, DockRepository>();
+            services.AddScoped<DockService>();
+
+            services.AddScoped<IMobileEquipmentRepository, MobileEquipmentRepository>();
+            services.AddScoped<MobileEquipmentService>();
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<UserService>();

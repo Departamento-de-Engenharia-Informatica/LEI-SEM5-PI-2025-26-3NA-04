@@ -12,6 +12,8 @@ namespace APDL.API.Domain.MobileEquipmentAggregate.ValueObjects
             Value = value;
         }
 
+        private EquipmentType() {}
+
         public static EquipmentType Truck => new EquipmentType(EquipmentTypeEnum.TRUCK);
         public static EquipmentType YardGantryCrane =>
             new EquipmentType(EquipmentTypeEnum.YARD_GANTRY_CRANE);

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using APDL.API.Domain.DockAggregate;
 using APDL.API.Domain.DockAggregate.DTO;
+using APDL.API.Domain.DockAggregate.Repos;
 using APDL.API.Domain.DockAggregate.ValueObjects;
 using APDL.API.Domain.Shared;
 
