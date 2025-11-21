@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 export interface Position {
   x: number;
@@ -52,8 +53,7 @@ export interface PortLayout {
   providedIn: 'root'
 })
 export class PortLayoutService {
-  private apiUrl = 'https://localhost:5001/api/portlayout';
-
+  private apiUrl = `${environment.apiUrl}/portlayout`;
   constructor(private http: HttpClient) { }
 
   getPortLayout(layoutId?: string): Observable<PortLayout> {
