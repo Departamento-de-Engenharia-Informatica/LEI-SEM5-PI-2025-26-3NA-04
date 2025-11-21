@@ -105,8 +105,16 @@ export class Auth {
           },
         })
       );
+
+      const url = `${environment.apiUrl}/auth/whoami`;
+      console.log("Requesting:", url);
+
+      console.log("Token:", token);
+      console.log("Token length:", token?.length);
+      console.log("Full headers:", { Authorization: `Bearer ${token}` });
+
       const user = await firstValueFrom(
-        this.http.get<User>(`${environment.apiUrl}/auth/whoami`, {
+        this.http.get<User>(url, {
           headers: { Authorization: `Bearer ${token}` }
         })
       );

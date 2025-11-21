@@ -3,8 +3,10 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using APDL.API.Domain.Shared;
 using APDL.API.Domain.UserAggregate;
+using APDL.API.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace APDL.API.Controllers
 {
@@ -14,10 +16,27 @@ namespace APDL.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly UserService _userService;
+        private readonly DDDSample1DbContext _context;
 
-        public AuthController(UserService userService)
+
+        public AuthController(UserService userService, DDDSample1DbContext context)
         {
             _userService = userService;
+            _context = context;
+        }
+
+        [HttpGet("count-users")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CountUsers()
+        {
+            var count = await _context.Users.CountAsync();
+            var allEmails = await _context.Users.Select(u => u.Email).ToListAsync();
+
+            return Ok(new
+            {
+                userCount = count,
+                emails = allEmails
+            });
         }
 
         [HttpGet("whoami")]
