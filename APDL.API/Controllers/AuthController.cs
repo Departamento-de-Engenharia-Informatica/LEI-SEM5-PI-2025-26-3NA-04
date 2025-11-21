@@ -1,16 +1,16 @@
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using APDL.API.Domain.Shared;
 using APDL.API.Domain.UserAggregate;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using System.Linq;
 
 namespace APDL.API.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class AuthController : ControllerBase
     {
         private readonly UserService _userService;
@@ -23,11 +23,14 @@ namespace APDL.API.Controllers
         [HttpGet("whoami")]
         public async Task<IActionResult> GetCurrentUser()
         {
-            var email = User.FindFirstValue(ClaimTypes.Email) 
-                     ?? User.FindFirstValue("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")
-                     ?? User.FindFirstValue("email")
-                     ?? User.Claims.FirstOrDefault(c => c.Type.EndsWith("/emailaddress"))?.Value
-                     ?? User.Claims.FirstOrDefault(c => c.Type == "email")?.Value;
+            var email =
+                User.FindFirstValue(ClaimTypes.Email)
+                ?? User.FindFirstValue(
+                    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+                )
+                ?? User.FindFirstValue("email")
+                ?? User.Claims.FirstOrDefault(c => c.Type.EndsWith("/emailaddress"))?.Value
+                ?? User.Claims.FirstOrDefault(c => c.Type == "email")?.Value;
 
             System.Console.WriteLine("=== TOKEN CLAIMS ===");
             foreach (var claim in User.Claims)
@@ -35,35 +38,42 @@ namespace APDL.API.Controllers
                 System.Console.WriteLine($"{claim.Type}: {claim.Value}");
             }
             System.Console.WriteLine("===================");
-            
+
             if (string.IsNullOrEmpty(email))
             {
-                return Unauthorized(new { 
-                    error = "No email claim found in token",
-                    availableClaims = User.Claims.Select(c => c.Type).ToList()
-                });
+                return Unauthorized(
+                    new
+                    {
+                        error = "No email claim found in token",
+                        availableClaims = User.Claims.Select(c => c.Type).ToList(),
+                    }
+                );
             }
 
             var user = await _userService.GetUserByEmailAsync(email);
 
             if (user == null)
             {
-                return NotFound(new 
-                { 
-                    error = "User not registered",
-                    message = "Your account has not been activated. Please contact Port Authority.",
-                    email = email
-                });
+                return NotFound(
+                    new
+                    {
+                        error = "User not registered",
+                        message = "Your account has not been activated. Please contact Port Authority.",
+                        email = email,
+                    }
+                );
             }
 
-            return Ok(new
-            {
-                id = user.Id.ToString(),
-                email = user.Email,
-                name = user.Name,
-                role = user.Role,
-                isAuthenticated = true
-            });
+            return Ok(
+                new
+                {
+                    id = user.Id.ToString(),
+                    email = user.Email,
+                    name = user.Name,
+                    role = user.Role,
+                    isAuthenticated = true,
+                }
+            );
         }
     }
 }
