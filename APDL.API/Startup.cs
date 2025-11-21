@@ -86,7 +86,7 @@ namespace APDL.API
                                     "https://10.9.11.75",
                                     "http://10.9.11.75"
                                 )
-                                .AllowAnyHeader()
+                                .AllowAnyHeader() 
                                 .AllowAnyMethod()
                                 .AllowCredentials()
                                 .SetPreflightMaxAge(TimeSpan.FromMinutes(10));
