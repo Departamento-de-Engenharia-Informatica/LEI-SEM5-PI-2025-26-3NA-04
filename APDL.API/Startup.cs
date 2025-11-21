@@ -75,7 +75,8 @@ namespace APDL.API
                                 .WithOrigins("http://localhost:4200")
                                 .AllowAnyHeader()
                                 .AllowAnyMethod()
-                                .AllowCredentials();
+                                .AllowCredentials()
+                                .SetPreflightMaxAge(TimeSpan.FromMinutes(10));
                         }
                         else
                         {
@@ -85,9 +86,10 @@ namespace APDL.API
                                     "https://10.9.11.75",
                                     "http://10.9.11.75"
                                 )
-                                .AllowAnyHeader()
+                                .AllowAnyHeader() 
                                 .AllowAnyMethod()
-                                .AllowCredentials();
+                                .AllowCredentials()
+                                .SetPreflightMaxAge(TimeSpan.FromMinutes(10));
                         }
                     }
                 );
@@ -140,9 +142,9 @@ namespace APDL.API
 
             app.UseHttpsRedirection();
 
-            app.UseRouting();
-
             app.UseCors("AllowAngularApp");
+
+            app.UseRouting();
 
             app.UseSwagger();
             app.UseSwaggerUI();
