@@ -36,6 +36,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace APDL.API
@@ -151,6 +152,29 @@ namespace APDL.API
                     }
                 );
             });
+
+            using (var scope = app.ApplicationServices.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                try
+                {
+                    var context = services.GetRequiredService<DDDSample1DbContext>();
+
+                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogInformation("Checking database...");
+
+                    context.Database.Migrate();
+
+                    logger.LogInformation("Database is ready!");
+                }
+                catch (Exception ex)
+                {
+                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "An error occurred while creating/migrating the database");
+
+                    // throw;
+                }
+            }
         }
 
         public void ConfigureMyServices(IServiceCollection services)
