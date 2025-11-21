@@ -43,9 +43,12 @@ namespace APDL.API
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly IWebHostEnvironment _env;
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            _env = env;
         }
 
         public IConfiguration Configuration { get; }
@@ -66,11 +69,26 @@ namespace APDL.API
                     "AllowAngularApp",
                     policy =>
                     {
-                        policy
-                            .WithOrigins("http://localhost:4200")
-                            .AllowAnyHeader()
-                            .AllowAnyMethod()
-                            .AllowCredentials();
+                        if (_env.IsDevelopment())
+                        {
+                            policy
+                                .WithOrigins("http://localhost:4200")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod()
+                                .AllowCredentials();
+                        }
+                        else
+                        {
+                            policy
+                                .WithOrigins(
+                                    "http://localhost:4200",
+                                    "https://10.9.11.75",
+                                    "http://10.9.11.75"
+                                )
+                                .AllowAnyHeader()
+                                .AllowAnyMethod()
+                                .AllowCredentials();
+                        }
                     }
                 );
             });
