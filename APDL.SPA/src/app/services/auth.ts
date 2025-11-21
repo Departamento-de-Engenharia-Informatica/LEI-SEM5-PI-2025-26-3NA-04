@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { User, UserRole } from '../models/user';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -99,12 +100,12 @@ export class Auth {
       const token = await firstValueFrom(
         this.auth0.getAccessTokenSilently({
           authorizationParams: {
-            audience: 'https://localhost:5001/api'
+            audience: environment.auth0.authorizationParams.audience
           },
         })
       );
       const user = await firstValueFrom(
-        this.http.get<User>('https://localhost:5001/api/auth/whoami', {
+        this.http.get<User>(`${environment.apiUrl}/auth/whoami`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       );
