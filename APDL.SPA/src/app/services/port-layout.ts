@@ -38,7 +38,7 @@ export interface ContainerYard {
 export interface Warehouse {
   id: string;
   position: Position;
-  dimensions: Dimensions;
+  dimensions: Dimensions; 
 }
 
 export interface PortLayout {
