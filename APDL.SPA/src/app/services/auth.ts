@@ -100,7 +100,8 @@ export class Auth {
       const token = await firstValueFrom(
         this.auth0.getAccessTokenSilently({
           authorizationParams: {
-            audience: environment.auth0.authorizationParams.audience
+            audience: environment.auth0.authorizationParams.audience,
+            scope: 'openid profile email offline_access'
           },
         })
       );
