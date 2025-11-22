@@ -10,5 +10,5 @@ export enum UserRole {
   SHIPPING_AGENT = 'Shipping Agent Representative',
   LOGISTICS_OPERATOR = 'Logistics Operator',
   PORT_AUTHORITY = 'Port Authority Officer',
-  ADMIN = 'Administrator',
+  ADMIN = 'Admin',
 }

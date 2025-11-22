@@ -7,7 +7,7 @@ using APDL.API.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using APDL.API.Domain.UserAggregate.DTO;
 namespace APDL.API.Controllers
 {
     [Route("api/[controller]")]
@@ -96,24 +96,66 @@ namespace APDL.API.Controllers
         }
 
         
-       [HttpPost("activate")]
-        public async Task<IActionResult> ActivateUser([FromBody] ActivationRequest request)
+        
+        [HttpPost("users")]
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserDto dto)
         {
-            var email = User.FindFirstValue(ClaimTypes.Email);
-            if (string.IsNullOrEmpty(email))
-                return Unauthorized(new { error = "No email claim found" });
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            var user = await _userService.GetUserByActivationTokenAsync(request.Token);
-            if (user == null)
-                return BadRequest(new { error = "Invalid or expired activation link" });
+            /*var callerRole =
+                User.FindFirstValue("role")
+                ?? User.Claims.FirstOrDefault(c => c.Type.EndsWith("/role"))?.Value;
 
-            if (user.Email != email)
-                return Forbid("Authenticated user does not match activation link");
+            if (string.IsNullOrWhiteSpace(callerRole) || !callerRole.Equals("ADMIN", System.StringComparison.OrdinalIgnoreCase))
+            {
+                return Forbid(); // 403
+            }*/
 
-            await _userService.ActivateUserAsync(user.Id);
+            try
+            {
+                var created = await _userService.CreateUserAsync(dto);
 
-            return Ok(new { message = "Activation successful", role = user.Role });
+                return Ok(
+                new
+                {
+                    id = created.Id.ToString(),
+                    email = created.Email,
+                    name = created.Name,
+                    role = created.Role,
+                    isAuthenticated = true,
+                }
+            );
+            }
+            catch (System.Exception ex)
+            {
+                System.Console.Error.WriteLine($"Error creating user: {ex}");
+                return StatusCode(500, new
+                {
+                    error = "Error creating user",
+                    details = ex.Message
+                });
+            }
         }
+
+        
+        [HttpGet("activate")]
+        public IActionResult Activate([FromQuery] string token)
+        {
+            try
+            {
+                // Chama o serviço para validar token e gerar URL do Auth0
+                var redirectUrl = _userService.ProcessActivationToken(token);
+                return Redirect(redirectUrl);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { error = "Invalid or expired activation link", details = ex.Message });
+            }
+        }
+
+
+
 
     }
 }
