@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using APDL.API.Domain.Shared;
 
-namespace APDL.API.Domain.DockAggregate
+namespace APDL.API.Domain.DockAggregate.Repos
 {
     public interface IDockRepository : IRepository<Dock, DockId>
     {

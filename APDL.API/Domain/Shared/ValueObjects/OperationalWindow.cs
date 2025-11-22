@@ -7,11 +7,13 @@ namespace APDL.API.Domain.Shared.ValueObjects
 {
     public class OperationalWindow : IValueObject
     {
-        public DayOfWeek StartDay { get; }
-        public TimeSpan StartTime { get; }
-        public DayOfWeek EndDay { get; }
-        public TimeSpan EndTime { get; }
-        public bool Is24x7 { get; }
+        public DayOfWeek StartDay { get; private set; }
+        public TimeSpan StartTime { get; private set; }
+        public DayOfWeek EndDay { get; private set; }
+        public TimeSpan EndTime { get; private set; }
+        public bool Is24x7 { get; private set; }
+
+        private OperationalWindow() { }
 
         private OperationalWindow(
             DayOfWeek startDay,
@@ -39,6 +41,7 @@ namespace APDL.API.Domain.Shared.ValueObjects
             EndTime = endTime;
             Is24x7 = is24x7;
         }
+
 
         public static OperationalWindow Create24x7()
         {

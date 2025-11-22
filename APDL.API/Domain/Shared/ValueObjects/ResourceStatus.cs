@@ -11,6 +11,9 @@ namespace APDL.API.Domain.Shared.ValueObjects
             Value = value;
         }
 
+        private ResourceStatus() { }
+
+
         public static ResourceStatus Available => new ResourceStatus(ResourceStatusEnum.AVAILABLE);
         public static ResourceStatus Unavailable =>
             new ResourceStatus(ResourceStatusEnum.UNAVAILABLE);

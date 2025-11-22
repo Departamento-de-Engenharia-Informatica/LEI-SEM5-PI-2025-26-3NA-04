@@ -1,11 +1,9 @@
 using APDL.API.Domain.ContainerAggregate;
-using APDL.API.Domain.DockAggregate;
 using APDL.API.Domain.EquipmentAggregate;
 using APDL.API.Domain.ManifestAggregate;
 using APDL.API.Domain.OperatingStaffAggregate;
 using APDL.API.Domain.QualificationsAggregate;
 using APDL.API.Domain.ShippingAgentAggregate;
-using APDL.API.Domain.Storage;
 using APDL.API.Domain.UserAggregate;
 using APDL.API.Domain.Vessels;
 using APDL.API.Domain.VesselTypes;
@@ -13,10 +11,10 @@ using APDL.API.Domain.VesselVisitAggregate;
 using APDL.API.Infrastructure.ContainerInfrastructure;
 using APDL.API.Infrastructure.DockInfrastructure;
 using APDL.API.Infrastructure.ManifestInfrastructure;
+using APDL.API.Infrastructure.MobileEquipmentInfrastructure;
 using APDL.API.Infrastructure.OperatingStaffInfrastructure;
 using APDL.API.Infrastructure.ShippingAgentInfrastructure;
 using APDL.API.Infrastructure.StaffQualificationInfrastructure;
-using APDL.API.Infrastructure.Storage;
 using APDL.API.Infrastructure.UserInfrastructure;
 using APDL.API.Infrastructure.Vessels;
 using APDL.API.Infrastructure.VesselTypes;
@@ -32,7 +30,7 @@ namespace APDL.API.Infrastructure
         public DbSet<CargoManifest> CargoManifests { get; set; }
         public DbSet<Container> Containers { get; set; }
         public DbSet<VesselVisitNotification> VesselVisitNotifications { get; set; }
-        public DbSet<Facility> Facilities { get; set; }
+        // public DbSet<Facility> Facilities { get; set; }
         public DbSet<VesselType> VesselTypes { get; set; }
         public DbSet<Dock> Docks { get; set; }
         public DbSet<StaffQualification> StaffQualifications { get; set; }
@@ -53,13 +51,15 @@ namespace APDL.API.Infrastructure
             modelBuilder.ApplyConfiguration(new CargoManifestEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new ContainerEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new VesselVisitNotificationEntityTypeConfiguration());
-            modelBuilder.ApplyConfiguration(new FacilityEntityTypeConfiguration());
+            // modelBuilder.ApplyConfiguration(new FacilityEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new VesselTypeEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new StsCraneEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new VesselEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new UserEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new DockEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new StaffQualificationEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new OperatingStaffEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new MobileEquipmentEntityTypeConfiguration());
         }
     }
 }

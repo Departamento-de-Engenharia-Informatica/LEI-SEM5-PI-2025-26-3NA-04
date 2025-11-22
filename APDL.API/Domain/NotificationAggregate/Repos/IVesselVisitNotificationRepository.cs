@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using APDL.API.Domain.Dock;
+using APDL.API.Domain.DockAggregate;
 using APDL.API.Domain.Shared;
 using APDL.API.Domain.ShippingAgentAggregate;
 using APDL.API.Domain.Vessels;

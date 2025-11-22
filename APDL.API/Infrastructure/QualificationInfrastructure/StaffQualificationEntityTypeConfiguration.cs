@@ -26,6 +26,8 @@ namespace APDL.API.Infrastructure.StaffQualificationInfrastructure
                         .HasColumnName("QualificationType")
                         .HasConversion<string>()
                         .IsRequired();
+
+                    qt.HasIndex(t => t.Value).IsUnique();
                 }
             );
 
@@ -42,8 +44,6 @@ namespace APDL.API.Infrastructure.StaffQualificationInfrastructure
                 .IsRequired();
 
             builder.Property(q => q.IsActive).HasColumnName("IsActive").IsRequired();
-
-            builder.HasIndex("QualificationType").IsUnique();
         }
     }
 }

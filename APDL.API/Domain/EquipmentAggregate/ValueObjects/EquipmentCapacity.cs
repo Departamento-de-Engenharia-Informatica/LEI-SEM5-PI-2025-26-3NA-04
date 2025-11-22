@@ -10,6 +10,8 @@ namespace APDL.API.Domain.MobileEquipmentAggregate.ValueObjects
 
         public int? ContainersPerHour { get; }
 
+        private EquipmentCapacity() { }
+
         private EquipmentCapacity(int containersPerTrip, double averageSpeedPerHour)
         {
             ContainersPerTrip = containersPerTrip;
