@@ -38,11 +38,7 @@ namespace APDL.API.Controllers
             var count = await _context.Users.CountAsync();
             var allEmails = await _context.Users.Select(u => u.Email).ToListAsync();
 
-            return Ok(new
-            {
-                userCount = count,
-                emails = allEmails
-            });
+            return Ok(new { userCount = count, emails = allEmails });
         }
 
         [HttpGet("whoami")]
