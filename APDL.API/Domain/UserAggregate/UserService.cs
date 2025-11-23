@@ -173,7 +173,7 @@ namespace APDL.API.Domain.UserAggregate
             }
         }
         
-        var redirectUrlWithUser =  $"http://localhost:4200/login?activated=true&email={Uri.EscapeDataString(auth0User.email)}";
+        var redirectUrlWithUser =  $"http://localhost:4200/login?resetSuccess=true&email={Uri.EscapeDataString(auth0User.email)}";
         var ticketPayload = new
         {
             user_id = auth0User.user_id,
@@ -182,6 +182,9 @@ namespace APDL.API.Domain.UserAggregate
         };
 
         var ticketResponse = await _httpClient.PostAsJsonAsync($"{domain}/api/v2/tickets/password-change", ticketPayload);
+
+        Console.WriteLine($"Password reset link: {ticketResponse}");
+
 
         if (!ticketResponse.IsSuccessStatusCode)
         {

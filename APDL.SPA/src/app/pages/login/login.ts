@@ -16,10 +16,9 @@ export class Login implements OnInit{
   constructor(private authService: Auth, private route: ActivatedRoute,private router: Router) {}
 
   ngOnInit(): void {
-    // Lógica para detetar os parâmetros de ativação no URL
     this.route.queryParams.subscribe(params => {
       // Verifica se o URL contém ?activated=true e um email
-      const isActivated = params['activated'] === 'true';
+      const isActivated = params['resetSuccess'] === 'true';
       const email = params['email'];
 
       if (isActivated && email) {
@@ -27,22 +26,16 @@ export class Login implements OnInit{
       }
     });
   }
-  
-  /**
-   * NOVO MÉTODO: Faz a chamada ao Auth Service para ativar o utilizador e trata a resposta.
-   * @param email O email a ativar.
-   */
+
   activateUser(email: string): void {
-    this.activationStatus = 'activating'; // Status: A processar
+    this.activationStatus = 'activating';
 
     this.authService.activateUserByEmail(email).subscribe({
       next: () => {
-        // Sucesso na ativação
         this.activationStatus = 'success';
         this.clearUrlParams();
       },
       error: (err) => {
-        // Falha na ativação
         console.error('Falha ao ativar o utilizador:', err);
         this.activationStatus = 'error';
         this.clearUrlParams();
@@ -51,7 +44,6 @@ export class Login implements OnInit{
   }
 
   clearUrlParams(): void {
-    // Navega para a mesma rota, mas com queryParams nulos para limpar o URL
     this.router.navigate([], {
       queryParams: { activated: null, email: null },
       queryParamsHandling: 'merge'
