@@ -14,6 +14,8 @@ using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
+using System.Text.Json;
+using System.Collections.Generic;
 
 
 
@@ -40,8 +42,7 @@ namespace APDL.API.Domain.UserAggregate
         {
             return await _repo.GetByEmailAsync(email);
         }
-        
-        
+
         /*public async Task<User> CreateUserAsync(CreateUserDto dto)
         {
             var domain = _config["Auth0:Domain"];
@@ -87,75 +88,162 @@ namespace APDL.API.Domain.UserAggregate
             Console.WriteLine($"Password reset link: {ticketData.ticket}");
 
             return user;
-        }*/
-
+        }
         
-        public async Task<User> CreateUserAsync(CreateUserDto dto)
+         private async Task<string> GetManagementApiTokenAsync()
         {
+            var clientId = _config["Auth0:ClientId"];
+            var clientSecret = _config["Auth0:ClientSecret"];
             var domain = _config["Auth0:Domain"];
-            var token = await GetManagementApiTokenAsync();
 
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", token);
+            var payload = new
+            {
+                client_id = clientId,
+                client_secret = clientSecret,
+                audience = $"{domain}/api/v2/",
+                grant_type = "client_credentials",
+                scope = "create:users read:users"
+            };
 
-            // 1. Criar utilizador no Auth0
+            var response = await _httpClient.PostAsJsonAsync($"{domain}/oauth/token", payload);
+            response.EnsureSuccessStatusCode();
+
+            var tokenResponse = await response.Content.ReadFromJsonAsync<Auth0TokenResponse>();
+            return tokenResponse.access_token;
+        }
+        
+        */
+        
+        
+         public async Task<User> CreateUserAsync(CreateUserDto dto)
+    {
+        var domain = _config["Auth0:Domain"];
+        var token = await GetManagementApiTokenAsync(); 
+
+        _httpClient.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", token);
+
+
+        var existingAuth0User = await GetAuth0UserByEmailAsync(dto.Email);
+        
+        if (existingAuth0User != null)
+        {
+             throw new Exception("O utilizador com este email já se encontra registado.");
+        }
+        
+        Auth0UserResponse auth0User = existingAuth0User;
+
+        if (auth0User == null)
+        {
             var tempPassword = Guid.NewGuid().ToString("N").Substring(0, 12) + "!";
+            
             var payload = new
             {
                 email = dto.Email,
                 password = tempPassword,
-                connection = "Username-Password-Authentication",
-                email_verified = false
+                connection = "Username-Password-Authentication"
             };
 
-            var createResponse = await _httpClient.PostAsJsonAsync($"{domain}/api/v2/users", payload);
+            var jsonPayload = JsonSerializer.Serialize(payload);
+            var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
+            var createResponse = await _httpClient.PostAsync($"{domain}/api/v2/users", content);
+
             if (!createResponse.IsSuccessStatusCode)
             {
                 var errorContent = await createResponse.Content.ReadAsStringAsync();
-                throw new Exception($"Auth0 error: {createResponse.StatusCode} - {errorContent}");
+                throw new Exception($"Auth0 creation error: {createResponse.StatusCode} - {errorContent}");
             }
 
-            var auth0User = await createResponse.Content.ReadFromJsonAsync<Auth0UserResponse>();
+            var auth0ResponseContent = await createResponse.Content.ReadAsStringAsync();
+            Console.WriteLine($"Auth0 Creation Response JSON: {auth0ResponseContent}"); 
 
-            // 2. Gerar JWT para ativação
-            var activationToken = GenerateActivationToken(auth0User.user_id);
-
-            // 3. Construir link de ativação
-            var activationLink = $"{_config["App:BaseUrl"]}/auth/activate?token={activationToken}";
-
-            // 4. Enviar email com link de ativação
-            await SendActivationEmail(dto.Email, activationLink);
-
-            // 5. Guardar utilizador na BD local
-            var user = new User { Email = dto.Email, Name = dto.Name, Role = dto.Role};
-            await _repo.AddAsync(user);
-            await _unitOfWork.CommitAsync();
-
-            return user;
-        }
-
-        // Método para gerar JWT
-        private string GenerateActivationToken(string userId)
-        {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Secret"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var claims = new[]
+            try
             {
-                new Claim(JwtRegisteredClaimNames.Sub, userId),
-                new Claim("purpose", "activation")
-            };
+                auth0User = JsonSerializer.Deserialize<Auth0UserResponse>(auth0ResponseContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to deserialize Auth0 user response. Raw content: {auth0ResponseContent}. Error: {ex.Message}");
+            }
 
-            var token = new JwtSecurityToken(
-                issuer: _config["Jwt:Issuer"],
-                audience: _config["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(24),
-                signingCredentials: creds
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            if (auth0User == null)
+            {
+                throw new Exception($"Auth0 user was created successfully but returned null/empty data. Raw content: {auth0ResponseContent}");
+            }
         }
+        
+        var redirectUrlWithUser = $"{_config["App:BaseUrl"]}/callback?userId={auth0User.user_id}";
+        var ticketPayload = new
+        {
+            user_id = auth0User.user_id,
+            includeEmailInRedirect = true, 
+            result_url = redirectUrlWithUser 
+        };
+
+        var ticketResponse = await _httpClient.PostAsJsonAsync($"{domain}/api/v2/tickets/password-change", ticketPayload);
+
+        if (!ticketResponse.IsSuccessStatusCode)
+        {
+            var errorContent = await ticketResponse.Content.ReadAsStringAsync();
+            throw new Exception($"Auth0 ticket error: {ticketResponse.StatusCode} - {errorContent}");
+        }
+
+        var ticketData = await ticketResponse.Content.ReadFromJsonAsync<Auth0PasswordChangeTicketResponse>();
+
+        var user = new User { Email = dto.Email, Name = dto.Name, Role = dto.Role };
+        await _repo.AddAsync(user);
+        await _unitOfWork.CommitAsync();
+
+        await SendActivationEmail(dto.Email, ticketData.ticket);
+
+        Console.WriteLine($"Password reset link: {ticketData.ticket}");
+
+        return user;
+    }
+
+    private async Task<Auth0UserResponse> GetAuth0UserByEmailAsync(string email)
+    {
+        var domain = _config["Auth0:Domain"];
+        var encodedEmail = Uri.EscapeDataString($"email:\"{email}\"");
+        var queryUrl = $"{domain}/api/v2/users?q={encodedEmail}&search_engine=v3";
+
+
+        var response = await _httpClient.GetAsync(queryUrl);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var users = await response.Content.ReadFromJsonAsync<List<Auth0UserResponse>>();
+            return users.FirstOrDefault();
+        }
+
+        return null;
+    }
+
+    private async Task<string> GetManagementApiTokenAsync()
+    {
+        using var tempClient = new HttpClient();
+        
+        var clientId = _config["Auth0:ClientId"];
+        var clientSecret = _config["Auth0:ClientSecret"];
+        var domain = _config["Auth0:Domain"];
+
+        var payload = new
+        {
+            client_id = clientId,
+            client_secret = clientSecret,
+            audience = $"{domain}/api/v2/",
+            grant_type = "client_credentials",
+            scope = "create:users read:users"
+        };
+
+        var response = await tempClient.PostAsJsonAsync($"{domain}/oauth/token", payload);
+        response.EnsureSuccessStatusCode();
+
+        var tokenResponse = await response.Content.ReadFromJsonAsync<Auth0TokenResponse>();
+        return tokenResponse.access_token;
+    }
+
 
         public async Task SendActivationEmail(string toEmail, string activationLink)
         {
@@ -185,59 +273,6 @@ namespace APDL.API.Domain.UserAggregate
                     await client.SendMailAsync(message);
                 }
             }
-        }
-
-        
-        public string ProcessActivationToken(string token)
-        {
-            var handler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_config["Jwt:Secret"]);
-
-            var principal = handler.ValidateToken(token, new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(key),
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidIssuer = _config["Jwt:Issuer"],
-                ValidAudience = _config["Jwt:Audience"],
-                ValidateLifetime = true
-            }, out _);
-
-            var userId = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-
-            if (string.IsNullOrEmpty(userId))
-                throw new Exception("User ID not found in token");
-
-            var state = Convert.ToBase64String(Encoding.UTF8.GetBytes(userId));
-
-            var auth0LoginUrl = $"{_config["Auth0:AuthorizeUrl"]}?client_id={_config["Auth0:ClientId"]}&response_type=code&redirect_uri={_config["App:BaseUrl"]}/callback&state={state}";
-
-            return auth0LoginUrl;
-        }
-
-
-        
-        private async Task<string> GetManagementApiTokenAsync()
-        {
-            var clientId = _config["Auth0:ClientId"];
-            var clientSecret = _config["Auth0:ClientSecret"];
-            var domain = _config["Auth0:Domain"];
-
-            var payload = new
-            {
-                client_id = clientId,
-                client_secret = clientSecret,
-                audience = $"{domain}/api/v2/",
-                grant_type = "client_credentials",
-                scope = "create:users read:users"
-            };
-
-            var response = await _httpClient.PostAsJsonAsync($"{domain}/oauth/token", payload);
-            response.EnsureSuccessStatusCode();
-
-            var tokenResponse = await response.Content.ReadFromJsonAsync<Auth0TokenResponse>();
-            return tokenResponse.access_token;
         }
 
     }

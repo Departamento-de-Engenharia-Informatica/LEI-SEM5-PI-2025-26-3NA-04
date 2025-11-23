@@ -8,6 +8,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using APDL.API.Domain.UserAggregate.DTO;
+using System;
+using Microsoft.Extensions.Configuration;
+
+
 namespace APDL.API.Controllers
 {
     [Route("api/[controller]")]
@@ -17,12 +21,14 @@ namespace APDL.API.Controllers
     {
         private readonly UserService _userService;
         private readonly DDDSample1DbContext _context;
+        private readonly IConfiguration _config;
 
 
-        public AuthController(UserService userService, DDDSample1DbContext context)
+        public AuthController(UserService userService, DDDSample1DbContext context, IConfiguration config)
         {
             _userService = userService;
             _context = context;
+            _config = config;
         }
 
         [HttpGet("count-users")]
@@ -138,19 +144,33 @@ namespace APDL.API.Controllers
             }
         }
 
-        
-        [HttpGet("activate")]
-        public IActionResult Activate([FromQuery] string token)
+
+        [HttpGet("/callback")]
+        public async Task<IActionResult> HandleActivationCallback([FromQuery] string userId)
         {
+            // 1. Validar se o ID do utilizador veio na query string (enviado pelo UserService)
+            if (string.IsNullOrEmpty(userId))
+            {
+                // Redireciona para o login com uma mensagem de erro
+                return RedirectPermanent("~/login?status=activation_failed");
+            }
+
             try
             {
-                // Chama o serviço para validar token e gerar URL do Auth0
-                var redirectUrl = _userService.ProcessActivationToken(token);
-                return Redirect(redirectUrl);
+                // 2. ATIVAR O UTILIZADOR NA BASE DE DADOS LOCAL
+                // Este método deve procurar o utilizador pelo ID do Auth0 e mudar o estado (ex: IsActive = true).
+                //await _userService.ActivateUserByAuth0IdAsync(userId); 
+
+                // 3. REDIRECIONAR PARA A PÁGINA DE LOGIN
+                // O tilde (~) refere-se à raiz da aplicação (o seu frontend, assumindo que está no mesmo domínio, 
+                // ou deve ser o URL completo se o frontend for um domínio separado).
+                return RedirectPermanent("~/login?status=activated");
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                return BadRequest(new { error = "Invalid or expired activation link", details = ex.Message });
+                // Em caso de erro (ex: utilizador não encontrado na BD local, falha de BD, etc.)
+                // Redireciona para o login com uma mensagem de erro genérica para o utilizador
+                return RedirectPermanent("~/login?status=activation_error");
             }
         }
 
