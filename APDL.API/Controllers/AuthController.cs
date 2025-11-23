@@ -7,6 +7,10 @@ using APDL.API.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using APDL.API.Domain.UserAggregate.DTO;
+using System;
+using Microsoft.Extensions.Configuration;
+
 
 namespace APDL.API.Controllers
 {
@@ -17,11 +21,14 @@ namespace APDL.API.Controllers
     {
         private readonly UserService _userService;
         private readonly DDDSample1DbContext _context;
+        private readonly IConfiguration _config;
 
-        public AuthController(UserService userService, DDDSample1DbContext context)
+
+        public AuthController(UserService userService, DDDSample1DbContext context, IConfiguration config)
         {
             _userService = userService;
             _context = context;
+            _config = config;
         }
 
         [HttpGet("count-users")]
@@ -89,5 +96,82 @@ namespace APDL.API.Controllers
                 }
             );
         }
+
+        
+        
+        [HttpPost("users")]
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            /*var callerRole =
+                User.FindFirstValue("role")
+                ?? User.Claims.FirstOrDefault(c => c.Type.EndsWith("/role"))?.Value;
+
+            if (string.IsNullOrWhiteSpace(callerRole) || !callerRole.Equals("ADMIN", System.StringComparison.OrdinalIgnoreCase))
+            {
+                return Forbid(); // 403
+            }*/
+
+            try
+            {
+                var created = await _userService.CreateUserAsync(dto);
+
+                return Ok(
+                new
+                {
+                    id = created.Id.ToString(),
+                    email = created.Email,
+                    name = created.Name,
+                    role = created.Role,
+                    isAuthenticated = true,
+                }
+            );
+            }
+            catch (System.Exception ex)
+            {
+                System.Console.Error.WriteLine($"Error creating user: {ex}");
+                return StatusCode(500, new
+                {
+                    error = "Error creating user",
+                    details = ex.Message
+                });
+            }
+        }
+
+
+        [HttpPost("activate-user")] 
+        [AllowAnonymous]
+        public async Task<IActionResult> ActivateUser([FromBody] ActivateUserRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (string.IsNullOrEmpty(request.Email))
+            {
+                return BadRequest(new { message = "O campo 'email' não pode ser nulo ou vazio." });
+            }
+
+            try
+            {
+                await _userService.ActivateUserByEmailAsync(request.Email);
+                return Ok(new { message = "Utilizador ativado com sucesso." });
+            }
+            catch (ApplicationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Ocorreu um erro interno do servidor." });
+            }
+        }
+
+
+
+
     }
 }

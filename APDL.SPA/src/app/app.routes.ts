@@ -108,7 +108,13 @@ export const routes: Routes = [
       {
         path: 'cube',
         component: Cube
+      },
+      {
+        path: 'create-user',
+        loadComponent: () => import('./pages/create-user/create-user').then(m => m.CreateUser),
+        canActivate: [roleGuard([UserRole.ADMIN])]
       }
+
     ]
   },
 

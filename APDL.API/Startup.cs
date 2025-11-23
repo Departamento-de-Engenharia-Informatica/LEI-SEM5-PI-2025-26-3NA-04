@@ -245,6 +245,7 @@ namespace APDL.API
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<UserService>();
+            services.AddHttpClient<UserService>();
         }
     }
 }

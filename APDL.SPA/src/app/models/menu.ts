@@ -23,6 +23,17 @@ export const MENU_ITEMS: MenuItem[] = [
     description: 'Dashboard and overview'
   },
 
+
+  //Admin
+  {
+    label: 'MENU.CREATE_USER',
+    route: '/create-user',
+    icon: '➕',
+    allowedRoles: [UserRole.ADMIN],
+    description: 'Create new users and send activation link'
+  },
+
+
   // Port Authority Officer
   {
     label: 'MENU.VESSEL_TYPES',
