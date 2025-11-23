@@ -10,6 +10,7 @@
   },
   "MENU": {
     "HOME": "Home",
+    "CREATE_USER": "Create User",
     "VESSEL_TYPES": "Vessel Types",
     "VESSELS": "Vessels",
     "DOCKS": "Docks",

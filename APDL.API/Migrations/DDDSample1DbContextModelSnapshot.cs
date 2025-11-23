@@ -162,7 +162,7 @@ namespace DDDNetCore.Migrations
 
             modelBuilder.Entity("APDL.API.Domain.ShippingAgentAggregate.ShippingAgent", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -172,13 +172,13 @@ namespace DDDNetCore.Migrations
 
             modelBuilder.Entity("APDL.API.Domain.ShippingAgentAggregate.ShippingAgentRepresentative", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("ShippingAgentId")
+                    b.Property<Guid?>("ShippingAgentId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -198,6 +198,9 @@ namespace DDDNetCore.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActivated")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -219,7 +222,7 @@ namespace DDDNetCore.Migrations
 
             modelBuilder.Entity("APDL.API.Domain.VesselTypes.VesselType", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -273,6 +276,12 @@ namespace DDDNetCore.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("SpecialHandlingRequirements");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("Status");
+
                     b.Property<DateTime?>("SubmittedAt")
                         .HasColumnType("TEXT")
                         .HasColumnName("SubmittedAt");
@@ -301,8 +310,7 @@ namespace DDDNetCore.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("VesselTypeId")
-                        .IsRequired()
+                    b.Property<Guid>("VesselTypeId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -852,7 +860,7 @@ namespace DDDNetCore.Migrations
                 {
                     b.OwnsOne("APDL.API.Domain.ShippingAgentAggregate.ValueObjects.Name", "AlternativeName", b1 =>
                         {
-                            b1.Property<string>("ShippingAgentId")
+                            b1.Property<Guid>("ShippingAgentId")
                                 .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
@@ -869,7 +877,7 @@ namespace DDDNetCore.Migrations
 
                     b.OwnsOne("APDL.API.Domain.ShippingAgentAggregate.ValueObjects.Name", "LegalName", b1 =>
                         {
-                            b1.Property<string>("ShippingAgentId")
+                            b1.Property<Guid>("ShippingAgentId")
                                 .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
@@ -887,7 +895,7 @@ namespace DDDNetCore.Migrations
 
                     b.OwnsOne("APDL.API.Domain.ShippingAgentAggregate.ValueObjects.Address", "Address", b1 =>
                         {
-                            b1.Property<string>("ShippingAgentId")
+                            b1.Property<Guid>("ShippingAgentId")
                                 .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
@@ -905,7 +913,7 @@ namespace DDDNetCore.Migrations
 
                     b.OwnsOne("APDL.API.Domain.ShippingAgentAggregate.ValueObjects.TaxNumber", "TaxNumber", b1 =>
                         {
-                            b1.Property<string>("ShippingAgentId")
+                            b1.Property<Guid>("ShippingAgentId")
                                 .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
@@ -938,7 +946,7 @@ namespace DDDNetCore.Migrations
 
                     b.OwnsOne("APDL.API.Domain.ShippingAgentAggregate.Email", "Email", b1 =>
                         {
-                            b1.Property<string>("ShippingAgentRepresentativeId")
+                            b1.Property<Guid>("ShippingAgentRepresentativeId")
                                 .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
@@ -956,7 +964,7 @@ namespace DDDNetCore.Migrations
 
                     b.OwnsOne("APDL.API.Domain.ShippingAgentAggregate.ValueObjects.Name", "Name", b1 =>
                         {
-                            b1.Property<string>("ShippingAgentRepresentativeId")
+                            b1.Property<Guid>("ShippingAgentRepresentativeId")
                                 .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
@@ -974,7 +982,7 @@ namespace DDDNetCore.Migrations
 
                     b.OwnsOne("APDL.API.Domain.ShippingAgentAggregate.ValueObjects.CitizenId", "CitizenId", b1 =>
                         {
-                            b1.Property<string>("ShippingAgentRepresentativeId")
+                            b1.Property<Guid>("ShippingAgentRepresentativeId")
                                 .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
@@ -992,7 +1000,7 @@ namespace DDDNetCore.Migrations
 
                     b.OwnsOne("APDL.API.Domain.ShippingAgentAggregate.ValueObjects.Nationality", "Nationality", b1 =>
                         {
-                            b1.Property<string>("ShippingAgentRepresentativeId")
+                            b1.Property<Guid>("ShippingAgentRepresentativeId")
                                 .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
@@ -1010,7 +1018,7 @@ namespace DDDNetCore.Migrations
 
                     b.OwnsOne("APDL.API.Domain.ShippingAgentAggregate.ValueObjects.Phone", "Phone", b1 =>
                         {
-                            b1.Property<string>("ShippingAgentRepresentativeId")
+                            b1.Property<Guid>("ShippingAgentRepresentativeId")
                                 .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
@@ -1041,7 +1049,7 @@ namespace DDDNetCore.Migrations
                 {
                     b.OwnsOne("APDL.API.Domain.VesselTypes.ValueObjects.Capacity", "Capacity", b1 =>
                         {
-                            b1.Property<string>("VesselTypeId")
+                            b1.Property<Guid>("VesselTypeId")
                                 .HasColumnType("TEXT");
 
                             b1.Property<int>("Value")
@@ -1058,7 +1066,7 @@ namespace DDDNetCore.Migrations
 
                     b.OwnsOne("APDL.API.Domain.VesselTypes.ValueObjects.Description", "Description", b1 =>
                         {
-                            b1.Property<string>("VesselTypeId")
+                            b1.Property<Guid>("VesselTypeId")
                                 .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
@@ -1076,7 +1084,7 @@ namespace DDDNetCore.Migrations
 
                     b.OwnsOne("APDL.API.Domain.VesselTypes.ValueObjects.Name", "Name", b1 =>
                         {
-                            b1.Property<string>("VesselTypeId")
+                            b1.Property<Guid>("VesselTypeId")
                                 .HasColumnType("TEXT");
 
                             b1.Property<string>("Value")
@@ -1094,7 +1102,7 @@ namespace DDDNetCore.Migrations
 
                     b.OwnsOne("APDL.API.Domain.VesselTypes.ValueObjects.Dimension", "MaxBays", b1 =>
                         {
-                            b1.Property<string>("VesselTypeId")
+                            b1.Property<Guid>("VesselTypeId")
                                 .HasColumnType("TEXT");
 
                             b1.Property<int>("Value")
@@ -1111,7 +1119,7 @@ namespace DDDNetCore.Migrations
 
                     b.OwnsOne("APDL.API.Domain.VesselTypes.ValueObjects.Dimension", "MaxRows", b1 =>
                         {
-                            b1.Property<string>("VesselTypeId")
+                            b1.Property<Guid>("VesselTypeId")
                                 .HasColumnType("TEXT");
 
                             b1.Property<int>("Value")
@@ -1128,7 +1136,7 @@ namespace DDDNetCore.Migrations
 
                     b.OwnsOne("APDL.API.Domain.VesselTypes.ValueObjects.Dimension", "MaxTiers", b1 =>
                         {
-                            b1.Property<string>("VesselTypeId")
+                            b1.Property<Guid>("VesselTypeId")
                                 .HasColumnType("TEXT");
 
                             b1.Property<int>("Value")
@@ -1217,27 +1225,6 @@ namespace DDDNetCore.Migrations
                                 .HasForeignKey("VesselVisitNotificationId");
                         });
 
-                    b.OwnsOne("APDL.API.Domain.NotificationAggregate.ValueObjects.NotificationStatus", "Status", b1 =>
-                        {
-                            b1.Property<string>("VesselVisitNotificationId")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(20)
-                                .HasColumnType("TEXT")
-                                .HasColumnName("Status");
-
-                            b1.HasKey("VesselVisitNotificationId");
-
-                            b1.HasIndex("Value");
-
-                            b1.ToTable("VesselVisitNotifications", "port");
-
-                            b1.WithOwner()
-                                .HasForeignKey("VesselVisitNotificationId");
-                        });
-
                     b.OwnsMany("APDL.API.Domain.NotificationAggregate.ValueObjects.SafetyOfficer", "_safetyCrewOfficers", b1 =>
                         {
                             b1.Property<int>("Id")
@@ -1267,8 +1254,6 @@ namespace DDDNetCore.Migrations
                     b.Navigation("ExpectedArrival");
 
                     b.Navigation("ExpectedDeparture");
-
-                    b.Navigation("Status");
 
                     b.Navigation("_cargoManifestIds");
 

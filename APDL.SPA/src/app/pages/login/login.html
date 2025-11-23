@@ -7,6 +7,22 @@
     </div>
 
     <div class="login-content">
+      <div class="message-box mb-4">
+          <div *ngIf="activationStatus === 'activating'" class="text-blue-600 p-4 rounded-lg bg-blue-50 shadow-md">
+              <h2 class="text-xl font-semibold">A processar a ativação...</h2>
+              <p class="mt-2">Aguarde enquanto confirmamos a sua conta na nossa base de dados.</p>
+          </div>
+          
+          <div *ngIf="activationStatus === 'success'" class="text-green-600 p-4 rounded-lg bg-green-50 shadow-md">
+              <h2 class="text-xl font-semibold">A sua conta foi ativada com sucesso!</h2>
+              <p class="mt-2">Pode agora iniciar sessão com a password que definiu.</p>
+          </div>
+
+          <div *ngIf="activationStatus === 'error'" class="text-red-600 p-4 rounded-lg bg-red-50 shadow-md">
+              <h2 class="text-xl font-semibold">Erro na ativação.</h2>
+              <p class="mt-2">Ocorreu uma falha ao tentar ativar a sua conta. Por favor, tente iniciar sessão ou contacte o suporte.</p>
+          </div>
+      </div>
       <p class="login-description">
         {{ 'LOGIN.MESSAGE' | translate }} 
       </p>

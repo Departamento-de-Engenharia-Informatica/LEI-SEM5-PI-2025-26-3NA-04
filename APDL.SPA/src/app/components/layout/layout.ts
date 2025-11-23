@@ -7,6 +7,7 @@ import { Footer } from '../footer/footer';
 import { Auth } from '../../services/auth';
 import { MenuItem, MENU_ITEMS } from '../../models/menu';
 import { TranslatePipe, TranslateDirective } from "@ngx-translate/core";
+import { UserRole } from '../../models/user';
 
 @Component({
   selector: 'app-layout',
@@ -46,7 +47,7 @@ export class Layout implements OnInit, OnDestroy {
 
   private updateVisibleMenuItems(): void {
     const currentRole = this.authService.getCurrentUserRole();
-
+    
     if (!currentRole) {
       this.visibleMenuItems = [];
       return;

@@ -10,6 +10,7 @@
   },
   "MENU": {
     "HOME": "Início",
+    "CREATE_USER": "Criar Utilizador",
     "VESSEL_TYPES": "Tipos de Embarcação",
     "VESSELS": "Embarcações",
     "DOCKS": "Docas",

@@ -5,6 +5,7 @@ using APDL.API.Domain.UserAggregate;
 using APDL.API.Infrastructure.Shared;
 using APDL.API.Infrastructure.UserInfrastructure;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace APDL.API.Infrastructure.UserInfrastructure
 {
@@ -22,5 +23,14 @@ namespace APDL.API.Infrastructure.UserInfrastructure
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
+
+        public async Task UpdateUserAsync(User user)
+        {
+            _context.Users.Update(user); 
+            
+            await _context.SaveChangesAsync();
+        }
+
+
     }
 }
