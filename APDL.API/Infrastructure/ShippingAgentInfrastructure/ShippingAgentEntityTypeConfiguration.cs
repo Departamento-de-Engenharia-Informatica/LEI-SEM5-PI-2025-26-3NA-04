@@ -1,6 +1,6 @@
+using APDL.API.Domain.ShippingAgentAggregate;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using APDL.API.Domain.ShippingAgentAggregate;
 
 namespace APDL.API.Infrastructure.ShippingAgentInfrastructure
 {
@@ -12,27 +12,45 @@ namespace APDL.API.Infrastructure.ShippingAgentInfrastructure
 
             builder.HasKey(sa => sa.Id);
 
-            builder.OwnsOne(sa => sa.LegalName, ln =>
-            {
-                ln.Property(l => l.Value).HasColumnName("LegalName").IsRequired();
-            });
+            builder
+                .Property(sa => sa.Id)
+                .HasConversion(id => id.AsGuid(), value => new ShippingAgentId(value))
+                .IsRequired();
 
-            builder.OwnsOne(sa => sa.AlternativeName, an =>
-            {
-                an.Property(a => a.Value).HasColumnName("AlternativeName");
-            });
+            builder.OwnsOne(
+                sa => sa.LegalName,
+                ln =>
+                {
+                    ln.Property(l => l.Value).HasColumnName("LegalName").IsRequired();
+                }
+            );
 
-            builder.OwnsOne(sa => sa.Address, ad =>
-            {
-                ad.Property(a => a.Value).HasColumnName("Address").IsRequired();
-            });
+            builder.OwnsOne(
+                sa => sa.AlternativeName,
+                an =>
+                {
+                    an.Property(a => a.Value).HasColumnName("AlternativeName");
+                }
+            );
 
-            builder.OwnsOne(sa => sa.TaxNumber, tn =>
-            {
-                tn.Property(t => t.Value).HasColumnName("TaxNumber").IsRequired();
-            });
+            builder.OwnsOne(
+                sa => sa.Address,
+                ad =>
+                {
+                    ad.Property(a => a.Value).HasColumnName("Address").IsRequired();
+                }
+            );
 
-            builder.Metadata.FindNavigation(nameof(ShippingAgent.Representatives))
+            builder.OwnsOne(
+                sa => sa.TaxNumber,
+                tn =>
+                {
+                    tn.Property(t => t.Value).HasColumnName("TaxNumber").IsRequired();
+                }
+            );
+
+            builder
+                .Metadata.FindNavigation(nameof(ShippingAgent.Representatives))
                 .SetPropertyAccessMode(PropertyAccessMode.Field);
         }
     }

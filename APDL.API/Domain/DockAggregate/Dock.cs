@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using APDL.API.Domain.DockAggregate;
@@ -40,6 +41,7 @@ public class Dock : Entity<DockId>, IAggregateRoot
                 nameof(draft)
             );
 
+        this.Id = new DockId(Guid.NewGuid());
         this.DockName = name;
         this.DockLength = length;
         this.DockDraft = draft;

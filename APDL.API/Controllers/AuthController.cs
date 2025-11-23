@@ -18,7 +18,6 @@ namespace APDL.API.Controllers
         private readonly UserService _userService;
         private readonly DDDSample1DbContext _context;
 
-
         public AuthController(UserService userService, DDDSample1DbContext context)
         {
             _userService = userService;
@@ -32,11 +31,7 @@ namespace APDL.API.Controllers
             var count = await _context.Users.CountAsync();
             var allEmails = await _context.Users.Select(u => u.Email).ToListAsync();
 
-            return Ok(new
-            {
-                userCount = count,
-                emails = allEmails
-            });
+            return Ok(new { userCount = count, emails = allEmails });
         }
 
         [HttpGet("whoami")]
