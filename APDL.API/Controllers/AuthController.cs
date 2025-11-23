@@ -145,32 +145,32 @@ namespace APDL.API.Controllers
         }
 
 
-        [HttpGet("/callback")]
-        public async Task<IActionResult> HandleActivationCallback([FromQuery] string userId)
+        [HttpPost("activate-user")] 
+        [AllowAnonymous]
+        public async Task<IActionResult> ActivateUser([FromBody] ActivateUserRequest request)
         {
-            // 1. Validar se o ID do utilizador veio na query string (enviado pelo UserService)
-            if (string.IsNullOrEmpty(userId))
+            if (!ModelState.IsValid)
             {
-                // Redireciona para o login com uma mensagem de erro
-                return RedirectPermanent("~/login?status=activation_failed");
+                return BadRequest(ModelState);
+            }
+
+            if (string.IsNullOrEmpty(request.Email))
+            {
+                return BadRequest(new { message = "O campo 'email' não pode ser nulo ou vazio." });
             }
 
             try
             {
-                // 2. ATIVAR O UTILIZADOR NA BASE DE DADOS LOCAL
-                // Este método deve procurar o utilizador pelo ID do Auth0 e mudar o estado (ex: IsActive = true).
-                //await _userService.ActivateUserByAuth0IdAsync(userId); 
-
-                // 3. REDIRECIONAR PARA A PÁGINA DE LOGIN
-                // O tilde (~) refere-se à raiz da aplicação (o seu frontend, assumindo que está no mesmo domínio, 
-                // ou deve ser o URL completo se o frontend for um domínio separado).
-                return RedirectPermanent("~/login?status=activated");
+                await _userService.ActivateUserByEmailAsync(request.Email);
+                return Ok(new { message = "Utilizador ativado com sucesso." });
+            }
+            catch (ApplicationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                // Em caso de erro (ex: utilizador não encontrado na BD local, falha de BD, etc.)
-                // Redireciona para o login com uma mensagem de erro genérica para o utilizador
-                return RedirectPermanent("~/login?status=activation_error");
+                return StatusCode(500, new { message = "Ocorreu um erro interno do servidor." });
             }
         }
 

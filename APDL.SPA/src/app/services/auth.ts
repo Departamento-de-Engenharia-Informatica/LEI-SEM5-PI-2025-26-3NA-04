@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { User, UserRole } from '../models/user';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { ApiService } from './api';
 
 @Injectable({
   providedIn: 'root',
@@ -51,7 +52,8 @@ export class Auth {
 
   constructor(private auth0: Auth0Service,
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    private apiService: ApiService
   ) {
     this.initialize();
   }
@@ -146,6 +148,9 @@ export class Auth {
       const url = 'https://localhost:5001/api/auth/activate';
       return this.http.post(url, { token });
     }
+    activateUserByEmail(email: string): Observable<any> {
+    return this.apiService.post('auth/activate-user', { email });
+  }
 
 
   getCurrentUser(): User | null {

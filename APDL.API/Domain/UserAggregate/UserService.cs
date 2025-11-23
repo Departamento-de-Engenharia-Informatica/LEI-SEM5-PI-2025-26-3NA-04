@@ -173,7 +173,7 @@ namespace APDL.API.Domain.UserAggregate
             }
         }
         
-        var redirectUrlWithUser = $"{_config["App:BaseUrl"]}/callback?userId={auth0User.user_id}";
+        var redirectUrlWithUser =  $"http://localhost:4200/login?activated=true&email={Uri.EscapeDataString(auth0User.email)}";
         var ticketPayload = new
         {
             user_id = auth0User.user_id,
@@ -273,6 +273,35 @@ namespace APDL.API.Domain.UserAggregate
                     await client.SendMailAsync(message);
                 }
             }
+        }
+
+        public async Task<bool> ActivateUserByEmailAsync(string email)
+        {
+            // 1. Procurar o utilizador na base de dados (assumindo a entidade User)
+            var user = await _repo.GetByEmailAsync(email);
+
+            if (user == null)
+            {
+                // Se o utilizador não existir, retornamos false (ou lançamos uma exceção, dependendo da sua política)
+                return false;
+            }
+
+            if (user.IsActivated)
+            {
+                return true; 
+            }
+
+            // 2. Marcar o utilizador como ativo
+            user.IsActivated = true;
+            
+            // Opcional: Se tiver um campo de data de ativação
+            // user.ActivatedAt = DateTime.UtcNow; 
+
+            // 3. Guardar as alterações na base de dados
+            await _repo.UpdateUserAsync(user);
+
+            // 4. Se a gravação foi bem-sucedida, retornar true
+            return true;
         }
 
     }

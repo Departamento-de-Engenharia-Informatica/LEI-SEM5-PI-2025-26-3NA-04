@@ -24,33 +24,13 @@ namespace APDL.API.Infrastructure.UserInfrastructure
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
 
-        
-        public async Task<User> GetUserByActivationTokenAsync(string token)
+        public async Task UpdateUserAsync(User user)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.ActivationToken == token);
-        }
-
-
-        public async Task UpdateAsync(User user)
-        {
-            _context.Users.Update(user);
+            _context.Users.Update(user); 
+            
             await _context.SaveChangesAsync();
         }
 
-        public async Task<User> ActivateUserAsync(Guid id)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
-            if (user == null) return null;
-
-            user.IsActive = true;
-            user.ActivationToken = null;
-            user.ActivationTokenExpiry = null;
-
-            _context.Users.Update(user);
-            await _context.SaveChangesAsync();
-
-            return user;
-        }
 
     }
 }

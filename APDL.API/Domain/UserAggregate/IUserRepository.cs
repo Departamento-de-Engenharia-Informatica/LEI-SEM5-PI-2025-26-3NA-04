@@ -7,5 +7,6 @@ namespace APDL.API.Domain.UserAggregate
     public interface IUserRepository : IRepository<User, UserId>
     {
         Task<User> GetByEmailAsync(string email);
+        Task UpdateUserAsync(User user);
     }
 }
