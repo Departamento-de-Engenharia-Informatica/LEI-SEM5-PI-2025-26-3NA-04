@@ -54,18 +54,15 @@ namespace APDL.API.Infrastructure.VesselVisitInfrastructure
                 }
             );
 
-            builder.OwnsOne(
-                v => v.Status,
-                s =>
-                {
-                    s.Property(st => st.Value)
-                        .HasColumnName("Status")
-                        .HasMaxLength(20)
-                        .IsRequired();
-
-                    s.HasIndex(st => st.Value);
-                }
-            );
+            builder
+                .Property(v => v.Status)
+                .HasConversion(
+                    status => status.Value,
+                    value => new NotificationStatus(value, false)
+                )
+                .HasColumnName("Status")
+                .HasMaxLength(20)
+                .IsRequired();
 
             builder
                 .Property(v => v.CargoType)
