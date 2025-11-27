@@ -52,9 +52,17 @@ export class PortSceneComponent implements OnInit, OnDestroy {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(window.devicePixelRatio);
 
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.05;
+
+    this.controls.mouseButtons = { LEFT: THREE.MOUSE.PAN, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE };
+
+    this.controls.minDistance = 50;
+    this.controls.maxDistance = 500;
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     this.scene.add(ambientLight);
@@ -63,11 +71,23 @@ export class PortSceneComponent implements OnInit, OnDestroy {
     directionalLight.position.set(50, 100, 50);
     this.scene.add(directionalLight);
 
+    directionalLight.castShadow = true;
+    
+    directionalLight.shadow.camera.left = -200;
+    directionalLight.shadow.camera.right = 200;
+    directionalLight.shadow.camera.top = 200;
+    directionalLight.shadow.camera.bottom = -200;
+    directionalLight.shadow.camera.near = 0.1;
+    directionalLight.shadow.camera.far = 300;
+
     const groundGeometry = new THREE.PlaneGeometry(500, 500);
     const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x228b22 });
     const ground = new THREE.Mesh(groundGeometry, groundMaterial);
     ground.rotation.x = -Math.PI / 2;
     ground.position.y = -1;
+
+    ground.receiveShadow = true;
+
     this.scene.add(ground);
 
     const gridHelper = new THREE.GridHelper(500, 50, 0x000000, 0x444444);
@@ -107,6 +127,9 @@ export class PortSceneComponent implements OnInit, OnDestroy {
       this.scene.add(mesh);
       this.addLabel(dock.id, dock.position);
 
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+
       dock.stsCranes.forEach(crane => {
         this.createSTSCrane(crane);
       });
@@ -125,6 +148,10 @@ export class PortSceneComponent implements OnInit, OnDestroy {
       const mesh = new THREE.Mesh(geometry, material);
       mesh.position.set(yard.position.x, yard.position.y, yard.position.z);
       mesh.name = yard.id;
+
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+
       this.scene.add(mesh);
       this.addLabel(yard.id, yard.position);
     });
@@ -142,6 +169,10 @@ export class PortSceneComponent implements OnInit, OnDestroy {
       const mesh = new THREE.Mesh(geometry, material);
       mesh.position.set(warehouse.position.x, warehouse.position.y, warehouse.position.z);
       mesh.name = warehouse.id;
+
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+
       this.scene.add(mesh);
       this.addLabel(warehouse.id, warehouse.position);
     });
@@ -175,6 +206,9 @@ export class PortSceneComponent implements OnInit, OnDestroy {
     );
     boom.name = `${crane.id}-boom`;
     this.scene.add(boom);
+
+    tower.castShadow = true;
+    boom.castShadow = true;
 
     this.addLabel(crane.id, { x: crane.position.x, y: crane.height + 5, z: crane.position.z });
   }
