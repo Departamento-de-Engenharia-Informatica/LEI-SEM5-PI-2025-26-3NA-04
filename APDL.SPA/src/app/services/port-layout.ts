@@ -39,6 +39,7 @@ export interface Warehouse {
   id: string;
   position: Position;
   dimensions: Dimensions; 
+  visual: VisualizationConfig;
 }
 
 export interface PortLayout {
@@ -47,6 +48,10 @@ export interface PortLayout {
   docks: Dock[];
   containerYards: ContainerYard[];
   warehouses: Warehouse[];
+}
+export interface VisualizationConfig {
+  texturePath: string; 
+  colorHex?: string;   
 }
 
 @Injectable({
