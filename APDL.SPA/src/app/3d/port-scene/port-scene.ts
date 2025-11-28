@@ -139,24 +139,20 @@ export class PortSceneComponent implements OnInit, OnDestroy {
     });
 
     layout.containerYards.forEach(yard => {
-        // 1. Defina a Geometria FORA do callback (é síncrona)
         const geometry = new THREE.BoxGeometry(
             yard.dimensions.width,
             yard.dimensions.height, // A altura é geralmente pequena para pátios
             yard.dimensions.depth
         );
 
-        // --- Configuração da Textura e Parâmetros de Repetição ---
         const texturePath = `textures/black-road-texture.jpg`;
         
-        // Fator de repetição (ajustável para densidade da estrada)
+        // Fator de repetição
         const repeatFactor = 5; 
         
         // Repetição X (Largura do Pátio) e Z (Profundidade do Pátio)
         const repeatX = yard.dimensions.width / repeatFactor;
         const repeatZ = yard.dimensions.depth / repeatFactor;
-        
-        // --- FUNÇÃO DE CARREGAMENTO ASSÍNCRONO ---
         
         this.textureLoader.load(texturePath, 
             
@@ -368,7 +364,6 @@ export class PortSceneComponent implements OnInit, OnDestroy {
         (error) => {
             console.error('Erro ao carregar a textura do armazém:', texturePath, error);
             
-            // ... (Código de Fallback para o Armazém principal)
             const fallbackMaterial = new THREE.MeshStandardMaterial({ color: 0xb22222, roughness: 0.6 });
             const fallbackMesh = new THREE.Mesh(geometry, fallbackMaterial);
             
