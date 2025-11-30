@@ -3,6 +3,10 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { PortLayoutService, PortLayout } from '../../services/port-layout';
 
+const SCENE_LIMIT = 200;
+const MIN_CAM_Y = 5;
+const MAX_CAM_Y = 300;
+
 @Component({
   selector: 'app-port-scene',
   standalone: true,
@@ -17,7 +21,8 @@ export class PortSceneComponent implements OnInit, OnDestroy {
   private renderer!: THREE.WebGLRenderer;
   private controls!: OrbitControls;
   private animationId: number = 0;
-  private textureLoader!: THREE.TextureLoader;
+  private textureLoader!: THREE.TextureLoader;private keyState: { [key: string]: boolean } = {};
+  private readonly movementSpeed = 5.0;
 
   constructor(private portLayoutService: PortLayoutService) { }
 
@@ -65,6 +70,9 @@ export class PortSceneComponent implements OnInit, OnDestroy {
     this.controls.minDistance = 50;
     this.controls.maxDistance = 500;
 
+    this.controls.minPolarAngle = Math.PI * 0.1;
+    this.controls.maxPolarAngle = Math.PI * 0.45;
+
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     this.scene.add(ambientLight);
 
@@ -98,7 +106,20 @@ export class PortSceneComponent implements OnInit, OnDestroy {
     window.addEventListener('resize', () => this.onWindowResize());
 
     this.textureLoader = new THREE.TextureLoader();
+
+    this.setupKeyboardControls(); 
   }
+
+  private setupKeyboardControls(): void {
+    window.addEventListener('keydown', (event) => {
+      this.keyState[event.key.toLowerCase()] = true;
+    });
+
+    window.addEventListener('keyup', (event) => {
+      this.keyState[event.key.toLowerCase()] = false;
+    });
+  }
+  
 
   private loadPortLayout(): void {
     this.portLayoutService.getPortLayout().subscribe({
@@ -514,9 +535,77 @@ private createSTSCrane(crane: any): void {
   }
 
   private animate(): void {
-    this.animationId = requestAnimationFrame(() => this.animate());
-    this.controls.update();
-    this.renderer.render(this.scene, this.camera);
+  this.animationId = requestAnimationFrame(() => this.animate());
+
+  const direction = new THREE.Vector3();
+  this.camera.getWorldDirection(direction); // Obtém o vetor para onde a câmara está a olhar
+  direction.y = 0; // Impede a câmara de voar (movimento vertical)
+  direction.normalize();
+
+  const right = new THREE.Vector3();
+  right.crossVectors(this.camera.up, direction); // Vetor perpendicular (para strafe A/D)
+  
+  // Vetor que irá acumular o deslocamento (por frame)
+  const moveVector = new THREE.Vector3(0, 0, 0); 
+  const moveStep = this.movementSpeed * 0.3; 
+
+  // 💡 LÓGICA DE MOVIMENTO VERTICAL (Shift + W/S)
+    if (this.keyState['shift']) {
+        if (this.keyState['w']) {
+            moveVector.y = moveStep; // Subir
+        }
+        if (this.keyState['s']) {
+            moveVector.y = -moveStep; // Descer
+        }
+    }
+    
+    // LÓGICA DE MOVIMENTO HORIZONTAL (W/S/A/D)
+    // Se Shift NÃO estiver pressionado, W/S move para frente/trás (Horizontal).
+    if (!this.keyState['shift']) {
+        if (this.keyState['w']) {
+            moveVector.addScaledVector(direction, moveStep); 
+        }
+        if (this.keyState['s']) {
+            moveVector.addScaledVector(direction, -moveStep); 
+        }
+    }
+
+    // Movimento Strafe (A/D) - Pode ser combinado com o movimento vertical
+    if (this.keyState['a']) {
+        moveVector.addScaledVector(right, moveStep); 
+    }
+    if (this.keyState['d']) {
+        moveVector.addScaledVector(right, -moveStep); 
+    }
+  
+  // Aplica o vetor de movimento à POSIÇÃO da câmara e ao PONTO ALVO (target)
+  // Mover ambos pelo mesmo vetor simula translação pura
+  this.camera.position.add(moveVector);
+  this.controls.target.add(moveVector);
+
+  this.controls.update();
+
+  const target = this.controls.target;
+
+  if (target.x > SCENE_LIMIT) {
+    target.x = SCENE_LIMIT;
+  } else if (target.x < -SCENE_LIMIT) {
+    target.x = -SCENE_LIMIT;
+  }
+
+  if (target.z > SCENE_LIMIT) {
+    target.z = SCENE_LIMIT;
+  } else if (target.z < -SCENE_LIMIT) {
+    target.z = -SCENE_LIMIT;
+  }
+
+  const cameraPosition = this.camera.position;
+    
+  cameraPosition.y = Math.max(MIN_CAM_Y, Math.min(MAX_CAM_Y, cameraPosition.y));
+
+
+
+  this.renderer.render(this.scene, this.camera);
   }
 
   private onWindowResize(): void {
