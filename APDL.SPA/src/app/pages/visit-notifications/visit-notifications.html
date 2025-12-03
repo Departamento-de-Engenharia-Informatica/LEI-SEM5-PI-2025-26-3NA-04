@@ -1,1 +1,266 @@
-<p>visit-notifications works!</p>
+<div class="notifications-container">
+  <header class="notifications-header">
+    <h1>Vessel Visit Notifications</h1>
+    <button class="btn-primary" (click)="openCreateForm()" [disabled]="loading">
+      + Create New Notification
+    </button>
+  </header>
+
+  <!-- Success/Error Messages -->
+  <div class="messages">
+    <div *ngIf="successMessage" class="alert alert-success">
+      {{ successMessage }}
+    </div>
+    <div *ngIf="error" class="alert alert-error">
+      {{ error }}
+    </div>
+  </div>
+
+  <!-- Filter Section -->
+  <div class="filter-section">
+    <label for="statusFilter">Filter by Status:</label>
+    <select 
+      id="statusFilter" 
+      [(ngModel)]="filterStatus" 
+      (change)="onFilterChange()"
+      class="status-filter">
+      <option *ngFor="let status of statusOptions" [value]="status">
+        {{ status }}
+      </option>
+    </select>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
+
+  <!-- Notifications List -->
+  <div *ngIf="!loading && !showCreateForm" class="notifications-list">
+    <div *ngIf="filteredNotifications.length === 0" class="no-results">
+      <p>No notifications found.</p>
+    </div>
+
+    <div *ngFor="let notification of filteredNotifications" 
+         class="notification-card"
+         (click)="selectNotification(notification)"
+         [class.selected]="selectedNotification?.id === notification.id">
+      
+      <div class="notification-header">
+        <h3>Notification #{{ notification.id.substring(0, 8) }}</h3>
+        <span [class]="getStatusClass(notification.status)" class="status-badge">
+          {{ notification.status }}
+        </span>
+      </div>
+
+      <div class="notification-details">
+        <div class="detail-row">
+          <span class="label">Vessel ID:</span>
+          <span class="value">{{ notification.vesselId }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Captain:</span>
+          <span class="value">{{ notification.captainName }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Cargo Type:</span>
+          <span class="value">{{ notification.cargoType }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Cargo Volume:</span>
+          <span class="value">{{ notification.cargoVolume }} m³</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Expected Arrival:</span>
+          <span class="value">{{ formatDate(notification.expectedArrival) }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Expected Departure:</span>
+          <span class="value">{{ formatDate(notification.expectedDeparture) }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Crew Count:</span>
+          <span class="value">{{ notification.totalCrewCount }}</span>
+        </div>
+        <div *ngIf="notification.safetyCrewOfficers.length > 0" class="detail-row">
+          <span class="label">Safety Officers:</span>
+          <span class="value">{{ notification.safetyCrewOfficers.length }}</span>
+        </div>
+        <div *ngIf="notification.assignedDockId" class="detail-row">
+          <span class="label">Assigned Dock:</span>
+          <span class="value">{{ notification.assignedDockId }}</span>
+        </div>
+        <div *ngIf="notification.rejectionReason" class="detail-row">
+          <span class="label">Rejection Reason:</span>
+          <span class="value rejection">{{ notification.rejectionReason }}</span>
+        </div>
+      </div>
+
+      <div class="notification-actions">
+        <button 
+          *ngIf="notification.status === 'InProgress'"
+          class="btn-submit"
+          (click)="submitNotification(notification.id); $event.stopPropagation()"
+          [disabled]="loading">
+          Submit for Review
+        </button>
+        <button 
+          *ngIf="notification.status === 'InProgress'"
+          class="btn-delete"
+          (click)="deleteNotification(notification.id); $event.stopPropagation()"
+          [disabled]="loading">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Form -->
+  <div *ngIf="showCreateForm" class="create-form">
+    <div class="form-header">
+      <h2>Create New Vessel Visit Notification</h2>
+      <button class="btn-close" (click)="closeCreateForm()">✕</button>
+    </div>
+
+    <form (ngSubmit)="createNotification()" class="notification-form">
+      <div class="form-section">
+        <h3>Vessel Information</h3>
+        
+        <div class="form-group">
+          <label for="vesselId">Vessel ID *</label>
+          <input 
+            type="text" 
+            id="vesselId" 
+            [(ngModel)]="newNotification.vesselId"
+            name="vesselId"
+            required
+            placeholder="Enter vessel ID">
+        </div>
+
+        <div class="form-group">
+          <label for="captainName">Captain Name *</label>
+          <input 
+            type="text" 
+            id="captainName" 
+            [(ngModel)]="newNotification.captainName"
+            name="captainName"
+            required
+            placeholder="Enter captain name">
+        </div>
+
+        <div class="form-group">
+          <label for="totalCrewCount">Total Crew Count *</label>
+          <input 
+            type="number" 
+            id="totalCrewCount" 
+            [(ngModel)]="newNotification.totalCrewCount"
+            name="totalCrewCount"
+            min="1"
+            required>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Schedule</h3>
+        
+        <div class="form-group">
+          <label for="expectedArrival">Expected Arrival *</label>
+          <input 
+            type="datetime-local" 
+            id="expectedArrival" 
+            [(ngModel)]="newNotification.expectedArrival"
+            name="expectedArrival"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label for="expectedDeparture">Expected Departure *</label>
+          <input 
+            type="datetime-local" 
+            id="expectedDeparture" 
+            [(ngModel)]="newNotification.expectedDeparture"
+            name="expectedDeparture"
+            required>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Cargo Information</h3>
+        
+        <div class="form-group">
+          <label for="cargoType">Cargo Type *</label>
+          <input 
+            type="text" 
+            id="cargoType" 
+            [(ngModel)]="newNotification.cargoType"
+            name="cargoType"
+            required
+            placeholder="e.g., Containers, Bulk, Liquid">
+        </div>
+
+        <div class="form-group">
+          <label for="cargoVolume">Cargo Volume (m³) *</label>
+          <input 
+            type="number" 
+            id="cargoVolume" 
+            [(ngModel)]="newNotification.cargoVolume"
+            name="cargoVolume"
+            min="0"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label for="specialHandlingRequirements">Special Handling Requirements</label>
+          <textarea 
+            id="specialHandlingRequirements" 
+            [(ngModel)]="newNotification.specialHandlingRequirements"
+            name="specialHandlingRequirements"
+            rows="3"
+            placeholder="Enter any special handling requirements (optional)"></textarea>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Safety Officers</h3>
+        
+        <div class="form-group safety-officers-input">
+          <input 
+            type="text" 
+            [(ngModel)]="newSafetyOfficerName"
+            name="safetyOfficerName"
+            placeholder="Enter officer name"
+            (keyup.enter)="addSafetyOfficerToForm()">
+          <button 
+            type="button" 
+            class="btn-add"
+            (click)="addSafetyOfficerToForm()">
+            Add Officer
+          </button>
+        </div>
+
+        <div *ngIf="newNotification.safetyCrewOfficerNames && newNotification.safetyCrewOfficerNames.length > 0" 
+             class="officers-list">
+          <div *ngFor="let officer of newNotification.safetyCrewOfficerNames" class="officer-item">
+            <span>{{ officer }}</span>
+            <button 
+              type="button" 
+              class="btn-remove"
+              (click)="removeSafetyOfficerFromForm(officer)">
+              Remove
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="closeCreateForm()">
+          Cancel
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="loading">
+          {{ loading ? 'Creating...' : 'Create Notification' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

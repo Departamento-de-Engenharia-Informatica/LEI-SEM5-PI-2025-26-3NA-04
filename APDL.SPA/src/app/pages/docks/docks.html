@@ -1,1 +1,185 @@
-<p>docks works!</p>
+<div class="docks-container">
+  <header class="docks-header">
+    <h1>Dock Management</h1>
+    <div class="header-actions">
+      <button class="btn-primary" (click)="openCreateForm()" [disabled]="loading">
+        + Create New Dock
+      </button>
+    </div>
+  </header>
+
+  <!-- Success/Error Messages -->
+  <div class="messages">
+    <div *ngIf="successMessage" class="alert alert-success">
+      {{ successMessage }}
+    </div>
+    <div *ngIf="error" class="alert alert-error">
+      {{ error }}
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
+
+  <!-- Docks List -->
+  <div *ngIf="!loading && !showCreateForm && !showEditForm" class="docks-grid">
+    <div *ngIf="docks.length === 0" class="no-results">
+      <p>No docks found.</p>
+    </div>
+
+    <div *ngFor="let dock of docks" 
+         class="dock-card"
+         (click)="selectDock(dock)"
+         [class.selected]="selectedDock?.id === dock.id">
+      
+      <div class="dock-header">
+        <h3>{{ dock.dockName }}</h3>
+        <span class="crane-badge">
+          {{ dock.numberOfSTSCranes }} Crane{{ dock.numberOfSTSCranes !== 1 ? 's' : '' }}
+        </span>
+      </div>
+
+      <div class="dock-details">
+        <div class="detail-row">
+          <span class="label">Length:</span>
+          <span class="value">{{ dock.dockLength }} m</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Draft:</span>
+          <span class="value">{{ dock.dockDraft }} m</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">ID:</span>
+          <span class="value id-text">{{ dock.id.substring(0, 8) }}...</span>
+        </div>
+      </div>
+
+      <div class="dock-actions">
+        <button 
+          class="btn-edit"
+          (click)="openEditForm(dock); $event.stopPropagation()"
+          [disabled]="loading">
+          Edit
+        </button>
+        <button 
+          class="btn-delete"
+          (click)="deleteDock(dock.id); $event.stopPropagation()"
+          [disabled]="loading">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Form -->
+  <div *ngIf="showCreateForm" class="form-container">
+    <div class="form-header">
+      <h2>Create New Dock</h2>
+      <button class="btn-close" (click)="closeCreateForm()">✕</button>
+    </div>
+
+    <form (ngSubmit)="createDock()" class="dock-form">
+      <div class="form-group">
+        <label for="dockName">Dock Name *</label>
+        <input 
+          type="text" 
+          id="dockName" 
+          [(ngModel)]="newDock.dockName"
+          name="dockName"
+          required
+          placeholder="e.g., Dock A, Terminal 1">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="dockLength">Length (meters) *</label>
+          <input 
+            type="number" 
+            id="dockLength" 
+            [(ngModel)]="newDock.dockLength"
+            name="dockLength"
+            min="1"
+            required
+            placeholder="e.g., 350">
+        </div>
+
+        <div class="form-group">
+          <label for="dockDraft">Draft (meters) *</label>
+          <input 
+            type="number" 
+            id="dockDraft" 
+            [(ngModel)]="newDock.dockDraft"
+            name="dockDraft"
+            min="1"
+            required
+            placeholder="e.g., 15">
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="closeCreateForm()">
+          Cancel
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="loading">
+          {{ loading ? 'Creating...' : 'Create Dock' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Edit Form -->
+  <div *ngIf="showEditForm" class="form-container">
+    <div class="form-header">
+      <h2>Edit Dock</h2>
+      <button class="btn-close" (click)="closeEditForm()">✕</button>
+    </div>
+
+    <form (ngSubmit)="updateDock()" class="dock-form">
+      <div class="form-group">
+        <label for="editDockName">Dock Name</label>
+        <input 
+          type="text" 
+          id="editDockName" 
+          [(ngModel)]="editDock.dockName"
+          name="editDockName"
+          placeholder="e.g., Dock A, Terminal 1">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="editDockLength">Length (meters)</label>
+          <input 
+            type="number" 
+            id="editDockLength" 
+            [(ngModel)]="editDock.dockLength"
+            name="editDockLength"
+            min="1"
+            placeholder="e.g., 350">
+        </div>
+
+        <div class="form-group">
+          <label for="editDockDraft">Draft (meters)</label>
+          <input 
+            type="number" 
+            id="editDockDraft" 
+            [(ngModel)]="editDock.dockDraft"
+            name="editDockDraft"
+            min="1"
+            placeholder="e.g., 15">
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="closeEditForm()">
+          Cancel
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="loading">
+          {{ loading ? 'Updating...' : 'Update Dock' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
