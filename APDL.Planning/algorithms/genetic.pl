@@ -152,7 +152,7 @@ remove_elite(N, [_|Rest], Result):-
     N > 0,
     N1 is N - 1,
     remove_elite(N1, Rest, Result).
-    
+
 % Take first N elements from list
 take_n(0, _, []):-!.
 take_n(_, [], []):-!.
@@ -179,7 +179,7 @@ find_original_fitness(TargetInd, [Ind*Fitness|_], Ind*Fitness):-
     TargetInd = Ind, !.
 find_original_fitness(TargetInd, [_|Rest], Result):-
     find_original_fitness(TargetInd, Rest, Result).
-s
+
 % Apply random multiplier between 0 and 1 to each individuals fitness
 apply_random_multipliers([], []).
 apply_random_multipliers([Ind*Fitness|Rest], [Ind*NewFitness|Result]):-
