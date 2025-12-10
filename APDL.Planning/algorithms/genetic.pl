@@ -195,7 +195,6 @@ generate_generation(G, G, Pop, _):-!,
 generate_generation(N, G, Pop, StartTime):-
     Pop = [_*BestFitness|_],
     
-    % Check stopping conditions
     (check_target_fitness(BestFitness), !,
         write('Generation '), write(N), write(':'), nl, write(Pop), nl,
         write('Stopping: Target fitness reached'), nl
@@ -204,29 +203,21 @@ generate_generation(N, G, Pop, StartTime):-
         write('Generation '), write(N), write(':'), nl, write(Pop), nl,
         write('Stopping: Time limit exceeded'), nl
     ;
-    % Continue to next generation
         write('Generation '), write(N), write(':'), nl, write(Pop), nl,
         
-        % Random permutation before crossover
         random_permutation(Pop, ShuffledPop),
         
-        % Crossover and mutation on shuffled population
         crossover(ShuffledPop, NPop1),
         mutation(NPop1, NPop),
         
-        % Evaluate new population
         evaluate_population(NPop, NPopValue),
         
-        % Combine parent and offspring populations
         append(Pop, NPopValue, CombinedPop),
         
-        % Remove duplicates
         remove_duplicates(CombinedPop, UniquePop),
         
-        % Order combined population by fitness
         order_population(UniquePop, CombinedSorted),
         
-        % Select next generation using elitism + fitness lottery
         select_population(CombinedSorted, NPopOrd),
         
         N1 is N + 1,
