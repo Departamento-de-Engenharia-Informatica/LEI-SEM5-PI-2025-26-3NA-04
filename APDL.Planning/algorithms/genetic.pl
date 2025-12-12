@@ -6,6 +6,7 @@
 :-dynamic target_fitness/1.
 :-dynamic time_limit/1.
 :-dynamic shortest_delay/2.
+:-dynamic dock/2.
 
 % Vessel definitions - vessel(Id, ArrivalTime, DepartureTime, UnloadTime, LoadTime)
 vessel(va, 6, 63, 10, 16).
@@ -16,9 +17,14 @@ vessel(ve, 36, 70, 12, 0).
 vessel(vf, 40, 60, 8, 6).
 vessel(vg, 52, 80, 9, 10).
 vessel(vi, 61, 90, 13, 8).
-%vessel(vj, 74, 100, 7, 7).
-%vessel(vk, 81, 110, 6, 8).
-%vessel(vl, 90, 140, 22, 18).
+vessel(vj, 74, 100, 7, 7).
+vessel(vk, 81, 110, 6, 8).
+vessel(vl, 90, 140, 22, 18).
+
+dock(dock1, 1).
+dock(dock2, 1).
+dock(dock3, 2).
+dock(dock4, 4).
 
 % vessels(NVessels) - counts total vessels
 vessels(N):- findall(V, vessel(V,_,_,_,_), L), length(L, N).
@@ -162,7 +168,6 @@ take_n(N, [X|Rest], [X|Result]):-
     take_n(N1, Rest, Result).
 
 % Fitness-based lottery: each individual gets fitness * random(0,1), select best scores
-% IMPORTANT: We select based on multiplied values but RETURN original fitness
 fitness_lottery(0, _, []):-!.
 fitness_lottery(NumToSelect, CombinedPop, [Winner|Rest]):-
     NumToSelect > 0,
@@ -384,3 +389,46 @@ mutacao23(G1, 1, [G2|Ind], G2, [G1|Ind]):-!.
 mutacao23(G1, P, [G|Ind], G2, [G|NInd]):-
     P1 is P - 1,
     mutacao23(G1, P1, Ind, G2, NInd).
+
+% Distribute vessels across docks
+distribute_vessels_to_docks(BestSequence, Assignments):-
+    findall(dock(DockId, NumCranes), dock(DockId, NumCranes), Docks),
+    initialize_dock_loads(Docks, DockLoads),
+    distribute_vessels(BestSequence, DockLoads, Assignments).
+
+% Initialize all docks with 0 load
+initialize_dock_loads([], []).
+initialize_dock_loads([dock(DockId, NumCranes)|Rest], [dock(DockId, NumCranes, 0, [])|Rest1]):-
+    initialize_dock_loads(Rest, Rest1).
+
+% Distribute each vessel to dock with lowest load
+distribute_vessels([], DockLoads, DockLoads):-!.
+distribute_vessels([Vessel|RestVessels], DockLoads, FinalAssignments):-
+    find_min_load_dock(DockLoads, MinDock),
+    MinDock = dock(DockId, NumCranes, CurrentLoad, VesselList),
+    
+    vessel(Vessel, _, _, Unload, Load),
+    VesselTime is Unload + Load,
+    AddedLoad is ceiling(VesselTime / NumCranes),
+    NewLoad is CurrentLoad + AddedLoad,
+    
+    append(VesselList, [Vessel], NewVesselList),
+    UpdatedDock = dock(DockId, NumCranes, NewLoad, NewVesselList),
+    
+    replace_dock(DockId, DockLoads, UpdatedDock, NewDockLoads),
+    
+    distribute_vessels(RestVessels, NewDockLoads, FinalAssignments).
+
+% Find dock with minimum load
+find_min_load_dock([Dock], Dock):-!.
+find_min_load_dock([Dock1|Rest], MinDock):-
+    find_min_load_dock(Rest, Dock2),
+    Dock1 = dock(_, _, Load1, _),
+    Dock2 = dock(_, _, Load2, _),
+    ((Load1 =< Load2, !, MinDock = Dock1); MinDock = Dock2).
+
+% Replace dock in list
+replace_dock(_, [], _, []).
+replace_dock(DockId, [dock(DockId, NC, _, _)|Rest], NewDock, [NewDock|Rest]):-!.
+replace_dock(DockId, [Dock|Rest], NewDock, [Dock|Rest1]):-
+    replace_dock(DockId, Rest, NewDock, Rest1).
