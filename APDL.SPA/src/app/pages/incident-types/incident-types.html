@@ -1,0 +1,144 @@
+<div class="incident-types-container">
+  <header class="incident-types-header">
+    <h1>Incident Types</h1>
+    <div class="header-actions">
+      <button class="btn-secondary" (click)="toggleView()">
+        {{ showHierarchy ? 'Flat View' : 'Hierarchy View' }}
+      </button>
+      <button class="btn-primary" (click)="openCreateForm()" [disabled]="loading">
+        + Create New Type
+      </button>
+    </div>
+  </header>
+
+  <div class="messages">
+    <div *ngIf="successMessage" class="alert alert-success">
+      {{ successMessage }}
+    </div>
+    <div *ngIf="error" class="alert alert-error">
+      {{ error }}
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
+
+  <div *ngIf="!loading && !showCreateForm && !showEditForm" class="types-list">
+    <div *ngIf="showHierarchy">
+      <div *ngFor="let type of hierarchicalTypes" class="type-card">
+        <div class="type-header">
+          <h3>{{ type.name }}</h3>
+          <span [class]="getSeverityClass(type.severity)" class="severity-badge">
+            {{ type.severity }}
+          </span>
+        </div>
+        <div class="type-details">
+          <div class="detail-row">
+            <span class="label">Code:</span>
+            <span class="value">{{ type.code }}</span>
+          </div>
+          <div *ngIf="type.description" class="detail-row">
+            <span class="label">Description:</span>
+            <span class="value">{{ type.description }}</span>
+          </div>
+        </div>
+        <div class="type-actions">
+          <button class="btn-edit" (click)="openEditForm(type)" [disabled]="loading">Edit</button>
+          <button class="btn-secondary" (click)="openCreateForm(type._id)" [disabled]="loading">Add Child</button>
+          <button class="btn-delete" (click)="deleteType(type._id)" [disabled]="loading">Delete</button>
+        </div>
+        <div *ngIf="type.children && type.children.length > 0" class="children">
+          <div *ngFor="let child of type.children" class="child-type">
+            <h4>{{ child.name }}</h4>
+            <span [class]="getSeverityClass(child.severity)" class="severity-badge">{{ child.severity }}</span>
+            <button class="btn-edit" (click)="openEditForm(child)">Edit</button>
+            <button class="btn-delete" (click)="deleteType(child._id)">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="!showHierarchy">
+      <div *ngFor="let type of incidentTypes" class="type-card">
+        <div class="type-header">
+          <h3>{{ type.name }}</h3>
+          <span [class]="getSeverityClass(type.severity)" class="severity-badge">{{ type.severity }}</span>
+        </div>
+        <div class="type-details">
+          <div class="detail-row">
+            <span class="label">Code:</span>
+            <span class="value">{{ type.code }}</span>
+          </div>
+          <div *ngIf="type.description" class="detail-row">
+            <span class="label">Description:</span>
+            <span class="value">{{ type.description }}</span>
+          </div>
+        </div>
+        <div class="type-actions">
+          <button class="btn-edit" (click)="openEditForm(type)" [disabled]="loading">Edit</button>
+          <button class="btn-delete" (click)="deleteType(type._id)" [disabled]="loading">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showCreateForm" class="create-form">
+    <div class="form-header">
+      <h2>Create Incident Type</h2>
+      <button class="btn-close" (click)="closeCreateForm()">✕</button>
+    </div>
+    <form (ngSubmit)="createType()" class="type-form">
+      <div class="form-group">
+        <label for="name">Name *</label>
+        <input type="text" id="name" [(ngModel)]="newType.name" name="name" required>
+      </div>
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" [(ngModel)]="newType.description" name="description" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="severity">Severity *</label>
+        <select id="severity" [(ngModel)]="newType.severity" name="severity" required>
+          <option value="Minor">Minor</option>
+          <option value="Major">Major</option>
+          <option value="Critical">Critical</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="closeCreateForm()">Cancel</button>
+        <button type="submit" class="btn-primary" [disabled]="loading">Create</button>
+      </div>
+    </form>
+  </div>
+
+  <div *ngIf="showEditForm && selectedType" class="create-form">
+    <div class="form-header">
+      <h2>Edit Incident Type</h2>
+      <button class="btn-close" (click)="closeEditForm()">✕</button>
+    </div>
+    <form (ngSubmit)="updateType()" class="type-form">
+      <div class="form-group">
+        <label for="editName">Name</label>
+        <input type="text" id="editName" [(ngModel)]="editType.name" name="editName">
+      </div>
+      <div class="form-group">
+        <label for="editDescription">Description</label>
+        <textarea id="editDescription" [(ngModel)]="editType.description" name="editDescription" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="editSeverity">Severity</label>
+        <select id="editSeverity" [(ngModel)]="editType.severity" name="editSeverity">
+          <option value="Minor">Minor</option>
+          <option value="Major">Major</option>
+          <option value="Critical">Critical</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="closeEditForm()">Cancel</button>
+        <button type="submit" class="btn-primary" [disabled]="loading">Update</button>
+      </div>
+    </form>
+  </div>
+</div>
+

@@ -21,6 +21,10 @@
     "STAFF": "Staff",
     "RESOURCES": "Recursos",
     "QUALIFICATIONS": "Qualificações",
+    "OPERATION_PLANS": "Planos de Operação",
+    "VESSEL_VISIT_EXECUTIONS": "Execuções de Visita de Embarcação",
+    "INCIDENT_TYPES": "Tipos de Incidente",
+    "INCIDENTS": "Incidentes",
     "3D_VISUALIZATION": "Visualização 3D"
   },
   "USER": {

@@ -12,8 +12,8 @@ namespace APDL.API.Domain.NotificationAggregate.ValueObjects
             if (value == default)
                 throw new BusinessRuleValidationException(nameof(ExpectedDeparture), "Expected departure date cannot be empty.");
 
-            if (value.Date < DateTime.UtcNow.Date)
-                throw new BusinessRuleValidationException(nameof(ExpectedDeparture), "Expected departure cannot be in the past.");
+            // if (value.Date < DateTime.UtcNow.Date)
+            //     throw new BusinessRuleValidationException(nameof(ExpectedDeparture), "Expected departure cannot be in the past.");
 
             Value = value;
         }

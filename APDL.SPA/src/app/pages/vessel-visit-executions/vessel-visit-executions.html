@@ -1,0 +1,232 @@
+<div class="executions-container">
+  <header class="executions-header">
+    <h1>Vessel Visit Executions</h1>
+    <button class="btn-primary" (click)="openCreateForm()" [disabled]="loading">
+      + Create New Execution
+    </button>
+  </header>
+
+  <div class="messages">
+    <div *ngIf="successMessage" class="alert alert-success">
+      {{ successMessage }}
+    </div>
+    <div *ngIf="error" class="alert alert-error">
+      {{ error }}
+    </div>
+  </div>
+
+  <div class="filter-section">
+    <label for="statusFilter">Filter by Status:</label>
+    <select 
+      id="statusFilter" 
+      [(ngModel)]="filterStatus" 
+      (change)="onFilterChange()"
+      class="status-filter">
+      <option *ngFor="let status of statusOptions" [value]="status">
+        {{ status }}
+      </option>
+    </select>
+  </div>
+
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
+
+  <div *ngIf="!loading && !showCreateForm && !showEditForm" class="executions-list">
+    <div *ngIf="filteredExecutions.length === 0" class="no-results">
+      <p>No executions found.</p>
+    </div>
+
+    <div *ngFor="let execution of filteredExecutions" 
+         class="execution-card"
+         (click)="selectExecution(execution)"
+         [class.selected]="selectedExecution?._id === execution._id">
+      
+      <div class="execution-header">
+        <h3>Execution #{{ execution._id.substring(0, 8) }}</h3>
+        <span [class]="getStatusClass(execution.status)" class="status-badge">
+          {{ execution.status }}
+        </span>
+      </div>
+
+      <div class="execution-details">
+        <div class="detail-row">
+          <span class="label">VVN ID:</span>
+          <span class="value">{{ execution.vvnId.substring(0, 8) }}...</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Vessel ID:</span>
+          <span class="value">{{ execution.vesselId.substring(0, 8) }}...</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Arrival Time:</span>
+          <span class="value">{{ formatDate(execution.actualArrivalTime) }}</span>
+        </div>
+        <div *ngIf="execution.actualBerthTime" class="detail-row">
+          <span class="label">Berth Time:</span>
+          <span class="value">{{ formatDate(execution.actualBerthTime) }}</span>
+        </div>
+        <div *ngIf="execution.actualDockId" class="detail-row">
+          <span class="label">Dock ID:</span>
+          <span class="value">{{ execution.actualDockId.substring(0, 8) }}...</span>
+        </div>
+        <div *ngIf="execution.actualDepartureTime" class="detail-row">
+          <span class="label">Departure Time:</span>
+          <span class="value">{{ formatDate(execution.actualDepartureTime) }}</span>
+        </div>
+      </div>
+
+      <div class="execution-actions">
+        <button 
+          class="btn-edit"
+          (click)="openEditForm(execution); $event.stopPropagation()"
+          [disabled]="loading">
+          Edit
+        </button>
+        <button 
+          class="btn-delete"
+          (click)="deleteExecution(execution._id); $event.stopPropagation()"
+          [disabled]="loading">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showCreateForm" class="create-form">
+    <div class="form-header">
+      <h2>Create Vessel Visit Execution</h2>
+      <button class="btn-close" (click)="closeCreateForm()">✕</button>
+    </div>
+
+    <form (ngSubmit)="createExecution()" class="execution-form">
+      <div class="form-section">
+        <h3>Execution Information</h3>
+        
+        <div class="form-group">
+          <label for="vvnId">VVN ID *</label>
+          <select 
+            id="vvnId" 
+            [(ngModel)]="newExecution.vvnId"
+            (change)="onVvnChange()"
+            name="vvnId"
+            required>
+            <option value="">-- Select VVN --</option>
+            <option *ngFor="let vvn of availableVVNs" [value]="vvn.id">
+              {{ vvn.id.substring(0, 8) }} - {{ vvn.captainName }}
+            </option>
+          </select>
+          <div *ngIf="availableVVNs.length === 0" class="form-hint">
+            <p>No approved VVNs available. Please approve a Vessel Visit Notification first.</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="vesselId">Vessel ID *</label>
+          <input 
+            type="text" 
+            id="vesselId" 
+            [(ngModel)]="newExecution.vesselId"
+            name="vesselId"
+            required
+            readonly>
+        </div>
+
+        <div class="form-group">
+          <label for="actualArrivalTime">Actual Arrival Time *</label>
+          <input 
+            type="datetime-local" 
+            id="actualArrivalTime" 
+            [(ngModel)]="newExecution.actualArrivalTime"
+            name="actualArrivalTime"
+            required>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="closeCreateForm()">
+          Cancel
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="loading">
+          {{ loading ? 'Creating...' : 'Create Execution' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div *ngIf="showEditForm && selectedExecution" class="create-form">
+    <div class="form-header">
+      <h2>Edit Vessel Visit Execution</h2>
+      <button class="btn-close" (click)="closeEditForm()">✕</button>
+    </div>
+
+    <form (ngSubmit)="updateExecution()" class="execution-form">
+      <div class="form-section">
+        <h3>Status</h3>
+        
+        <div class="form-group">
+          <label for="editStatus">Status:</label>
+          <select 
+            id="editStatus" 
+            [(ngModel)]="editExecution.status"
+            name="editStatus">
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Timing Information</h3>
+        
+        <div class="form-group">
+          <label for="actualBerthTime">Actual Berth Time:</label>
+          <input 
+            type="datetime-local" 
+            id="actualBerthTime" 
+            [(ngModel)]="editExecution.actualBerthTime"
+            name="actualBerthTime">
+        </div>
+
+        <div class="form-group">
+          <label for="actualDockId">Actual Dock ID:</label>
+          <input 
+            type="text" 
+            id="actualDockId" 
+            [(ngModel)]="editExecution.actualDockId"
+            name="actualDockId"
+            placeholder="Enter dock ID">
+        </div>
+
+        <div class="form-group">
+          <label for="actualUnberthTime">Actual Unberth Time:</label>
+          <input 
+            type="datetime-local" 
+            id="actualUnberthTime" 
+            [(ngModel)]="editExecution.actualUnberthTime"
+            name="actualUnberthTime">
+        </div>
+
+        <div class="form-group">
+          <label for="actualDepartureTime">Actual Departure Time:</label>
+          <input 
+            type="datetime-local" 
+            id="actualDepartureTime" 
+            [(ngModel)]="editExecution.actualDepartureTime"
+            name="actualDepartureTime">
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="closeEditForm()">
+          Cancel
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="loading">
+          {{ loading ? 'Updating...' : 'Update Execution' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+

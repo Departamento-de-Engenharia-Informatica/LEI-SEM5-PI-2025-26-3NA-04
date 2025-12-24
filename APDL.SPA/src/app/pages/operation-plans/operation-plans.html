@@ -1,0 +1,240 @@
+<div class="plans-container">
+  <header class="plans-header">
+    <h1>Operation Plans</h1>
+    <button class="btn-primary" (click)="openGenerateForm()" [disabled]="loading">
+      + Generate New Plan
+    </button>
+  </header>
+
+  <div class="messages">
+    <div *ngIf="successMessage" class="alert alert-success">
+      {{ successMessage }}
+    </div>
+    <div *ngIf="error" class="alert alert-error">
+      {{ error }}
+    </div>
+  </div>
+
+  <div class="filter-section">
+    <label for="statusFilter">Filter by Status:</label>
+    <select 
+      id="statusFilter" 
+      [(ngModel)]="filterStatus" 
+      (change)="onFilterChange()"
+      class="status-filter">
+      <option *ngFor="let status of statusOptions" [value]="status">
+        {{ status }}
+      </option>
+    </select>
+  </div>
+
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
+
+  <div *ngIf="!loading && !showGenerateForm && !showEditForm" class="plans-list">
+    <div *ngIf="filteredPlans.length === 0" class="no-results">
+      <p>No operation plans found.</p>
+    </div>
+
+    <div *ngFor="let plan of filteredPlans" 
+         class="plan-card"
+         (click)="selectPlan(plan)"
+         [class.selected]="selectedPlan?.planId === plan.planId">
+      
+      <div class="plan-header">
+        <h3>Plan #{{ plan.planId.substring(0, 8) }}</h3>
+        <span [class]="getStatusClass(plan.status)" class="status-badge">
+          {{ plan.status }}
+        </span>
+      </div>
+
+      <div class="plan-details">
+        <div class="detail-row">
+          <span class="label">Algorithm:</span>
+          <span class="value">{{ plan.algorithmUsed }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">VVNs:</span>
+          <span class="value">{{ plan.vvnIds.length }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Vessels:</span>
+          <span class="value">{{ plan.schedule.length }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Total Delay:</span>
+          <span class="value">{{ formatTimeUnits(plan.totalDelay) }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Created:</span>
+          <span class="value">{{ formatDate(plan.createdAt) }}</span>
+        </div>
+      </div>
+
+      <div class="plan-actions">
+        <button 
+          class="btn-edit"
+          (click)="openEditForm(plan); $event.stopPropagation()"
+          [disabled]="loading">
+          Edit
+        </button>
+        <button 
+          class="btn-delete"
+          (click)="deletePlan(plan.planId); $event.stopPropagation()"
+          [disabled]="loading">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showGenerateForm" class="create-form">
+    <div class="form-header">
+      <h2>Generate Operation Plan</h2>
+      <button class="btn-close" (click)="closeGenerateForm()">✕</button>
+    </div>
+
+    <form (ngSubmit)="generatePlan()" class="plan-form">
+      <div class="form-section">
+        <h3>Vessel Visit Notifications</h3>
+        
+        <div class="form-group">
+          <label for="vvnSelect">Select VVN:</label>
+          <select 
+            id="vvnSelect" 
+            [(ngModel)]="selectedVvnId"
+            name="vvnSelect"
+            class="vvn-select">
+            <option value="">-- Select VVN --</option>
+            <option *ngFor="let vvn of availableVVNs" [value]="vvn.id">
+              {{ vvn.id.substring(0, 8) }} - {{ vvn.captainName }} ({{ vvn.cargoType }})
+            </option>
+          </select>
+          <div *ngIf="availableVVNs.length === 0" class="form-hint">
+            <p>No approved VVNs available. Please approve a Vessel Visit Notification first.</p>
+          </div>
+          <button 
+            type="button" 
+            class="btn-add"
+            (click)="addVvnToForm()"
+            [disabled]="!selectedVvnId">
+            Add VVN
+          </button>
+        </div>
+
+        <div *ngIf="newPlan.vvnIds.length > 0" class="vvn-list">
+          <div *ngFor="let vvnId of newPlan.vvnIds" class="vvn-item">
+            <span>{{ vvnId.substring(0, 8) }}...</span>
+            <button 
+              type="button" 
+              class="btn-remove"
+              (click)="removeVvnFromForm(vvnId)">
+              Remove
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Algorithm Settings</h3>
+        
+        <div class="form-group">
+          <label for="algorithm">Algorithm:</label>
+          <select 
+            id="algorithm" 
+            [(ngModel)]="newPlan.algorithm"
+            name="algorithm">
+            <option value="original">Original</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="notes">Notes (optional):</label>
+          <textarea 
+            id="notes" 
+            [(ngModel)]="newPlan.notes"
+            name="notes"
+            rows="3"
+            placeholder="Enter any notes about this plan"></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="closeGenerateForm()">
+          Cancel
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="loading">
+          {{ loading ? 'Generating...' : 'Generate Plan' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div *ngIf="showEditForm && selectedPlan" class="create-form">
+    <div class="form-header">
+      <h2>Edit Operation Plan</h2>
+      <button class="btn-close" (click)="closeEditForm()">✕</button>
+    </div>
+
+    <form (ngSubmit)="updatePlan()" class="plan-form">
+      <div class="form-section">
+        <h3>Schedule</h3>
+        <div *ngFor="let entry of editPlan.schedule; let i = index" class="schedule-entry">
+          <h4>Vessel {{ entry.vesselLabel }}</h4>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Unload Start:</label>
+              <input type="number" [(ngModel)]="entry.unloadStartTime" [name]="'unloadStart' + i" min="0">
+            </div>
+            <div class="form-group">
+              <label>Load End:</label>
+              <input type="number" [(ngModel)]="entry.loadEndTime" [name]="'loadEnd' + i" min="0">
+            </div>
+            <div class="form-group">
+              <label>Delay:</label>
+              <input type="number" [(ngModel)]="entry.delay" [name]="'delay' + i" min="0" readonly>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Status & Notes</h3>
+        
+        <div class="form-group">
+          <label for="editStatus">Status:</label>
+          <select 
+            id="editStatus" 
+            [(ngModel)]="editPlan.status"
+            name="editStatus">
+            <option value="Generated">Generated</option>
+            <option value="Manual">Manual</option>
+            <option value="Approved">Approved</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="editNotes">Notes:</label>
+          <textarea 
+            id="editNotes" 
+            [(ngModel)]="editPlan.notes"
+            name="editNotes"
+            rows="3"
+            placeholder="Enter any notes"></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="closeEditForm()">
+          Cancel
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="loading">
+          {{ loading ? 'Updating...' : 'Update Plan' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+

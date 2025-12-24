@@ -9,7 +9,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth0 = inject(AuthService);
 
   const isApiRequest = req.url.includes(environment.apiUrl) || 
+                       req.url.includes(environment.oemApiUrl) ||
                        req.url.includes('localhost:5001') || 
+                       req.url.includes('localhost:3000') ||
                        req.url.includes('10.9.11.75');
 
   if (!isApiRequest) {

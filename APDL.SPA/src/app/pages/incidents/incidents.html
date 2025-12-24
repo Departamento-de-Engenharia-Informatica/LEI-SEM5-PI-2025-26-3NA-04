@@ -1,0 +1,238 @@
+<div class="incidents-container">
+  <header class="incidents-header">
+    <h1>Incidents</h1>
+    <button class="btn-primary" (click)="openCreateForm()" [disabled]="loading">
+      + Create New Incident
+    </button>
+  </header>
+
+  <div class="messages">
+    <div *ngIf="successMessage" class="alert alert-success">
+      {{ successMessage }}
+    </div>
+    <div *ngIf="error" class="alert alert-error">
+      {{ error }}
+    </div>
+  </div>
+
+  <div class="filter-section">
+    <h3>Filters</h3>
+    <div class="filter-row">
+      <div class="form-group">
+        <label>Start Date:</label>
+        <input type="date" [(ngModel)]="filters.startDate">
+      </div>
+      <div class="form-group">
+        <label>End Date:</label>
+        <input type="date" [(ngModel)]="filters.endDate">
+      </div>
+      <div class="form-group">
+        <label>Severity:</label>
+        <select [(ngModel)]="filters.severity">
+          <option [value]="undefined">All</option>
+          <option value="Minor">Minor</option>
+          <option value="Major">Major</option>
+          <option value="Critical">Critical</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status:</label>
+        <select [(ngModel)]="filters.status">
+          <option [value]="undefined">All</option>
+          <option value="active">Active</option>
+          <option value="resolved">Resolved</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Incident Type:</label>
+        <select [(ngModel)]="filters.incidentTypeId">
+          <option [value]="undefined">All</option>
+          <option *ngFor="let type of incidentTypes" [value]="type._id">{{ type.name }}</option>
+        </select>
+      </div>
+      <div class="filter-actions">
+        <button class="btn-primary" (click)="applyFilters()">Apply</button>
+        <button class="btn-secondary" (click)="clearFilters()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
+
+  <div *ngIf="!loading && !showCreateForm && !showEditForm" class="incidents-list">
+    <div *ngIf="filteredIncidents.length === 0" class="no-results">
+      <p>No incidents found.</p>
+    </div>
+
+    <div *ngFor="let incident of filteredIncidents" 
+         class="incident-card"
+         (click)="selectIncident(incident)"
+         [class.selected]="selectedIncident?._id === incident._id">
+      
+      <div class="incident-header">
+        <h3>{{ incident.description.substring(0, 50) }}{{ incident.description.length > 50 ? '...' : '' }}</h3>
+        <div class="badges">
+          <span [class]="getSeverityClass(incident.severity)" class="severity-badge">
+            {{ incident.severity }}
+          </span>
+          <span [class]="getStatusClass(incident.status)" class="status-badge">
+            {{ incident.status }}
+          </span>
+        </div>
+      </div>
+
+      <div class="incident-details">
+        <div class="detail-row">
+          <span class="label">Start Time:</span>
+          <span class="value">{{ formatDate(incident.startTime) }}</span>
+        </div>
+        <div *ngIf="incident.endTime" class="detail-row">
+          <span class="label">End Time:</span>
+          <span class="value">{{ formatDate(incident.endTime) }}</span>
+        </div>
+        <div *ngIf="incident.duration" class="detail-row">
+          <span class="label">Duration:</span>
+          <span class="value">{{ formatDuration(incident.duration) }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Affected VVEs:</span>
+          <span class="value">{{ incident.affectedVVEIds.length }}</span>
+        </div>
+        <div *ngIf="incident.affectsAllOngoingVVEs" class="detail-row">
+          <span class="label">Affects All Ongoing:</span>
+          <span class="value">Yes</span>
+        </div>
+        <div *ngIf="incident.affectsAllUpcomingVVEs" class="detail-row">
+          <span class="label">Affects All Upcoming:</span>
+          <span class="value">Yes</span>
+        </div>
+      </div>
+
+      <div class="incident-actions">
+        <button 
+          class="btn-edit"
+          (click)="openEditForm(incident); $event.stopPropagation()"
+          [disabled]="loading">
+          Edit
+        </button>
+        <button 
+          class="btn-delete"
+          (click)="deleteIncident(incident._id); $event.stopPropagation()"
+          [disabled]="loading">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showCreateForm" class="create-form">
+    <div class="form-header">
+      <h2>Create Incident</h2>
+      <button class="btn-close" (click)="closeCreateForm()">✕</button>
+    </div>
+    <form (ngSubmit)="createIncident()" class="incident-form">
+      <div class="form-section">
+        <h3>Basic Information</h3>
+        <div class="form-group">
+          <label for="incidentTypeId">Incident Type *</label>
+          <select id="incidentTypeId" [(ngModel)]="newIncident.incidentTypeId" name="incidentTypeId" required>
+            <option value="">-- Select Type --</option>
+            <option *ngFor="let type of incidentTypes" [value]="type._id">{{ type.name }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="startTime">Start Time *</label>
+          <input type="datetime-local" id="startTime" [(ngModel)]="newIncident.startTime" name="startTime" required>
+        </div>
+        <div class="form-group">
+          <label for="severity">Severity *</label>
+          <select id="severity" [(ngModel)]="newIncident.severity" name="severity" required>
+            <option value="Minor">Minor</option>
+            <option value="Major">Major</option>
+            <option value="Critical">Critical</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="description">Description *</label>
+          <textarea id="description" [(ngModel)]="newIncident.description" name="description" rows="3" required></textarea>
+        </div>
+      </div>
+      <div class="form-section">
+        <h3>Affected Vessel Visit Executions</h3>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" [(ngModel)]="newIncident.affectsAllOngoingVVEs" name="affectsAllOngoing">
+            Affects All Ongoing VVEs
+          </label>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" [(ngModel)]="newIncident.affectsAllUpcomingVVEs" name="affectsAllUpcoming">
+            Affects All Upcoming VVEs
+          </label>
+        </div>
+        <div class="form-group">
+          <label>Select Specific VVE:</label>
+          <select [(ngModel)]="selectedVveId" name="vveSelect">
+            <option value="">-- Select VVE --</option>
+            <option *ngFor="let exec of executions" [value]="exec._id">{{ exec._id.substring(0, 8) }}</option>
+          </select>
+          <button type="button" class="btn-add" (click)="addVveToForm()" [disabled]="!selectedVveId">Add</button>
+        </div>
+        <div *ngIf="newIncident.affectedVVEIds && newIncident.affectedVVEIds.length > 0" class="vve-list">
+          <div *ngFor="let vveId of newIncident.affectedVVEIds" class="vve-item">
+            <span>{{ vveId.substring(0, 8) }}...</span>
+            <button type="button" class="btn-remove" (click)="removeVveFromForm(vveId)">Remove</button>
+          </div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="closeCreateForm()">Cancel</button>
+        <button type="submit" class="btn-primary" [disabled]="loading">Create</button>
+      </div>
+    </form>
+  </div>
+
+  <div *ngIf="showEditForm && selectedIncident" class="create-form">
+    <div class="form-header">
+      <h2>Edit Incident</h2>
+      <button class="btn-close" (click)="closeEditForm()">✕</button>
+    </div>
+    <form (ngSubmit)="updateIncident()" class="incident-form">
+      <div class="form-section">
+        <h3>Status & Timing</h3>
+        <div class="form-group">
+          <label for="editStatus">Status:</label>
+          <select id="editStatus" [(ngModel)]="editIncident.status" name="editStatus">
+            <option value="active">Active</option>
+            <option value="resolved">Resolved</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="editEndTime">End Time:</label>
+          <input type="datetime-local" id="editEndTime" [(ngModel)]="editIncident.endTime" name="editEndTime">
+        </div>
+        <div class="form-group">
+          <label for="editSeverity">Severity:</label>
+          <select id="editSeverity" [(ngModel)]="editIncident.severity" name="editSeverity">
+            <option value="Minor">Minor</option>
+            <option value="Major">Major</option>
+            <option value="Critical">Critical</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="editDescription">Description:</label>
+          <textarea id="editDescription" [(ngModel)]="editIncident.description" name="editDescription" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="closeEditForm()">Cancel</button>
+        <button type="submit" class="btn-primary" [disabled]="loading">Update</button>
+      </div>
+    </form>
+  </div>
+</div>
+

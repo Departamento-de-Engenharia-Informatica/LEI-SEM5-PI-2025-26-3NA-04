@@ -18,6 +18,10 @@ import { Staff } from './pages/staff/staff';
 import { Resources } from './pages/resources/resources';
 import { Qualifications } from './pages/qualifications/qualifications';
 import { PortSceneComponent } from './3d/port-scene/port-scene';
+import { OperationPlans } from './pages/operation-plans/operation-plans';
+import { VesselVisitExecutions } from './pages/vessel-visit-executions/vessel-visit-executions';
+import { IncidentTypes } from './pages/incident-types/incident-types';
+import { Incidents } from './pages/incidents/incidents';
 
 export const routes: Routes = [
   {
@@ -102,6 +106,26 @@ export const routes: Routes = [
       {
         path: 'qualifications',
         component: Qualifications,
+        canActivate: [roleGuard([UserRole.LOGISTICS_OPERATOR, UserRole.ADMIN])]
+      },
+      {
+        path: 'operation-plans',
+        component: OperationPlans,
+        canActivate: [roleGuard([UserRole.LOGISTICS_OPERATOR, UserRole.ADMIN])]
+      },
+      {
+        path: 'vessel-visit-executions',
+        component: VesselVisitExecutions,
+        canActivate: [roleGuard([UserRole.LOGISTICS_OPERATOR, UserRole.ADMIN])]
+      },
+      {
+        path: 'incident-types',
+        component: IncidentTypes,
+        canActivate: [roleGuard([UserRole.LOGISTICS_OPERATOR, UserRole.ADMIN])]
+      },
+      {
+        path: 'incidents',
+        component: Incidents,
         canActivate: [roleGuard([UserRole.LOGISTICS_OPERATOR, UserRole.ADMIN])]
       },
 

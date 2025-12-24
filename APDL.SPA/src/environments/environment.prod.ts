@@ -1,6 +1,7 @@
 export const environment = {
   production: true,
   apiUrl: 'https://10.9.11.75/api',
+  oemApiUrl: 'http://10.9.11.75:3000/api',
   auth0: {
     domain: 'apdl-operations.eu.auth0.com',
     clientId: '9moFd6KqbCZnZImZrmhwHW3CTq6k9Qn0',

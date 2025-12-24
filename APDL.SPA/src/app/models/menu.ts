@@ -109,6 +109,34 @@ export const MENU_ITEMS: MenuItem[] = [
     allowedRoles: [UserRole.LOGISTICS_OPERATOR, UserRole.ADMIN],
     description: 'Manage staff and resource qualifications (UC 2.2.13)'
   },
+  {
+    label: 'MENU.OPERATION_PLANS',
+    route: '/operation-plans',
+    icon: '📋',
+    allowedRoles: [UserRole.LOGISTICS_OPERATOR, UserRole.ADMIN],
+    description: 'Generate and manage operation plans (UC 4.1.2, 4.1.4)'
+  },
+  {
+    label: 'MENU.VESSEL_VISIT_EXECUTIONS',
+    route: '/vessel-visit-executions',
+    icon: '⚓',
+    allowedRoles: [UserRole.LOGISTICS_OPERATOR, UserRole.ADMIN],
+    description: 'Create and manage vessel visit executions (UC 4.1.7)'
+  },
+  {
+    label: 'MENU.INCIDENT_TYPES',
+    route: '/incident-types',
+    icon: '⚠️',
+    allowedRoles: [UserRole.LOGISTICS_OPERATOR, UserRole.ADMIN],
+    description: 'Manage incident type classifications (UC 4.1.12)'
+  },
+  {
+    label: 'MENU.INCIDENTS',
+    route: '/incidents',
+    icon: '🚨',
+    allowedRoles: [UserRole.LOGISTICS_OPERATOR, UserRole.ADMIN],
+    description: 'Log and manage incidents (UC 4.1.13)'
+  },
 
   // 3D
   {
