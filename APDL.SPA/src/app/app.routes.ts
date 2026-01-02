@@ -22,6 +22,8 @@ import { OperationPlans } from './pages/operation-plans/operation-plans';
 import { VesselVisitExecutions } from './pages/vessel-visit-executions/vessel-visit-executions';
 import { IncidentTypes } from './pages/incident-types/incident-types';
 import { Incidents } from './pages/incidents/incidents';
+import { PrivacyPolicy } from './pages/privacy-policy/privacy-policy';
+import { PrivacyPolicyAdmin } from './pages/privacy-policy-admin/privacy-policy-admin';
 
 export const routes: Routes = [
   {
@@ -33,6 +35,11 @@ export const routes: Routes = [
   {
     path: 'login',
     component: Login
+  },
+
+  {
+    path: 'privacy-policy',
+    component: PrivacyPolicy
   },
 
   {
@@ -136,6 +143,11 @@ export const routes: Routes = [
       {
         path: 'create-user',
         loadComponent: () => import('./pages/create-user/create-user').then(m => m.CreateUser),
+        canActivate: [roleGuard([UserRole.ADMIN])]
+      },
+      {
+        path: 'privacy-policy-admin',
+        component: PrivacyPolicyAdmin,
         canActivate: [roleGuard([UserRole.ADMIN])]
       }
 

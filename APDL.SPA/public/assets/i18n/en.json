@@ -25,7 +25,8 @@
     "VESSEL_VISIT_EXECUTIONS": "Vessel Visit Executions",
     "INCIDENT_TYPES": "Incident Types",
     "INCIDENTS": "Incidents",
-    "3D_VISUALIZATION": "3D Visualization"
+    "3D_VISUALIZATION": "3D Visualization",
+    "PRIVACY_POLICY_ADMIN": "Privacy Policy Management"
   },
   "USER": {
     "WELCOME": "Welcome",
@@ -46,6 +47,14 @@
     "HELP": "If you believe you should have access to this page, please contact your administrator."
   },
   "FOOTER": {
-    "TAGLINE": "Port Operations Management System"
+    "TAGLINE": "Port Operations Management System",
+    "PRIVACY_POLICY": "Privacy Policy"
+  },
+  "PRIVACY_POLICY_NOTIFICATION": {
+    "TITLE": "Privacy Policy Updated",
+    "MESSAGE": "Our Privacy Policy has been updated. Please review the changes.",
+    "VERSION": "Version",
+    "ACKNOWLEDGE": "I Acknowledge",
+    "VIEW_POLICY": "View Policy"
   }
 }

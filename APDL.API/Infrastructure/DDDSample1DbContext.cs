@@ -2,6 +2,7 @@ using APDL.API.Domain.ContainerAggregate;
 using APDL.API.Domain.EquipmentAggregate;
 using APDL.API.Domain.ManifestAggregate;
 using APDL.API.Domain.OperatingStaffAggregate;
+using APDL.API.Domain.PrivacyPolicyAggregate;
 using APDL.API.Domain.QualificationsAggregate;
 using APDL.API.Domain.ShippingAgentAggregate;
 using APDL.API.Domain.UserAggregate;
@@ -13,6 +14,7 @@ using APDL.API.Infrastructure.DockInfrastructure;
 using APDL.API.Infrastructure.ManifestInfrastructure;
 using APDL.API.Infrastructure.MobileEquipmentInfrastructure;
 using APDL.API.Infrastructure.OperatingStaffInfrastructure;
+using APDL.API.Infrastructure.PrivacyPolicyInfrastructure;
 using APDL.API.Infrastructure.ShippingAgentInfrastructure;
 using APDL.API.Infrastructure.StaffQualificationInfrastructure;
 using APDL.API.Infrastructure.UserInfrastructure;
@@ -38,6 +40,7 @@ namespace APDL.API.Infrastructure
         public DbSet<MobileEquipment> MobileEquipment { get; set; }
         public DbSet<Vessel> Vessels { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<PrivacyPolicy> PrivacyPolicies { get; set; }
 
         public DDDSample1DbContext(DbContextOptions<DDDSample1DbContext> options)
             : base(options) { }
@@ -60,6 +63,7 @@ namespace APDL.API.Infrastructure
             modelBuilder.ApplyConfiguration(new StaffQualificationEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new OperatingStaffEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new MobileEquipmentEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new PrivacyPolicyEntityTypeConfiguration());
         }
     }
 }

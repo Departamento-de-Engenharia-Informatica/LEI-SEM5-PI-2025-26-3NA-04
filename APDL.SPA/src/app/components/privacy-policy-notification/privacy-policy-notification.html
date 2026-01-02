@@ -1,0 +1,21 @@
+<div class="notification-modal" *ngIf="show">
+  <div class="modal-backdrop" (click)="onAcknowledge()"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>{{ 'PRIVACY_POLICY_NOTIFICATION.TITLE' | translate }}</h2>
+    </div>
+    <div class="modal-body">
+      <p>{{ 'PRIVACY_POLICY_NOTIFICATION.MESSAGE' | translate }}</p>
+      <p><strong>{{ 'PRIVACY_POLICY_NOTIFICATION.VERSION' | translate }}:</strong> {{ currentVersion }}</p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" (click)="onAcknowledge()">
+        {{ 'PRIVACY_POLICY_NOTIFICATION.ACKNOWLEDGE' | translate }}
+      </button>
+      <button class="btn-primary" (click)="onViewPolicy()">
+        {{ 'PRIVACY_POLICY_NOTIFICATION.VIEW_POLICY' | translate }}
+      </button>
+    </div>
+  </div>
+</div>
+

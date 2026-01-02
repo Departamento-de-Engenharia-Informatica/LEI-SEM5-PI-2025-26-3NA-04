@@ -26,9 +26,20 @@ namespace APDL.API.Infrastructure.UserInfrastructure
 
         public async Task UpdateUserAsync(User user)
         {
-            _context.Users.Update(user); 
-            
-            await _context.SaveChangesAsync();
+            var existingUser = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == user.Id);
+            if (existingUser != null)
+            {
+                _context.Users.Attach(user);
+                _context.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<int> SetPrivacyPolicyNotificationForAllUsersAsync()
+        {
+            return await _context.Database.ExecuteSqlRawAsync(
+                "UPDATE \"Users\" SET \"PrivacyPolicyNotificationPending\" = true"
+            );
         }
 
 

@@ -4,6 +4,8 @@ export interface User {
   email: string;
   role: UserRole;
   isAuthenticated: boolean;
+  privacyPolicyNotificationPending?: boolean;
+  currentPrivacyPolicyVersion?: number;
 }
 
 export enum UserRole {

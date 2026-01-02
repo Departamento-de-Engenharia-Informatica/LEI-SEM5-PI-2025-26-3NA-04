@@ -4,6 +4,7 @@ import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/rou
 import { Subscription } from 'rxjs';
 import { Header } from '../header/header';
 import { Footer } from '../footer/footer';
+import { PrivacyPolicyNotification } from '../privacy-policy-notification/privacy-policy-notification';
 import { Auth } from '../../services/auth';
 import { MenuItem, MENU_ITEMS } from '../../models/menu';
 import { TranslatePipe, TranslateDirective } from "@ngx-translate/core";
@@ -19,6 +20,7 @@ import { UserRole } from '../../models/user';
     RouterLinkActive,
     Header,
     Footer,
+    PrivacyPolicyNotification,
     TranslatePipe,
     TranslateDirective
   ],

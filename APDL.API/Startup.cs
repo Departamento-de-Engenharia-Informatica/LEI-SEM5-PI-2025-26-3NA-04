@@ -11,6 +11,8 @@ using APDL.API.Domain.Shared;
 using APDL.API.Domain.ShippingAgentAggregate;
 using APDL.API.Domain.ShippingAgentAggregate.Repos;
 using APDL.API.Domain.StaffQualificationAggregate;
+using APDL.API.Domain.PrivacyPolicyAggregate;
+using APDL.API.Domain.PrivacyPolicyAggregate.Repos;
 using APDL.API.Domain.UserAggregate;
 using APDL.API.Domain.Vessels;
 using APDL.API.Domain.VesselTypes;
@@ -22,6 +24,7 @@ using APDL.API.Infrastructure.ManifestInfrastructure;
 using APDL.API.Infrastructure.MobileEquipmentInfrastructure;
 using APDL.API.Infrastructure.Shared;
 using APDL.API.Infrastructure.ShippingAgentInfrastructure;
+using APDL.API.Infrastructure.PrivacyPolicyInfrastructure;
 using APDL.API.Infrastructure.StaffQualificationInfrastructure;
 using APDL.API.Infrastructure.UserInfrastructure;
 using APDL.API.Infrastructure.Vessels;
@@ -246,6 +249,9 @@ namespace APDL.API
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<UserService>();
             services.AddHttpClient<UserService>();
+
+            services.AddScoped<IPrivacyPolicyRepository, PrivacyPolicyRepository>();
+            services.AddScoped<PrivacyPolicyService>();
         }
     }
 }

@@ -280,12 +280,10 @@ namespace APDL.API.Domain.UserAggregate
 
         public async Task<bool> ActivateUserByEmailAsync(string email)
         {
-            // 1. Procurar o utilizador na base de dados (assumindo a entidade User)
             var user = await _repo.GetByEmailAsync(email);
 
             if (user == null)
             {
-                // Se o utilizador não existir, retornamos false (ou lançamos uma exceção, dependendo da sua política)
                 return false;
             }
 
@@ -294,17 +292,38 @@ namespace APDL.API.Domain.UserAggregate
                 return true; 
             }
 
-            // 2. Marcar o utilizador como ativo
             user.IsActivated = true;
-            
-            // Opcional: Se tiver um campo de data de ativação
-            // user.ActivatedAt = DateTime.UtcNow; 
-
-            // 3. Guardar as alterações na base de dados
             await _repo.UpdateUserAsync(user);
 
-            // 4. Se a gravação foi bem-sucedida, retornar true
             return true;
+        }
+
+        public async Task SetPrivacyPolicyNotificationForAllUsersAsync()
+        {
+            try
+            {
+                System.Console.WriteLine("Setting privacy policy notification for all users using batch update");
+                var updatedCount = await _repo.SetPrivacyPolicyNotificationForAllUsersAsync();
+                System.Console.WriteLine($"Successfully updated {updatedCount} users with privacy policy notification");
+            }
+            catch (Exception ex)
+            {
+                System.Console.Error.WriteLine($"Error in SetPrivacyPolicyNotificationForAllUsersAsync: {ex.Message}");
+                System.Console.Error.WriteLine($"Stack trace: {ex.StackTrace}");
+                throw;
+            }
+        }
+
+        public async Task AcknowledgePrivacyPolicyAsync(string email, int version)
+        {
+            var user = await _repo.GetByEmailAsync(email);
+            if (user == null)
+            {
+                throw new Exception("User not found");
+            }
+
+            user.MarkPrivacyPolicyAcknowledged(version);
+            await _repo.UpdateUserAsync(user);
         }
 
     }

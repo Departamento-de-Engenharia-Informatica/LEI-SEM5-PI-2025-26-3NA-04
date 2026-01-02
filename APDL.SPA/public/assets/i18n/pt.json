@@ -25,7 +25,8 @@
     "VESSEL_VISIT_EXECUTIONS": "Execuções de Visita de Embarcação",
     "INCIDENT_TYPES": "Tipos de Incidente",
     "INCIDENTS": "Incidentes",
-    "3D_VISUALIZATION": "Visualização 3D"
+    "3D_VISUALIZATION": "Visualização 3D",
+    "PRIVACY_POLICY_ADMIN": "Gestão de Política de Privacidade"
   },
   "USER": {
     "WELCOME": "Bem-vindo",
@@ -46,6 +47,14 @@
     "HELP": "Se deveria ter acesso a esta página, entre em contato com o administrador."
   },
   "FOOTER": {
-    "TAGLINE": "Sistema de Gestão de Operações Portuárias"
+    "TAGLINE": "Sistema de Gestão de Operações Portuárias",
+    "PRIVACY_POLICY": "Política de Privacidade"
+  },
+  "PRIVACY_POLICY_NOTIFICATION": {
+    "TITLE": "Política de Privacidade Atualizada",
+    "MESSAGE": "A nossa Política de Privacidade foi atualizada. Por favor, reveja as alterações.",
+    "VERSION": "Versão",
+    "ACKNOWLEDGE": "Confirmo",
+    "VIEW_POLICY": "Ver Política"
   }
 }

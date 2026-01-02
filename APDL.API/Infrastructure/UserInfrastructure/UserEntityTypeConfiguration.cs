@@ -26,6 +26,13 @@ namespace APDL.API.Infrastructure.UserInfrastructure
             builder.Property(u => u.Role)
                 .IsRequired()
                 .HasMaxLength(100);
+
+            builder.Property(u => u.LastPrivacyPolicyVersionAcknowledged)
+                .IsRequired(false);
+
+            builder.Property(u => u.PrivacyPolicyNotificationPending)
+                .IsRequired()
+                .HasDefaultValue(false);
         }
     }
 }

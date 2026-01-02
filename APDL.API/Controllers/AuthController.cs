@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using APDL.API.Domain.Shared;
 using APDL.API.Domain.UserAggregate;
+using APDL.API.Domain.PrivacyPolicyAggregate;
 using APDL.API.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,13 +23,15 @@ namespace APDL.API.Controllers
         private readonly UserService _userService;
         private readonly DDDSample1DbContext _context;
         private readonly IConfiguration _config;
+        private readonly PrivacyPolicyService _privacyPolicyService;
 
 
-        public AuthController(UserService userService, DDDSample1DbContext context, IConfiguration config)
+        public AuthController(UserService userService, DDDSample1DbContext context, IConfiguration config, PrivacyPolicyService privacyPolicyService)
         {
             _userService = userService;
             _context = context;
             _config = config;
+            _privacyPolicyService = privacyPolicyService;
         }
 
         [HttpGet("count-users")]
@@ -85,6 +88,11 @@ namespace APDL.API.Controllers
                 );
             }
 
+            var activePolicy = await _privacyPolicyService.GetActivePolicyAsync();
+            var currentVersion = activePolicy?.Version ?? 0;
+
+            System.Console.WriteLine($"WhoAmI - User: {user.Email}, NotificationPending: {user.PrivacyPolicyNotificationPending}, CurrentVersion: {currentVersion}, LastAcknowledged: {user.LastPrivacyPolicyVersionAcknowledged}");
+
             return Ok(
                 new
                 {
@@ -93,6 +101,8 @@ namespace APDL.API.Controllers
                     name = user.Name,
                     role = user.Role,
                     isAuthenticated = true,
+                    privacyPolicyNotificationPending = user.PrivacyPolicyNotificationPending,
+                    currentPrivacyPolicyVersion = currentVersion
                 }
             );
         }

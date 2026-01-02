@@ -8,5 +8,6 @@ namespace APDL.API.Domain.UserAggregate
     {
         Task<User> GetByEmailAsync(string email);
         Task UpdateUserAsync(User user);
+        Task<int> SetPrivacyPolicyNotificationForAllUsersAsync();
     }
 }

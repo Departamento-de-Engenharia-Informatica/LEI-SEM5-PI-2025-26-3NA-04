@@ -1,0 +1,130 @@
+<div class="admin-container">
+  <header class="admin-header">
+    <h1>Privacy Policy Management</h1>
+    <button class="btn-primary" (click)="openCreateForm()" [disabled]="loading || showCreateForm">
+      + Create New Version
+    </button>
+  </header>
+
+  <div class="messages">
+    <div *ngIf="successMessage" class="alert alert-success">
+      {{ successMessage }}
+    </div>
+    <div *ngIf="error" class="alert alert-error">
+      {{ error }}
+    </div>
+  </div>
+
+  <div *ngIf="activePolicy" class="active-policy-info">
+    <h2>Current Active Policy</h2>
+    <p><strong>Version:</strong> {{ activePolicy.version }}</p>
+    <p><strong>Effective Date:</strong> {{ activePolicy.effectiveDate | date:'medium' }}</p>
+    <p><strong>Created:</strong> {{ activePolicy.createdAt | date:'medium' }}</p>
+  </div>
+
+  <div *ngIf="showCreateForm" class="create-form-section">
+    <h2>Create New Version</h2>
+    <form (ngSubmit)="publishNewVersion()">
+      <div class="form-group">
+        <label for="effectiveDate">Effective Date:</label>
+        <input 
+          type="date" 
+          id="effectiveDate" 
+          [(ngModel)]="newPolicy.effectiveDate" 
+          name="effectiveDate"
+          required
+          class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label for="content">Policy Content (HTML supported):</label>
+        <textarea 
+          id="content" 
+          [(ngModel)]="newPolicy.content" 
+          name="content"
+          rows="20"
+          required
+          class="form-control content-textarea"
+          placeholder="Enter the privacy policy content here. HTML is supported."></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="previewPolicy()" [disabled]="loading">
+          Preview
+        </button>
+        <button type="button" class="btn-secondary" (click)="closeCreateForm()" [disabled]="loading">
+          Cancel
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="loading">
+          <span *ngIf="loading">Publishing...</span>
+          <span *ngIf="!loading">Publish New Version</span>
+        </button>
+      </div>
+    </form>
+
+    <div *ngIf="showPreview" class="preview-section">
+      <h3>Preview</h3>
+      <div class="preview-content" [innerHTML]="newPolicy.content"></div>
+    </div>
+  </div>
+
+  <div *ngIf="!showCreateForm" class="versions-section">
+    <h2>Version History</h2>
+
+    <div *ngIf="loading" class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Loading...</p>
+    </div>
+
+    <div *ngIf="!loading && versions.length === 0" class="no-results">
+      <p>No privacy policy versions found.</p>
+    </div>
+
+    <div *ngIf="!loading && versions.length > 0" class="versions-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Version</th>
+            <th>Effective Date</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let version of versions" [class.active]="version.isActive">
+            <td>{{ version.version }}</td>
+            <td>{{ version.effectiveDate | date:'medium' }}</td>
+            <td>
+              <span [class]="version.isActive ? 'status-active' : 'status-archived'">
+                {{ version.isActive ? 'Active' : 'Archived' }}
+              </span>
+            </td>
+            <td>{{ version.createdAt | date:'medium' }}</td>
+            <td>
+              <button class="btn-link" (click)="viewVersion(version)">View</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div *ngIf="selectedVersion" class="modal-overlay" (click)="closeVersionView()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Privacy Policy Version {{ selectedVersion.version }}</h2>
+        <button class="btn-close" (click)="closeVersionView()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="version-details">
+          <p><strong>Effective Date:</strong> {{ selectedVersion.effectiveDate | date:'medium' }}</p>
+          <p><strong>Status:</strong> {{ selectedVersion.isActive ? 'Active' : 'Archived' }}</p>
+          <p><strong>Created:</strong> {{ selectedVersion.createdAt | date:'medium' }}</p>
+        </div>
+        <div class="version-content" [innerHTML]="selectedVersion.content"></div>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -153,6 +153,10 @@ export class Auth {
   }
 
 
+  refreshUser(): Promise<void> {
+    return this.loadUserRoleFromBackend();
+  }
+
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
   }

@@ -32,6 +32,13 @@ export const MENU_ITEMS: MenuItem[] = [
     allowedRoles: [UserRole.ADMIN],
     description: 'Create new users and send activation link'
   },
+  {
+    label: 'MENU.PRIVACY_POLICY_ADMIN',
+    route: '/privacy-policy-admin',
+    icon: '📋',
+    allowedRoles: [UserRole.ADMIN],
+    description: 'Manage Privacy Policy versions (UC 4.5.1)'
+  },
 
 
   // Port Authority Officer
