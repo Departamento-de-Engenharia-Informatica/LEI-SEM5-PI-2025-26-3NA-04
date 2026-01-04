@@ -21,8 +21,24 @@ export class PortSceneComponent implements OnInit, OnDestroy {
   private renderer!: THREE.WebGLRenderer;
   private controls!: OrbitControls;
   private animationId: number = 0;
-  private textureLoader!: THREE.TextureLoader;private keyState: { [key: string]: boolean } = {};
+  private textureLoader!: THREE.TextureLoader;
+  private keyState: { [key: string]: boolean } = {};
   private readonly movementSpeed = 5.0;
+  private raycaster!: THREE.Raycaster;
+  private mouse!: THREE.Vector2;
+  private selectedObject: THREE.Object3D | null = null;
+  private selectedObjectOriginalMaterials: (THREE.Material | THREE.Material[])[] = [];
+  private objectLabels: Map<string, THREE.Sprite> = new Map();
+  private currentLabel: THREE.Sprite | null = null;
+  private isAnimatingCamera: boolean = false;
+  private cameraAnimationStartPos!: THREE.Vector3;
+  private cameraAnimationTargetPos!: THREE.Vector3;
+  private cameraAnimationStartTarget!: THREE.Vector3;
+  private cameraAnimationTargetTarget!: THREE.Vector3;
+  private cameraAnimationStartTime: number = 0;
+  private readonly CAMERA_ANIMATION_DURATION = 1500;
+  private readonly OPTIMAL_VIEW_DISTANCE_MIN = 60;
+  private readonly OPTIMAL_VIEW_DISTANCE_MAX = 150;
 
   constructor(private portLayoutService: PortLayoutService) { }
 
@@ -42,9 +58,12 @@ export class PortSceneComponent implements OnInit, OnDestroy {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x87ceeb);
 
+    const canvas = this.canvasRef.nativeElement;
+    const width = canvas.clientWidth || window.innerWidth;
+    const height = canvas.clientHeight || window.innerHeight;
     this.camera = new THREE.PerspectiveCamera(
       75,
-      window.innerWidth / window.innerHeight,
+      width / height,
       0.1,
       1000
     );
@@ -55,7 +74,7 @@ export class PortSceneComponent implements OnInit, OnDestroy {
       canvas: this.canvasRef.nativeElement,
       antialias: true
     });
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.updateRendererSize();
     this.renderer.setPixelRatio(window.devicePixelRatio);
 
     this.renderer.shadowMap.enabled = true;
@@ -65,7 +84,7 @@ export class PortSceneComponent implements OnInit, OnDestroy {
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.05;
 
-    this.controls.mouseButtons = { LEFT: THREE.MOUSE.PAN, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE };
+    this.controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
 
     this.controls.minDistance = 50;
     this.controls.maxDistance = 500;
@@ -107,7 +126,11 @@ export class PortSceneComponent implements OnInit, OnDestroy {
 
     this.textureLoader = new THREE.TextureLoader();
 
-    this.setupKeyboardControls(); 
+    this.raycaster = new THREE.Raycaster();
+    this.mouse = new THREE.Vector2();
+
+    this.setupKeyboardControls();
+    this.setupMouseControls();
   }
 
   private setupKeyboardControls(): void {
@@ -118,6 +141,146 @@ export class PortSceneComponent implements OnInit, OnDestroy {
     window.addEventListener('keyup', (event) => {
       this.keyState[event.key.toLowerCase()] = false;
     });
+  }
+
+  private setupMouseControls(): void {
+    this.renderer.domElement.addEventListener('click', (event) => {
+      this.onMouseClick(event);
+    });
+  }
+
+  private onMouseClick(event: MouseEvent): void {
+    if (event.button !== 0) return;
+
+    const rect = this.renderer.domElement.getBoundingClientRect();
+    this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+
+    const selectableObjects = this.scene.children.filter(child => {
+      return child instanceof THREE.Mesh && 
+             child.name !== '' && 
+             !child.name.includes('-door') && 
+             !child.name.includes('-roof') &&
+             child.name !== 'ground' &&
+             !(child instanceof THREE.GridHelper);
+    });
+
+    const intersects = this.raycaster.intersectObjects(selectableObjects, true);
+
+    if (intersects.length > 0) {
+      let selectedMesh = intersects[0].object as THREE.Mesh;
+      
+      if (selectedMesh.name.includes('-boom')) {
+        const craneId = selectedMesh.name.replace('-boom', '');
+        const craneTower = this.scene.children.find(child => 
+          child instanceof THREE.Mesh && child.name === craneId
+        ) as THREE.Mesh;
+        if (craneTower) {
+          selectedMesh = craneTower;
+        }
+      }
+      
+      this.selectObject(selectedMesh);
+    } else {
+      this.deselectObject();
+    }
+  }
+
+  private selectObject(object: THREE.Mesh): void {
+    this.deselectObject();
+
+    this.selectedObject = object;
+    this.selectedObjectOriginalMaterials = [];
+
+    if (Array.isArray(object.material)) {
+      object.material.forEach(mat => {
+        this.selectedObjectOriginalMaterials.push(mat.clone());
+      });
+      object.material.forEach(mat => {
+        if (mat instanceof THREE.MeshStandardMaterial) {
+          mat.emissive.setHex(0x444444);
+        }
+      });
+    } else {
+      this.selectedObjectOriginalMaterials.push(object.material.clone());
+      if (object.material instanceof THREE.MeshStandardMaterial) {
+        object.material.emissive.setHex(0x444444);
+      }
+    }
+
+    this.showLabel(object.name);
+    this.animateCameraToObject(object);
+  }
+
+  private deselectObject(): void {
+    if (this.selectedObject && this.selectedObject instanceof THREE.Mesh) {
+      if (Array.isArray(this.selectedObject.material)) {
+        this.selectedObject.material.forEach((mat, index) => {
+          const originalMat = this.selectedObjectOriginalMaterials[index];
+          if (mat instanceof THREE.MeshStandardMaterial && originalMat instanceof THREE.MeshStandardMaterial) {
+            mat.emissive.copy(originalMat.emissive);
+          }
+        });
+      } else {
+        const originalMat = this.selectedObjectOriginalMaterials[0];
+        if (this.selectedObject.material instanceof THREE.MeshStandardMaterial && originalMat instanceof THREE.MeshStandardMaterial) {
+          this.selectedObject.material.emissive.copy(originalMat.emissive);
+        }
+      }
+    }
+
+    this.hideLabel();
+    this.selectedObject = null;
+    this.selectedObjectOriginalMaterials = [];
+  }
+
+  private animateCameraToObject(object: THREE.Mesh): void {
+    if (this.isAnimatingCamera) return;
+
+    const worldPosition = new THREE.Vector3();
+    object.getWorldPosition(worldPosition);
+
+    const boundingBox = new THREE.Box3().setFromObject(object);
+    const objectSize = boundingBox.getSize(new THREE.Vector3());
+    const maxDimension = Math.max(objectSize.x, objectSize.y, objectSize.z);
+    
+    const optimalDistance = Math.max(
+      this.OPTIMAL_VIEW_DISTANCE_MIN,
+      Math.min(this.OPTIMAL_VIEW_DISTANCE_MAX, maxDimension * 2.5)
+    );
+
+    const currentCameraToObject = new THREE.Vector3();
+    currentCameraToObject.subVectors(this.camera.position, worldPosition);
+    const currentDistance = currentCameraToObject.length();
+
+    const targetDistance = optimalDistance;
+    const viewAngle = Math.PI / 4;
+    const targetHeight = Math.max(MIN_CAM_Y, Math.min(MAX_CAM_Y, worldPosition.y + targetDistance * Math.sin(viewAngle)));
+
+    const horizontalDistance = Math.sqrt(targetDistance * targetDistance - Math.pow(targetHeight - worldPosition.y, 2));
+    
+    const currentHorizontalDirection = new THREE.Vector2(currentCameraToObject.x, currentCameraToObject.z);
+    if (currentHorizontalDirection.length() > 0.001) {
+      currentHorizontalDirection.normalize();
+    } else {
+      currentHorizontalDirection.set(1, 0);
+    }
+
+    const targetCameraPos = new THREE.Vector3(
+      worldPosition.x - currentHorizontalDirection.x * horizontalDistance,
+      targetHeight,
+      worldPosition.z - currentHorizontalDirection.y * horizontalDistance
+    );
+
+    this.cameraAnimationStartPos = this.camera.position.clone();
+    this.cameraAnimationTargetPos = targetCameraPos;
+    this.cameraAnimationStartTarget = this.controls.target.clone();
+    this.cameraAnimationTargetTarget = worldPosition.clone();
+
+    this.isAnimatingCamera = true;
+    this.cameraAnimationStartTime = performance.now();
   }
   
 
@@ -149,7 +312,12 @@ export class PortSceneComponent implements OnInit, OnDestroy {
       mesh.position.set(dock.position.x, dock.position.y, dock.position.z);
       mesh.name = dock.id;
       this.scene.add(mesh);
-      this.addLabel(dock.id, dock.position);
+      
+      const maxCraneHeight = dock.stsCranes.length > 0 
+        ? Math.max(...dock.stsCranes.map(crane => crane.height))
+        : 0;
+      const labelHeight = Math.max(dock.dimensions.height, maxCraneHeight);
+      this.addLabel(dock.id, dock.position, labelHeight);
 
       mesh.castShadow = true;
       mesh.receiveShadow = true;
@@ -220,7 +388,7 @@ export class PortSceneComponent implements OnInit, OnDestroy {
                 mesh.receiveShadow = true;
 
                 this.scene.add(mesh);
-                this.addLabel(yard.id, yard.position);
+                this.addLabel(yard.id, yard.position, yard.dimensions.height);
 
             }, 
             // Callback de Progresso (Opcional)
@@ -300,7 +468,7 @@ export class PortSceneComponent implements OnInit, OnDestroy {
             mesh.castShadow = true;
             mesh.receiveShadow = true;
             this.scene.add(mesh);
-            this.addLabel(warehouse.id, warehouse.position);
+            this.addLabel(warehouse.id, warehouse.position, warehouse.dimensions.height);
             
            const doorWidth = 5;
             const doorHeight = 8;
@@ -513,110 +681,163 @@ private createSTSCrane(crane: any): void {
     );
 }
 
-  private addLabel(text: string, position: { x: number; y: number; z: number }): void {
+  private addLabel(text: string, position: { x: number; y: number; z: number }, objectHeight?: number): void {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d')!;
     canvas.width = 256;
     canvas.height = 64;
 
-    context.fillStyle = 'white';
+    context.fillStyle = 'rgba(255, 255, 255, 0.95)';
     context.fillRect(0, 0, canvas.width, canvas.height);
+    context.strokeStyle = '#333';
+    context.lineWidth = 2;
+    context.strokeRect(0, 0, canvas.width, canvas.height);
     context.fillStyle = 'black';
     context.font = 'bold 24px Arial';
     context.textAlign = 'center';
     context.fillText(text, 128, 40);
 
     const texture = new THREE.CanvasTexture(canvas);
-    const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+    const spriteMaterial = new THREE.SpriteMaterial({ map: texture, transparent: true });
     const sprite = new THREE.Sprite(spriteMaterial);
-    sprite.position.set(position.x, position.y + 10, position.z);
+    
+    const labelHeight = objectHeight ? position.y + objectHeight + 8 : position.y + 10;
+    sprite.position.set(position.x, labelHeight, position.z);
     sprite.scale.set(20, 5, 1);
+    sprite.visible = false;
+    
     this.scene.add(sprite);
+    this.objectLabels.set(text, sprite);
+  }
+
+  private showLabel(objectName: string): void {
+    this.hideLabel();
+    const label = this.objectLabels.get(objectName);
+    if (label) {
+      label.visible = true;
+      this.currentLabel = label;
+    }
+  }
+
+  private hideLabel(): void {
+    if (this.currentLabel) {
+      this.currentLabel.visible = false;
+      this.currentLabel = null;
+    }
   }
 
   private animate(): void {
-  this.animationId = requestAnimationFrame(() => this.animate());
+    this.animationId = requestAnimationFrame(() => this.animate());
 
-  const direction = new THREE.Vector3();
-  this.camera.getWorldDirection(direction); // Obtém o vetor para onde a câmara está a olhar
-  direction.y = 0; // Impede a câmara de voar (movimento vertical)
-  direction.normalize();
+    if (this.isAnimatingCamera) {
+      const elapsed = performance.now() - this.cameraAnimationStartTime;
+      const progress = Math.min(elapsed / this.CAMERA_ANIMATION_DURATION, 1);
+      const easeProgress = this.easeInOutQuart(progress);
 
-  const right = new THREE.Vector3();
-  right.crossVectors(this.camera.up, direction); // Vetor perpendicular (para strafe A/D)
-  
-  // Vetor que irá acumular o deslocamento (por frame)
-  const moveVector = new THREE.Vector3(0, 0, 0); 
-  const moveStep = this.movementSpeed * 0.3; 
+      this.camera.position.lerpVectors(this.cameraAnimationStartPos, this.cameraAnimationTargetPos, easeProgress);
+      this.controls.target.lerpVectors(this.cameraAnimationStartTarget, this.cameraAnimationTargetTarget, easeProgress);
 
-  // 💡 LÓGICA DE MOVIMENTO VERTICAL (Shift + W/S)
-    if (this.keyState['shift']) {
+      if (progress >= 1) {
+        this.isAnimatingCamera = false;
+        this.camera.position.copy(this.cameraAnimationTargetPos);
+        this.controls.target.copy(this.cameraAnimationTargetTarget);
+      }
+    } else {
+      const direction = new THREE.Vector3();
+      this.camera.getWorldDirection(direction);
+      direction.y = 0;
+      direction.normalize();
+
+      const right = new THREE.Vector3();
+      right.crossVectors(this.camera.up, direction);
+      
+      const moveVector = new THREE.Vector3(0, 0, 0); 
+      const moveStep = this.movementSpeed * 0.3; 
+
+      if (this.keyState['shift']) {
         if (this.keyState['w']) {
-            moveVector.y = moveStep; // Subir
+          moveVector.y = moveStep;
         }
         if (this.keyState['s']) {
-            moveVector.y = -moveStep; // Descer
+          moveVector.y = -moveStep;
         }
-    }
-    
-    // LÓGICA DE MOVIMENTO HORIZONTAL (W/S/A/D)
-    // Se Shift NÃO estiver pressionado, W/S move para frente/trás (Horizontal).
-    if (!this.keyState['shift']) {
+      }
+      
+      if (!this.keyState['shift']) {
         if (this.keyState['w']) {
-            moveVector.addScaledVector(direction, moveStep); 
+          moveVector.addScaledVector(direction, moveStep); 
         }
         if (this.keyState['s']) {
-            moveVector.addScaledVector(direction, -moveStep); 
+          moveVector.addScaledVector(direction, -moveStep); 
         }
-    }
+      }
 
-    // Movimento Strafe (A/D) - Pode ser combinado com o movimento vertical
-    if (this.keyState['a']) {
+      if (this.keyState['a']) {
         moveVector.addScaledVector(right, moveStep); 
-    }
-    if (this.keyState['d']) {
+      }
+      if (this.keyState['d']) {
         moveVector.addScaledVector(right, -moveStep); 
+      }
+      
+      this.camera.position.add(moveVector);
+      this.controls.target.add(moveVector);
     }
-  
-  // Aplica o vetor de movimento à POSIÇÃO da câmara e ao PONTO ALVO (target)
-  // Mover ambos pelo mesmo vetor simula translação pura
-  this.camera.position.add(moveVector);
-  this.controls.target.add(moveVector);
 
-  this.controls.update();
+    this.controls.update();
 
-  const target = this.controls.target;
+    const target = this.controls.target;
 
-  if (target.x > SCENE_LIMIT) {
-    target.x = SCENE_LIMIT;
-  } else if (target.x < -SCENE_LIMIT) {
-    target.x = -SCENE_LIMIT;
+    if (target.x > SCENE_LIMIT) {
+      target.x = SCENE_LIMIT;
+    } else if (target.x < -SCENE_LIMIT) {
+      target.x = -SCENE_LIMIT;
+    }
+
+    if (target.z > SCENE_LIMIT) {
+      target.z = SCENE_LIMIT;
+    } else if (target.z < -SCENE_LIMIT) {
+      target.z = -SCENE_LIMIT;
+    }
+
+    const cameraPosition = this.camera.position;
+    cameraPosition.y = Math.max(MIN_CAM_Y, Math.min(MAX_CAM_Y, cameraPosition.y));
+
+    this.renderer.render(this.scene, this.camera);
   }
 
-  if (target.z > SCENE_LIMIT) {
-    target.z = SCENE_LIMIT;
-  } else if (target.z < -SCENE_LIMIT) {
-    target.z = -SCENE_LIMIT;
+  private easeInOutCubic(t: number): number {
+    return t < 0.5 
+      ? 4 * t * t * t 
+      : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
 
-  const cameraPosition = this.camera.position;
+  private easeInOutQuart(t: number): number {
+    return t < 0.5
+      ? 8 * t * t * t * t
+      : 1 - Math.pow(-2 * t + 2, 4) / 2;
+  }
+
+  private updateRendererSize(): void {
+    const canvas = this.canvasRef.nativeElement;
+    const width = canvas.clientWidth || window.innerWidth;
+    const height = canvas.clientHeight || window.innerHeight;
     
-  cameraPosition.y = Math.max(MIN_CAM_Y, Math.min(MAX_CAM_Y, cameraPosition.y));
-
-
-
-  this.renderer.render(this.scene, this.camera);
+    this.camera.aspect = width / height;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(width, height, false);
   }
 
   private onWindowResize(): void {
-    this.camera.aspect = window.innerWidth / window.innerHeight;
-    this.camera.updateProjectionMatrix();
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.updateRendererSize();
   }
 
   currentLayoutId: string = 'layout1';
 
   switchLayout(layoutId: string): void {
+    this.deselectObject();
+    this.objectLabels.clear();
+    this.currentLabel = null;
+    
     while (this.scene.children.length > 0) {
       this.scene.remove(this.scene.children[0]);
     }
